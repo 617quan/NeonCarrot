@@ -12,9 +12,9 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug",
-            "executable": "/Users/quanvu/Documents/GitHub/NeonCarrot/.pio/build/esp32doit-devkit-v1/firmware.elf",
+            "executable": "/Users/griffinfaecher/Desktop/NeonCarrot/.pio/build/esp32doit-devkit-v1/firmware.elf",
             "projectEnvName": "esp32doit-devkit-v1",
-            "toolchainBinDir": "/Users/quanvu/.platformio/packages/toolchain-xtensa-esp32/bin",
+            "toolchainBinDir": "/Users/griffinfaecher/.platformio/packages/toolchain-xtensa-esp-elf/bin",
             "internalConsoleOptions": "openOnSessionStart",
             "preLaunchTask": {
                 "type": "PlatformIO",
@@ -25,18 +25,18 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (skip Pre-Debug)",
-            "executable": "/Users/quanvu/Documents/GitHub/NeonCarrot/.pio/build/esp32doit-devkit-v1/firmware.elf",
+            "executable": "/Users/griffinfaecher/Desktop/NeonCarrot/.pio/build/esp32doit-devkit-v1/firmware.elf",
             "projectEnvName": "esp32doit-devkit-v1",
-            "toolchainBinDir": "/Users/quanvu/.platformio/packages/toolchain-xtensa-esp32/bin",
+            "toolchainBinDir": "/Users/griffinfaecher/.platformio/packages/toolchain-xtensa-esp-elf/bin",
             "internalConsoleOptions": "openOnSessionStart"
         },
         {
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (without uploading)",
-            "executable": "/Users/quanvu/Documents/GitHub/NeonCarrot/.pio/build/esp32doit-devkit-v1/firmware.elf",
+            "executable": "/Users/griffinfaecher/Desktop/NeonCarrot/.pio/build/esp32doit-devkit-v1/firmware.elf",
             "projectEnvName": "esp32doit-devkit-v1",
-            "toolchainBinDir": "/Users/quanvu/.platformio/packages/toolchain-xtensa-esp32/bin",
+            "toolchainBinDir": "/Users/griffinfaecher/.platformio/packages/toolchain-xtensa-esp-elf/bin",
             "internalConsoleOptions": "openOnSessionStart",
             "loadMode": "manual"
         }
