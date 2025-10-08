@@ -44,17 +44,17 @@
 /* Controls the Pulse pins for All 3 Motors on Wheel 3 */
 #define WHEEL3_PULSE_LIFT 19
 #define WHEEL3_PULSE_SWERVE 20
-#define WHEEL3_PULSE_DRIVE 21
+#define WHEEL3_PULSE_DRIVE 21 // good
 
 /* Controls the Enable pins for All 3 Motors on Wheel 3 */
 #define WHEEL3_ENABLE_LIFT 22
 #define WHEEL3_ENABLE_SWERVE 23
-#define WHEEL3_ENABLE_DRIVE 24
+#define WHEEL3_ENABLE_DRIVE 25 // good
 
 /* Controls the Direction pins for All 3 Motors on Wheel 3 */
-#define WHEEL3_DIRECTION_LIFT 25
+#define WHEEL3_DIRECTION_LIFT 37
 #define WHEEL3_DIRECTION_SWERVE 26
-#define WHEEL3_DIRECTION_DRIVE 27
+#define WHEEL3_DIRECTION_DRIVE 27 // good
 
 /* WHEEL 4 PIN DEFINES */
 

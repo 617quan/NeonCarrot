@@ -6,19 +6,25 @@
 #define _WHEEL
 
 #include <stdint.h>
+#include "pinout_defines.h"
 
-/* Motor struct */
-struct Motor {
-        //Pin numbers
-        uint8_t enable_pin;
-        uint8_t direction_pin;
-        uint8_t pulse_pin;
-};
 
 class Wheel {
 public:
         Wheel();
         ~Wheel();
+        /* Motor struct */
+        struct Motor {
+                //Pin numbers
+                uint8_t enable_pin;
+                uint8_t direction_pin;
+                uint8_t pulse_pin;
+        };
+
+        /* Motor Types */
+        Motor drive;
+        Motor lift;
+        Motor swerve;
         
         void enable(Motor motor_type);
         void disable(Motor motor_type);
@@ -29,12 +35,9 @@ public:
         void setDirHigh(Motor motor_type);
         void setDirLow(Motor motor_type);
 
-        void testPulseSignal(Motor motor_type);
+        void testPulseSignal(Motor motor_type, int frequency);
 
-        /* Motor Types */
-        Motor drive;
-        Motor lift;
-        Motor swerve;
+        
 
 private:
 
