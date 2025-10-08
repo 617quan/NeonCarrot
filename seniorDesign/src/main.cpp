@@ -1,18 +1,51 @@
-#include <Arduino.h>
+/* main.cpp
+ * Purpose: Pin framework for wheel bot motion. Defines pulse, enable, and
+   direction on the MC.
 
-// put function declarations here:
-int myFunction(int, int);
+ * FUNCTION NAMES = camelCase
+ * GLOBAL VARIABLES = ALL CAPS
+ * VARIABLES = snake_case
+ */
+
+#include <Arduino.h>
+#include "pinout_defines.h"
+#include "wheel.h"
+
+/* MAIN */
+void loop() {
+    Wheel wheel;
+    setup();
+    driveForward(wheel);
+
+}
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+    pinMode(WHEEL3_PULSE_LIFT, OUTPUT);
+    pinMode(WHEEL3_PULSE_SWERVE, OUTPUT);
+    pinMode(WHEEL3_PULSE_DRIVE, OUTPUT);
+    
+    pinMode(WHEEL3_ENABLE_LIFT, OUTPUT);
+    pinMode(WHEEL3_ENABLE_SWERVE, OUTPUT);
+    pinMode(WHEEL3_ENABLE_DRIVE, OUTPUT);
+
+    pinMode(WHEEL3_DIRECTION_LIFT, OUTPUT);
+    pinMode(WHEEL3_DIRECTION_SWERVE, OUTPUT);
+    pinMode(WHEEL3_DIRECTION_DRIVE, OUTPUT);
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
+/* Move given wheel forwards */
+void driveForward(Wheel wheel) {
+    /* Set pins for drive motor */
+    wheel.enable(wheel.drive);
+    wheel.setPulseHigh(wheel.drive);
+    wheel.setDirHigh(wheel.drive);
+
 }
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+void lift() {
+
+}
+
+void turn(){
+    
 }
