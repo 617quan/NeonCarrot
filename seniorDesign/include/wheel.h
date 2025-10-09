@@ -1,61 +1,39 @@
-/* wheel.h
- * Purpose: Wheel class
- */
+// /* wheel.h
+//  * Purpose: Wheel class
+//  */
 
-#ifndef _WHEEL
-#define _WHEEL
+// #ifndef _WHEEL
+// #define _WHEEL
 
-#include <stdint.h>
-#include "pinout_defines.h"
+// #include <stdint.h>
+// #include "pinout_defines.h"
+// #include "motor.h"
 
 
-class Wheel {
-public:
-        Wheel();
-        ~Wheel();
-        /* Motor struct */
-        struct Motor {
-                //Pin numbers
-                uint8_t enable_pin;
-                uint8_t direction_pin;
-                uint8_t pulse_pin;
-        };
-
-        /* Motor Types */
-        Motor drive;
-        Motor lift;
-        Motor swerve;
+// class Wheel {
+// public:
+//         Wheel();
+//         ~Wheel();
         
-        void enable(Motor motor_type);
-        void disable(Motor motor_type);
+//         void enable(Motor motor_type);
+//         void disable(Motor motor_type);
 
-        void setPulseHigh(Motor motor_type);
-        void setPulseLow(Motor motor_type);
+//         void setPulseHigh(Motor motor_type);
+//         void setPulseLow(Motor motor_type);
 
-        void setDirHigh(Motor motor_type);
-        void setDirLow(Motor motor_type);
+//         void setDirHigh(Motor motor_type);
+//         void setDirLow(Motor motor_type);
 
-        void testPulseSignal(Motor motor_type, int frequency);
+//         void testPulseSignal(Motor motor_type, int frequency);
 
         
 
-private:
+// private:
 
-        /* Pin numbers */
-        uint8_t pulse_lift_pin;
-        uint8_t pulse_swerve_pin;
-        uint8_t pulse_drive_pin;
+//         Motor lift_motor;
+//         Motor drive_motor;
+//         Motor swerve_motor;
+//         int wheel_num;
+// };
 
-        uint8_t enable_lift_pin;
-        uint8_t enable_swerve_pin;
-        uint8_t enable_drive_pin;
-
-        uint8_t direction_lift_pin;
-        uint8_t direction_swerve_pin;
-        uint8_t direction_drive_pin;
-
-        /* Pin values */
-        int enable_lift_value;
-};
-
-#endif
+// #endif
