@@ -15,10 +15,10 @@ public:
         Motor(uint8_t step_pin, uint8_t enable_pin, uint8_t swerve_pin);
         ~Motor();
 
-private:
+        void AccelForward(uint32_t steps_s_s);
+        void spin_forward(uint32_t steps_s);
 
-        int step_pin, enable_pin, swerve_pin;
-        static FastAccelStepperEngine engine;
+private:
         FastAccelStepper *stepper;
 
 };

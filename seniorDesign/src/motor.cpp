@@ -4,6 +4,7 @@
 
 #include "motor.h"
 #include <Arduino.h>
+#include "FastAccelStepper.h"
 
 /* THIS IS THE WORST DOCUMENTATION EVER:
 https://github.com/gin66/FastAccelStepper/blob/master/src/FastAccelStepper.h
@@ -124,17 +125,12 @@ FastAccelStepper: The actual motor object that can move, stop, and shake ass.
 
 */
 
-/* Defines the globaly used engine for all motors. Only need 1 I think */
-FastAccelStepperEngine Motor::engine;
 
 /* Constructor */
 Motor::Motor(uint8_t step_pin, uint8_t enable_pin, uint8_t swerve_pin) {
 
-    static bool initialized = false;
-    if (!initialized) {
-        engine.init();
-        initialized = true;
-    }
+    FastAccelStepperEngine engine;
+    engine.init();
 
     stepper = engine.stepperConnectToPin(step_pin);
 
@@ -148,7 +144,9 @@ Motor::Motor(uint8_t step_pin, uint8_t enable_pin, uint8_t swerve_pin) {
         stepper->setSpeedInHz(0);
         stepper->setAcceleration(0);
     } else {
-            /* You're cooked mf */
+        while(1) {
+        Serial.println("Failed to connect stepper to pin!");
+        }
     }
 
 }
@@ -156,4 +154,22 @@ Motor::Motor(uint8_t step_pin, uint8_t enable_pin, uint8_t swerve_pin) {
 Motor::~Motor() {
 /* Nothing new being made, so nothing here */
 }
+
+void Motor::AccelForward(uint32_t steps_s_s) {
+
+    if (stepper->setAcceleration(steps_s_s) != (int8_t)steps_s_s) {
+        /* Something Broke */
+        return;
+    }
+    stepper->setLinearAcceleration(steps_s_s);
+    
+}
+
+void Motor::spin_forward(uint32_t steps_s) {
+
+    stepper->setSpeedInHz(steps_s);
+
+}
+
+
 
