@@ -1,10 +1,54 @@
-/* motor.cpp
- * Purpose: Make a Motor gang
- */
+// /* motor.cpp
+//  * Purpose: Make a Motor gang
+//  */
 
-#include "motor.h"
-#include <Arduino.h>
-#include "FastAccelStepper.h"
+// #include "motor.h"
+// #include <Arduino.h>
+// #include "FastAccelStepper.h"
+
+// /* Constructor */
+// Motor::Motor(uint8_t step_pin, uint8_t enable_pin, uint8_t swerve_pin) {
+
+//     FastAccelStepperEngine engine;
+//     engine.init();
+
+//     stepper = engine.stepperConnectToPin(step_pin);
+
+//     if(stepper != nullptr) {
+//         /* SETS THE DIRECTION AND ENABLE PINS */
+//         stepper->setDirectionPin(swerve_pin);
+//         stepper->setEnablePin(enable_pin);
+//         stepper->setAutoEnable(false);
+
+//         stepper->setCurrentPosition(0);
+//         stepper->setSpeedInHz(0);
+//         stepper->setAcceleration(0);
+//     } else {
+//         while(1) {
+//             Serial.println("Failed to connect stepper to pin!");
+//         }
+//     }
+// }
+
+// Motor::~Motor() {
+// /* Nothing new being made, so nothing here */
+// }
+
+// void Motor::AccelForward(uint32_t steps_s_s) {
+
+//     if (stepper->setAcceleration(steps_s_s) != (int8_t)steps_s_s) {
+//         /* Something Broke */
+//         return;
+//     }
+//     stepper->setLinearAcceleration(steps_s_s);
+    
+// }
+
+// void Motor::spin_forward(uint32_t steps_s) {
+
+//     stepper->setSpeedInHz(steps_s);
+
+// }
 
 /* THIS IS THE WORST DOCUMENTATION EVER:
 https://github.com/gin66/FastAccelStepper/blob/master/src/FastAccelStepper.h
@@ -124,52 +168,3 @@ FastAccelStepper: The actual motor object that can move, stop, and shake ass.
     bool isRunning() / isStopping(): Self explanitory
 
 */
-
-
-/* Constructor */
-Motor::Motor(uint8_t step_pin, uint8_t enable_pin, uint8_t swerve_pin) {
-
-    FastAccelStepperEngine engine;
-    engine.init();
-
-    stepper = engine.stepperConnectToPin(step_pin);
-
-    if(stepper != nullptr) {
-        /* SETS THE DIRECTION AND ENABLE PINS */
-        stepper->setDirectionPin(swerve_pin);
-        stepper->setEnablePin(enable_pin);
-        stepper->setAutoEnable(false);
-
-        stepper->setCurrentPosition(0);
-        stepper->setSpeedInHz(0);
-        stepper->setAcceleration(0);
-    } else {
-        while(1) {
-        Serial.println("Failed to connect stepper to pin!");
-        }
-    }
-
-}
-
-Motor::~Motor() {
-/* Nothing new being made, so nothing here */
-}
-
-void Motor::AccelForward(uint32_t steps_s_s) {
-
-    if (stepper->setAcceleration(steps_s_s) != (int8_t)steps_s_s) {
-        /* Something Broke */
-        return;
-    }
-    stepper->setLinearAcceleration(steps_s_s);
-    
-}
-
-void Motor::spin_forward(uint32_t steps_s) {
-
-    stepper->setSpeedInHz(steps_s);
-
-}
-
-
-

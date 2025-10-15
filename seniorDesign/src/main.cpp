@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include "pinout_defines.h"
-#include "motor.h"
+#include "wheel.h"
 
 FastAccelStepperEngine engine;
 FastAccelStepper *stepper = nullptr;
@@ -47,11 +47,10 @@ void setup() {
     stepper->setAcceleration(accel);
 }
 
+
 void loop() {   
     /* Take 1600 steps (should be one full rotation on 8 microstep) */
     stepper->move(steps_per_rev, false);
 
     delay(2000);
-
-
 }
