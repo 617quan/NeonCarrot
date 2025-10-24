@@ -13,63 +13,190 @@
 
 #include "wheel.h"
 
-/* Constructor */
-Wheel::Wheel(uint8_t lift_pulse_pin,  uint8_t lift_enable_pin,  uint8_t lift_dir_pin,
-             uint8_t turn_pulse_pin,  uint8_t turn_enable_pin,  uint8_t turn_dir_pin,
-             uint8_t drive_pulse_pin, uint8_t drive_enable_pin, uint8_t drive_dir_pin) {
+/********** Wheel Constructor ********
+ *
+ * Takes in all information about all 3 motors (pin numbers, speeds, and
+ * accelerations) and initializes them.
+ *
+ * Parameters:
+ *      MotorSettings_t lift_motor_settings: pinout, speed, and accel for the
+ *      lift motor
+ *      MotorSettings_t drive_motor_settings: pinout, speed, and accel for the
+ *      drive motor
+ *      MotorSettings_t turn_motor_settings: pinout, speed, and accel for the
+ *      turn motor
+ * 
+ * Return:
+ *      A Wheel object with 3 initialized motors.
+ *
+ * Expects:
+ *      All pinouts are defined. The speeds and accells don't need to be.
+ *      They'll just be set to 0.
+ *
+ * Notes:
+ *      Nada
+ *      
+ ************************/
+Wheel::Wheel(MotorSettings_t lift_motor_settings, 
+             MotorSettings_t drive_motor_settings, 
+             MotorSettings_t turn_motor_settings) {
 
-    
-    engine.init();
+    /* Initialize pins for all motors */
+    initMotor(lift_motor, lift_motor_settings);
+    initMotor(turn_motor, turn_motor_settings);
+    initMotor(drive_motor, drive_motor_settings);
 
+    /* Take the arguments from the constructor and set them equal to the private
+    class members */
+    lift_motor_settings = lift_motor_settings;
+    drive_motor_settings = drive_motor_settings;
+    turn_motor_settings = turn_motor_settings;
 
-    initMotorPulsePins(lift_pulse_pin, turn_pulse_pin, drive_pulse_pin);
-
-    /* Set the direction and enable pins for all three motors */
-    if(lift_motor != nullptr && turn_motor != nullptr && drive_motor != nullptr) {
-        lift_motor->setDirectionPin(lift_pulse_pin, true, 0);
-        lift_motor->setEnablePin(lift_enable_pin);
-        lift_motor->setAutoEnable(false);
-        
-        turn_motor->setDirectionPin(turn_pulse_pin, true, 0);
-        turn_motor->setEnablePin(turn_enable_pin);
-        turn_motor->setAutoEnable(false);
-
-        drive_motor->setDirectionPin(drive_pulse_pin, true, 0);
-        drive_motor->setEnablePin(drive_enable_pin);
-        drive_motor->setAutoEnable(false);
-    } else {
-        while(1) {
-            Serial.println("You're fucked!");
-        }
-    }
 }
 
 Wheel::~Wheel() {
 /* Nothing new being made, so nothing here */
 }
 
-void Wheel::initMotorPulsePins(uint8_t lift_pulse_pin, uint8_t turn_pulse_pin, uint8_t drive_pulse_pin) {
-    lift_motor = engine.stepperConnectToPin(lift_pulse_pin);
-    turn_motor = engine.stepperConnectToPin(turn_pulse_pin);
-    drive_motor = engine.stepperConnectToPin(turn_pulse_pin);
+
+/********** initMotor ********
+ *
+ * Takes in a motor pointer and a struct containing the pins, max speed, and
+ * acceleration, and initializes the motor with that information
+ *
+ * Parameters:
+ *      FastAccelStepper *motor: pointer to a motor
+ *      MotorSettings_t motor_settings: struct containing pinout, speed, and
+ *      accel info.
+ * 
+ * Return:
+ *      Nothing. Motor is initialized
+ *
+ * Expects:
+ *      Pointer to a private motor object. Speed and accel don't have to be
+ *      initialized. Pins inside struct need to be initialized
+ *
+ * Notes:
+ *      Nada
+ *      
+ ************************/
+void Wheel::initMotor(FastAccelStepper *motor, MotorSettings_t motor_settings) {
+
+    motor = engine.stepperConnectToPin(motor_settings.pulse_pin);
+    if (motor == nullptr) Serial.println("You're fucked!");
+    motor->setDirectionPin(motor_settings.dir_pin, true, 0);
+    motor->setEnablePin(motor_settings.enable_pin);
+    if (motor_settings.max_speed != 0) {
+        motor->setSpeedInHz(motor_settings.max_speed);
+    }
+    if (motor_settings.accel != 0) {
+        motor->setAcceleration(motor_settings.accel);
+    }
+
 }
 
+/********** moveUp ********
+ *
+ * Move the lift motor up num_steps number of steps.
+ *
+ * Parameters:
+ *      uint32_t num_steps: Move the motor up this many steps. 
+ * 
+ * Return:
+ *      Nothing. Moves the motor up TODO: Figure out actual distance for each
+ *      motor.
+ *
+ * Expects:
+ *      Unsigned number. 
+ *
+ * Notes:
+ *      TODO: 
+ *      
+ ************************/
 void Wheel::moveUp(uint32_t num_steps) {
-    lift_motor->setSpeedInHz(num_steps);
-    lift_motor->setDirectionPin(lift_dir_pin, true, 0);
+
+    /* TODO: Incorporate logic to be specific in how many milimeters the motor
+    lifts */
+
+    lift_motor->move(num_steps);
 }
 
+/********** moveDown ********
+ *
+ * Move the lift motor down num_steps number of steps.
+ *
+ * Parameters:
+ *      uint32_t num_steps: Move the motor down this many steps. 
+ * 
+ * Return:
+ *      Nothing. Moves the motor down TODO: Figure out actual distance for each
+ *      motor.
+ *
+ * Expects:
+ *      Unsigned number. 
+ *
+ * Notes:
+ *      Argument purely specifies number of steps to move. DO NOT SAY "Move
+ *      -8000 steps". Use an unsigned number
+ *      TODO: 
+ *      
+ ************************/
 void Wheel::moveDown(uint32_t num_steps) {
-
+    lift_motor->move((int32_t)-num_steps);
 }
 
-void Wheel::moveRight(uint32_t num_steps) {
-    turn_motor->setSpeedInHz(num_steps);
-    turn_motor->setDirectionPin(turn_dir_pin, true, 0);
+/********** turnRight ********
+ *
+ * Turn the motor right degrees number of degrees
+ *
+ * Parameters:
+ *      uint32_t degrees: number of degrees to turn the motor to the right
+ * 
+ * Return:
+ *      Nothing. Turns the motor the number of degrees specified in the argument
+ *
+ * Expects:
+ *      Unsigned number in between 0 and 360. Can use larger number, but that
+ *      would just turn the motor more than a full rotation
+ *
+ * Notes:
+ *      Here's the math: 
+ *      STEPS_PER_REV / 360 = STEPS_PER_DEGREE_TURNED (STEPS_PER_DEGREE_TURNED
+ *      is not an actual declared variable. Just an intermediate step)
+ *      STEPS_PER_DEGREE_TURNED * TURN_GEARBOX_RATIO = steps_needed
+ *      
+ ************************/
+void Wheel::turnRight(uint32_t degrees) {
+    uint32_t steps_needed = (STEPS_PER_REV / 360) * TURN_GEARBOX_RATIO;
+    turn_motor->move(steps_needed);
 }
 
-void Wheel::moveLeft(uint32_t num_steps) {
-
+/********** turnLeft ********
+ *
+ * Turn the motor left degrees number of degrees
+ *
+ * Parameters:
+ *      uint32_t degrees: number of degrees to turn the motor to the left
+ * 
+ * Return:
+ *      Nothing. Turns the motor the number of degrees specified in the argument
+ *
+ * Expects:
+ *      Unsigned number in between 0 and 360. Can use larger number, but that
+ *      would just turn the motor more than a full rotation
+ *
+ * Notes:
+ *      Here's the math: 
+ *      STEPS_PER_REV / 360 = STEPS_PER_DEGREE_TURNED (STEPS_PER_DEGREE_TURNED
+ *      is not an actual declared variable. Just an intermediate step)
+ *      STEPS_PER_DEGREE_TURNED * TURN_GEARBOX_RATIO = steps_needed
+ * 
+ *      After that, just make the number negative to turn it left
+ *      
+ ************************/
+void Wheel::turnLeft(uint32_t num_steps) {
+    uint32_t steps_needed = (STEPS_PER_REV / 360) * TURN_GEARBOX_RATIO;
+    turn_motor->move((int32_t)-steps_needed);
 }
 
 /* Moves the wheel forwards by given steps */

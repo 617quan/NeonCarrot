@@ -10,20 +10,36 @@
 #include "FastAccelStepper.h"
 #include "pinout_defines.h"
 
+#define TURN_GEARBOX_RATIO 100
+#define DRIVE_GEARBOX_RATIO 30
+#define MICROSTEP 8
+#define STEPS_PER_REV MICROSTEP * 200
+/* TODO: Find how many steps moves the bot up x number of milimeters */
+
+struct MotorSettings_t {
+    uint8_t pulse_pin, enable_pin, dir_pin;
+    uint32_t max_speed = 0;
+    int32_t accel = 0;
+};
+
 class Wheel {
 public:
-    Wheel(uint8_t lift_pulse_pin,  uint8_t lift_enable_pin,  uint8_t lift_dir_pin,
-          uint8_t turn_pulse_pin,  uint8_t turn_enable_pin,  uint8_t turn_dir_pin,
-          uint8_t drive_pulse_pin, uint8_t drive_enable_pin, uint8_t drive_dir_pin
-    );
+    Wheel(MotorSettings_t lift_motor_settings, 
+          MotorSettings_t drive_motor_settings, 
+          MotorSettings_t turn_motor_settings
+         );
+
     ~Wheel();
+
+    static void initEngine() { engine.init(); } /* Call this at the beginning of setup to get the engine setup */
     
     void moveUp(uint32_t num_steps);
     void moveDown(uint32_t num_steps);
-    void moveRight(uint32_t num_steps);
-    void moveLeft(uint32_t num_steps);
+    void turnRight(uint32_t degrees);
+    void turnLeft(uint32_t degrees);
     void moveForward(uint32_t num_steps);
     void moveBackwards(uint32_t num_steps);
+
 
     void stopMoving();
 
@@ -31,26 +47,21 @@ public:
 
 private:
 
-    void initMotorPulsePins(uint8_t lift_pulse_pin, uint8_t turn_pulse_pin, uint8_t drive_pulse_pin);
+    /* Call these in the constructor to initialize all the pins */
+    void initMotor(FastAccelStepper *motor, MotorSettings_t lift_motor_settings);
 
+    /* Get the current position of each motor */
     int32_t getLiftCurrentPosition();
     int32_t getTurnCurrentPosition();
     int32_t getDriveCurrentPosition();
 
-    FastAccelStepper *lift_motor;
-    FastAccelStepper *turn_motor;
-    FastAccelStepper *drive_motor;
+    /* Define the three motors and the engine. NOTE: static only instantiates
+    one engine */
+    FastAccelStepper *lift_motor, *turn_motor, *drive_motor;
     static FastAccelStepperEngine engine;
 
-    /* Three driver pins for each motor */
-    uint8_t  lift_pulse_pin,  lift_enable_pin,  lift_dir_pin;
-    uint8_t  turn_pulse_pin,  turn_enable_pin,  turn_dir_pin;
-    uint8_t  drive_pulse_pin, drive_enable_pin, drive_dir_pin;
-    
-    /* Max speed and accel for each motor */
-    uint32_t lift_max_speed, turn_max_speed, drive_max_speed;
-    int32_t  lift_accel,     turn_accel,     drive_accel;
-        
+    /* Three structs to hold all of the pin numbers */
+    MotorSettings_t lift_motor_settings, turn_motor_settings, drive_motor_settings;
 
 };
 
