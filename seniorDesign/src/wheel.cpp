@@ -13,6 +13,12 @@
 
 #include "wheel.h"
 
+FastAccelStepperEngine engine;
+
+void Wheel::engineStartup() {
+    engine.init();
+}
+
 /********** Wheel Constructor ********
  *
  * Takes in all information about all 3 motors (pin numbers, speeds, and
@@ -41,16 +47,16 @@ Wheel::Wheel(MotorSettings_t lift_motor_settings,
              MotorSettings_t drive_motor_settings, 
              MotorSettings_t turn_motor_settings) {
 
-    /* Initialize pins for all motors */
-    initMotor(lift_motor, lift_motor_settings);
-    initMotor(turn_motor, turn_motor_settings);
-    initMotor(drive_motor, drive_motor_settings);
-
     /* Take the arguments from the constructor and set them equal to the private
     class members */
-    lift_motor_settings = lift_motor_settings;
-    drive_motor_settings = drive_motor_settings;
-    turn_motor_settings = turn_motor_settings;
+    this->lift_motor_settings = lift_motor_settings;
+    this->drive_motor_settings = drive_motor_settings;
+    this->turn_motor_settings = turn_motor_settings;
+    
+    /* Initialize pins for all motors */
+    // initMotor(lift_motor, this->lift_motor_settings);
+    // initMotor(turn_motor, this->turn_motor_settings);
+    initMotor(drive_motor, this->drive_motor_settings);
 
 }
 
@@ -167,8 +173,8 @@ void Wheel::moveDown(uint32_t num_steps) {
  *      
  ************************/
 void Wheel::turnRight(uint32_t degrees) {
-    uint32_t steps_needed = (STEPS_PER_REV / 360) * TURN_GEARBOX_RATIO;
-    turn_motor->move(steps_needed);
+    float steps_needed = (degrees / 360) * FULL_TURN_ROTATION;
+    turn_motor->move((uint32_t)steps_needed);
 }
 
 /********** turnLeft ********
@@ -194,19 +200,20 @@ void Wheel::turnRight(uint32_t degrees) {
  *      After that, just make the number negative to turn it left
  *      
  ************************/
-void Wheel::turnLeft(uint32_t num_steps) {
-    uint32_t steps_needed = (STEPS_PER_REV / 360) * TURN_GEARBOX_RATIO;
+void Wheel::turnLeft(uint32_t degrees) {
+    float steps_needed = (degrees / 360) * FULL_TURN_ROTATION;
     turn_motor->move((int32_t)-steps_needed);
 }
 
 /* Moves the wheel forwards by given steps */
-void Wheel::moveForward(uint32_t num_steps) {
-    drive_motor->setDirectionPin(drive_dir_pin, true, 0);
-    drive_motor->setSpeedInHz(num_steps);
+void Wheel::moveForward(uint32_t num_inches) {
+    float steps_needed = (num_inches / WHEEL_CIRCUMFERENCE) * FULL_DRIVE_ROTATION;
+    drive_motor->move(steps_needed);
 }
 
-void Wheel::moveBackwards(uint32_t num_steps) {
-    //drive_motor->setSpeedInHz(steps_s);
+void Wheel::moveBackwards(uint32_t num_inches) {
+    float steps_needed = (num_inches / WHEEL_CIRCUMFERENCE) * FULL_DRIVE_ROTATION;
+    drive_motor->move((int32_t)-steps_needed);
 }
 
 void Wheel::stopMoving() {

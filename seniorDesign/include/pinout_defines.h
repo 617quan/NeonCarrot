@@ -42,19 +42,19 @@
 /* WHEEL 3 PIN DEFINES */
 
 /* Controls the Pulse pins for All 3 Motors on Wheel 3 */
-#define WHEEL3_PULSE_LIFT 19
-#define WHEEL3_PULSE_SWERVE 20
-#define WHEEL3_PULSE_DRIVE 21 // good
+#define WHEEL3_PULSE_LIFT 4 /* According to Quan's Big Diagram */
+#define WHEEL3_PULSE_SWERVE 2 /* According to Quan's Big Diagram */
+#define WHEEL3_PULSE_DRIVE 15 /* According to Quan's Big Diagram */
 
 /* Controls the Enable pins for All 3 Motors on Wheel 3 */
-#define WHEEL3_ENABLE_LIFT 22
-#define WHEEL3_ENABLE_SWERVE 23
-#define WHEEL3_ENABLE_DRIVE 25 // good
+#define WHEEL3_ENABLE_LIFT 5 /* NOTE: GRIFFIN THINKS WE NEED THIS. UNIVERSAL FOR ALL LIFT ENABLES */
+#define WHEEL3_ENABLE_SWERVE 17 /* NOTE: GRIFFIN THINKS WE NEED THIS. UNIVERSAL FOR ALL SWERVE ENABLES */
+#define WHEEL3_ENABLE_DRIVE 23 /* According to Quan's Big Diagram */
 
 /* Controls the Direction pins for All 3 Motors on Wheel 3 */
-#define WHEEL3_DIRECTION_LIFT 37
-#define WHEEL3_DIRECTION_SWERVE 26
-#define WHEEL3_DIRECTION_DRIVE 27 // good
+#define WHEEL3_DIRECTION_LIFT 16 /* NOTE: GRIFFIN THINKS WE NEED THIS. UNIVERSAL FOR ALL LIFT DIRECTIONS */
+#define WHEEL3_DIRECTION_SWERVE 27 /* NOTE: GRIFFIN THINKS WE NEED THIS. UNIVERSAL FOR ALL SWERVE DIRECTIONS */
+#define WHEEL3_DIRECTION_DRIVE 13 /* According to Quan's Big Diagram */
 
 /* WHEEL 4 PIN DEFINES */
 
