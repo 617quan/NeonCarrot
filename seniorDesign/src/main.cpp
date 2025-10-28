@@ -28,25 +28,25 @@ void setup() {
     pinMode(WHEEL3_PULSE_SWERVE, OUTPUT);
     pinMode(WHEEL3_ENABLE_SWERVE, OUTPUT);
     pinMode(WHEEL3_DIRECTION_SWERVE, OUTPUT);
+    pinMode(19, OUTPUT);
 
 
-
-    MotorSettings_t wheel3_lift_settings = {WHEEL3_PULSE_LIFT, WHEEL3_ENABLE_LIFT, WHEEL3_DIRECTION_LIFT, 10000, .75};
-    MotorSettings_t wheel3_drive_settings = {WHEEL3_PULSE_DRIVE, WHEEL3_ENABLE_DRIVE, WHEEL3_DIRECTION_DRIVE, 10000, .75};
-    MotorSettings_t wheel3_turn_settings = {WHEEL3_PULSE_SWERVE, WHEEL3_ENABLE_SWERVE, WHEEL3_DIRECTION_SWERVE, 10000, .75};
+    MotorSettings_t wheel3_lift_settings = {WHEEL3_PULSE_LIFT, WHEEL3_ENABLE_LIFT, WHEEL3_DIRECTION_LIFT, 10000, 4000};
+    MotorSettings_t wheel3_drive_settings = {WHEEL3_PULSE_DRIVE, WHEEL3_ENABLE_DRIVE, WHEEL3_DIRECTION_DRIVE, 8000, 4000};
+    MotorSettings_t wheel3_turn_settings = {WHEEL3_PULSE_SWERVE, WHEEL3_ENABLE_SWERVE, WHEEL3_DIRECTION_SWERVE, 10000, 4000};
 
     
     Wheel3 = new Wheel(wheel3_lift_settings, wheel3_drive_settings, wheel3_turn_settings);
 
 }
 
-
+bool testing_bool = 1;
 void loop() {   
 
-    Wheel3->moveForward(8);
+    Wheel3->moveForward(48000);
     
-    
-    
+    digitalWrite(19,testing_bool);
+    testing_bool = !testing_bool;
 
-    delay(10000);
+    delay(1000);
 }

@@ -25,7 +25,7 @@
 struct MotorSettings_t {
     uint8_t pulse_pin, enable_pin, dir_pin;
     uint32_t max_speed = 0;
-    float accel = 0;
+    int32_t accel = 0;
 };
 
 class Wheel {
@@ -54,7 +54,7 @@ public:
 private:
 
     /* Call these in the constructor to initialize all the pins */
-    void initMotor(FastAccelStepper *motor, MotorSettings_t lift_motor_settings);
+    FastAccelStepper* initMotor(MotorSettings_t lift_motor_settings);
 
     /* Get the current position of each motor */
     int32_t getLiftCurrentPosition();
@@ -63,8 +63,8 @@ private:
 
     /* Define the three motors and the engine. NOTE: static only instantiates
     one engine */
-    FastAccelStepper *lift_motor, *turn_motor, *drive_motor;
-    // static FastAccelStepperEngine engine;
+    FastAccelStepper *lift_motor, *turn_motor, *drive_motor = nullptr;
+    static FastAccelStepperEngine engine;
 
     /* Three structs to hold all of the pin numbers */
     MotorSettings_t lift_motor_settings, turn_motor_settings, drive_motor_settings;

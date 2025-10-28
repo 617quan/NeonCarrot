@@ -12,8 +12,8 @@
  */ 
 
 #include "wheel.h"
-
-FastAccelStepperEngine engine;
+#include "pinout_defines.h"
+FastAccelStepperEngine Wheel::engine;
 
 void Wheel::engineStartup() {
     engine.init();
@@ -54,9 +54,14 @@ Wheel::Wheel(MotorSettings_t lift_motor_settings,
     this->turn_motor_settings = turn_motor_settings;
     
     /* Initialize pins for all motors */
-    // initMotor(lift_motor, this->lift_motor_settings);
-    // initMotor(turn_motor, this->turn_motor_settings);
-    initMotor(drive_motor, this->drive_motor_settings);
+    drive_motor = initMotor(drive_motor_settings);
+    turn_motor  = initMotor(turn_motor_settings);
+    lift_motor  = initMotor(lift_motor_settings);
+
+    if (drive_motor != nullptr && turn_motor != nullptr && lift_motor != nullptr) {
+        digitalWrite(19, 1);    
+    }
+
 
 }
 
@@ -86,19 +91,17 @@ Wheel::~Wheel() {
  *      Nada
  *      
  ************************/
-void Wheel::initMotor(FastAccelStepper *motor, MotorSettings_t motor_settings) {
-
-    motor = engine.stepperConnectToPin(motor_settings.pulse_pin);
-    if (motor == nullptr) Serial.println("You're fucked!");
+FastAccelStepper* Wheel::initMotor(MotorSettings_t motor_settings) {
+    FastAccelStepper *motor = engine.stepperConnectToPin(motor_settings.pulse_pin);
+    if (motor == nullptr) {
+        // digitalWrite(19, 1);
+        return nullptr;
+    }
     motor->setDirectionPin(motor_settings.dir_pin, true, 0);
     motor->setEnablePin(motor_settings.enable_pin);
-    if (motor_settings.max_speed != 0) {
-        motor->setSpeedInHz(motor_settings.max_speed);
-    }
-    if (motor_settings.accel != 0) {
-        motor->setAcceleration(motor_settings.accel);
-    }
-
+    if (motor_settings.max_speed != 0) motor->setSpeedInHz(motor_settings.max_speed);
+    if (motor_settings.accel != 0) motor->setAcceleration(motor_settings.accel);
+    return motor;
 }
 
 /********** moveUp ********
@@ -207,8 +210,9 @@ void Wheel::turnLeft(uint32_t degrees) {
 
 /* Moves the wheel forwards by given steps */
 void Wheel::moveForward(uint32_t num_inches) {
-    float steps_needed = (num_inches / WHEEL_CIRCUMFERENCE) * FULL_DRIVE_ROTATION;
-    drive_motor->move(steps_needed);
+    // float steps_needed = ((float)num_inches / (float)WHEEL_CIRCUMFERENCE) * (float)FULL_DRIVE_ROTATION;
+    // drive_motor->move((uint32_t)steps_needed, true);
+    drive_motor->move((int32_t)num_inches, false);
 }
 
 void Wheel::moveBackwards(uint32_t num_inches) {
