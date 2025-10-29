@@ -98,7 +98,7 @@ FastAccelStepper* Wheel::initMotor(MotorSettings_t motor_settings) {
         return nullptr;
     }
     motor->setDirectionPin(motor_settings.dir_pin, true, 0);
-    motor->setEnablePin(motor_settings.enable_pin);
+    motor->setEnablePin(motor_settings.enable_pin, false);
     if (motor_settings.max_speed != 0) motor->setSpeedInHz(motor_settings.max_speed);
     if (motor_settings.accel != 0) motor->setAcceleration(motor_settings.accel);
     return motor;
@@ -176,8 +176,8 @@ void Wheel::moveDown(uint32_t num_steps) {
  *      
  ************************/
 void Wheel::turnRight(uint32_t degrees) {
-    float steps_needed = (degrees / 360) * FULL_TURN_ROTATION;
-    turn_motor->move((uint32_t)steps_needed);
+    // float steps_needed = (degrees / 360) * FULL_TURN_ROTATION;
+    turn_motor->move(degrees, false);
 }
 
 /********** turnLeft ********
@@ -204,8 +204,8 @@ void Wheel::turnRight(uint32_t degrees) {
  *      
  ************************/
 void Wheel::turnLeft(uint32_t degrees) {
-    float steps_needed = (degrees / 360) * FULL_TURN_ROTATION;
-    turn_motor->move((int32_t)-steps_needed);
+    // float steps_needed = (degrees / 360) * FULL_TURN_ROTATION;
+    turn_motor->move((int32_t)-degrees);
 }
 
 /* Moves the wheel forwards by given steps */
@@ -213,6 +213,12 @@ void Wheel::moveForward(uint32_t num_inches) {
     // float steps_needed = ((float)num_inches / (float)WHEEL_CIRCUMFERENCE) * (float)FULL_DRIVE_ROTATION;
     // drive_motor->move((uint32_t)steps_needed, true);
     drive_motor->move((int32_t)num_inches, false);
+    // if(drive_motor->getStepPin() == 15){
+    //     digitalWrite(19,testing_bool);
+    //     testing_bool = !testing_bool;
+    // }
+    // digitalWrite(19,testing_bool);
+    // testing_bool = !testing_bool;
 }
 
 void Wheel::moveBackwards(uint32_t num_inches) {

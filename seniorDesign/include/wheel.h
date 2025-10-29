@@ -69,6 +69,8 @@ private:
     /* Three structs to hold all of the pin numbers */
     MotorSettings_t lift_motor_settings, turn_motor_settings, drive_motor_settings;
 
+    bool testing_bool = 0;
+
 };
 
 #endif
