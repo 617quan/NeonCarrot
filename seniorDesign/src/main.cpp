@@ -26,6 +26,10 @@ Wheel *Wheel4 = nullptr;
 SPIClass *vspi = NULL;
 //SPIClass *hspi = NULL;
 
+// SPI settings object (SPI_MODE0 means read on rising edge write on next
+// falling edge, 20MHz is frequency for communication clock)
+SPISettings mySettings(20000000, MSBFIRST, SPI_MODE0);
+
 void setup() {
     // Serial.begin(115200);
     // Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2);
@@ -110,15 +114,17 @@ void setup() {
 
 
     /* SPI SHIT - just vspi for now */
+
+    
+    // need vspi object to determine which SPI bus you are using to transfer. 
     vspi = new SPIClass(VSPI);
     //hspi = new SPIClass(HSPI);
 
-    vspi->begin(SPI_CLK, VSPI_MISO, VSPI_MOSI, VSPI_SS);
-    // hspi.begin(HSPI_CLK, HSPI_MISO, HSPI_MOSI, HSPI_SS);
+    // initializes all the pins to necessary modes
+    vspi->begin(SPI_CLK, VSPI_MISO, VSPI_MOSI, VSPI_SS); 
 
-    pinMode(vspi->pinSS(), OUTPUT);  //VSPI SS
-    //pinMode(hspi->pinSS(), OUTPUT);  //HSPI SS
-    /* To select the peripheral you want to communicate with, you should set its CS pin to LOW. */
+    
+    
 }
 
 void loop() {  
@@ -128,6 +134,42 @@ void loop() {
     // Wheel4->moveForward(48000);
     Wheel3->turnRight(48000);
     Wheel3->moveForward(48000);
+
+    /* SPI */
+    // Basicaly we need:
+    // two different mains to flash to parent and child microcontroller
+
+    // a protocol structure to recognize commands sent over MISO and MOSI serial
+    // communication (ex byte 0x01 indicates start of a packet, 0x0F -> 0x08 ->
+    // 0xF0 means something like set wheel drive motor to value 0xF0)
+
+    // a go byte (command)
+
+
+    // SPI clock divider automatically set to 1/4 on chip system frequency
+    // (don't use)
+
+    // to send packets over vspi pins use begintransaction(mySettings), transfer(),
+    // then endTransaction()
+    vspi->beginTransaction(mySettings);
+
+    // Set object's CS/SS pin to low to tell child peripheral/ESP32 to get ready
+    digitalWrite(VSPI_SS, LOW);
+
+    //only transfer one byte
+    vspi->transfer(0x00);
+
+    //transfer array of bytes
+    uint8_t data_to_send{0x00, 0x01, 0x02};
+    vspi->transfer(data_to_send, sizeof(data_to_send));
+    // to recieve this array you need to know the size already or put on heap
+
+    vspi->endTransaction();
+    // hspi.begin(HSPI_CLK, HSPI_MISO, HSPI_MOSI, HSPI_SS);
+
+    //pinMode(hspi->pinSS(), OUTPUT);  //HSPI SS
+
+    
     
 
     delay(1000);
