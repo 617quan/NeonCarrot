@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "pinout_defines.h"
 #include "wheel.h"
+#include <SPI.h>
 
 /* If the microstep is on 8, then we need 1600 steps per one rotation
 (Hypothetically). TODO: It's not actually doing that.
@@ -21,11 +22,13 @@ Wheel *Wheel2 = nullptr;
 Wheel *Wheel3 = nullptr;
 Wheel *Wheel4 = nullptr;
 
+/* Uninitialized pointers to SPI objects */
+SPIClass *vspi = NULL;
+//SPIClass *hspi = NULL;
 
 void setup() {
     // Serial.begin(115200);
     // Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2);
-
     Wheel::engineStartup();
 
     pinMode(WHEEL1_PULSE_LIFT, OUTPUT);
@@ -87,11 +90,11 @@ void setup() {
     //     Serial.println("Wheel 2 is fucked");
     // }
 
-    MotorSettings_t wheel3_lift_settings = {WHEEL3_PULSE_LIFT, WHEEL3_ENABLE_LIFT, WHEEL3_DIRECTION_LIFT, 10000, 4000};
-    MotorSettings_t wheel3_drive_settings = {WHEEL3_PULSE_DRIVE, WHEEL3_ENABLE_DRIVE, WHEEL3_DIRECTION_DRIVE, 8000, 8000};
-    MotorSettings_t wheel3_turn_settings = {WHEEL3_PULSE_SWERVE, WHEEL3_ENABLE_SWERVE, WHEEL3_DIRECTION_SWERVE, 1000, 1000};
+    //MotorSettings_t wheel3_lift_settings = {WHEEL3_PULSE_LIFT, WHEEL3_ENABLE_LIFT, WHEEL3_DIRECTION_LIFT, 10000, 4000};
+    //MotorSettings_t wheel3_drive_settings = {WHEEL3_PULSE_DRIVE, WHEEL3_ENABLE_DRIVE, WHEEL3_DIRECTION_DRIVE, 8000, 8000};
+    //MotorSettings_t wheel3_turn_settings = {WHEEL3_PULSE_SWERVE, WHEEL3_ENABLE_SWERVE, WHEEL3_DIRECTION_SWERVE, 1000, 1000};
     
-    Wheel3 = new Wheel(wheel3_lift_settings, wheel3_drive_settings, wheel3_turn_settings);
+    //Wheel3 = new Wheel(wheel3_lift_settings, wheel3_drive_settings, wheel3_turn_settings);
     // if (Wheel3 == nullptr) {
     //     Serial.println("Wheel 3 is fucked");
     // }
@@ -106,7 +109,16 @@ void setup() {
     // }
 
 
+    /* SPI SHIT - just vspi for now */
+    vspi = new SPIClass(VSPI);
+    //hspi = new SPIClass(HSPI);
 
+    vspi->begin(SPI_CLK, VSPI_MISO, VSPI_MOSI, VSPI_SS);
+    // hspi.begin(HSPI_CLK, HSPI_MISO, HSPI_MOSI, HSPI_SS);
+
+    pinMode(vspi->pinSS(), OUTPUT);  //VSPI SS
+    //pinMode(hspi->pinSS(), OUTPUT);  //HSPI SS
+    /* To select the peripheral you want to communicate with, you should set its CS pin to LOW. */
 }
 
 void loop() {  

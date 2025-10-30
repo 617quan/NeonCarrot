@@ -1,14 +1,10 @@
 /* wheel.cpp
  * Purpose:
  * Notes: Microstep setting: 1/8
- * Pulses per revolution: Motor requires 1600 input pulses to complete 360° rotation
- * 
- * Micro step at 8 = 1600 micro steps per step
- * Gear box ratio for drive is 1:30 -> 1600 * 30 = 48000 steps needed for one
- * wheel
- * Gear box ratio for turn is 1:100 -> 1600 * 100 = 160000 steps needed for one
- * wheel 
- * 
+ *        Pulses per revolution: Motor requires 1600 input pulses to complete 360° rotation
+ *        Micro step at 8 = 1600 micro steps per step
+ *        Gear box ratio for drive is 1:30 -> 1600 * 30 = 48000 steps needed for one wheel
+ *        Gear box ratio for turn is 1:100 -> 1600 * 100 = 160000 steps needed for one wheel
  */ 
 
 #include "wheel.h"
@@ -230,10 +226,12 @@ void Wheel::stopMoving() {
         drive_motor->stopMove();
 }
 
-/* Purpose: Retrieve the current position of the stepper
- * Notes: The actual position may be off by the number of steps in the ongoing
- * command. If precise real time position is needed, attaching a pulse counter
- * may be of help. */
+/*** getCurrentPosition ***
+ * Retrieve the current position of the stepper
+ * Notes: 
+ * - The actual position may be off by the number of steps in the ongoing
+ *   command. If precise real time position is needed, attaching a pulse 
+ *   counter may be of help. */
 int32_t Wheel::getLiftCurrentPosition() {
     return lift_motor->getCurrentPosition();
 }

@@ -73,4 +73,13 @@
 #define WHEEL4_DIRECTION_SWERVE 17
 #define WHEEL4_DIRECTION_DRIVE 5
 
+/* SPI Pins - just use VSPI for now */
+#define SPI_CLK 18
+#define VSPI_MISO 23
+#define VSPI_MOSI 19
+#define VSPI_SS 5
+// #define HSPI_MISO
+// #define HSPI_MOSI 
+// #define HSPI_SS
+
 #endif

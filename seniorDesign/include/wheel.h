@@ -46,7 +46,6 @@ public:
     void moveForward(uint32_t num_inches);
     void moveBackwards(uint32_t num_inches);
 
-
     void stopMoving();
 
     void calibratePosition();
