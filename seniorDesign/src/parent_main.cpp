@@ -3,6 +3,8 @@
 #include "wheel.h"
 #include <SPI.h>
 
+/* PARENT MAIN WHEELS 1 & 2 */
+
 /* If the microstep is on 8, then we need 1600 steps per one rotation
 (Hypothetically). TODO: It's not actually doing that.
 
@@ -19,14 +21,14 @@ acceleration time.
 
 Wheel *Wheel1 = nullptr;
 Wheel *Wheel2 = nullptr;
-Wheel *Wheel3 = nullptr;
-Wheel *Wheel4 = nullptr;
+// Wheel *Wheel3 = nullptr;
+// Wheel *Wheel4 = nullptr;
 
 /* Uninitialized pointers to SPI objects */
 SPIClass *vspi = NULL;
 //SPIClass *hspi = NULL;
 
-// SPI settings object (SPI_MODE0 means read on rising edge write on next
+// SPI settings object (SPI_MODE0 means data captured on rising edge write on next
 // falling edge, 20MHz is frequency for communication clock)
 SPISettings mySettings(20000000, MSBFIRST, SPI_MODE0);
 
@@ -55,44 +57,44 @@ void setup() {
     pinMode(WHEEL2_ENABLE_SWERVE, OUTPUT);
     pinMode(WHEEL2_DIRECTION_SWERVE, OUTPUT);
 
-    pinMode(WHEEL3_PULSE_LIFT, OUTPUT);
-    pinMode(WHEEL3_ENABLE_LIFT, OUTPUT);
-    pinMode(WHEEL3_DIRECTION_LIFT, OUTPUT);
-    pinMode(WHEEL3_PULSE_DRIVE, OUTPUT);
-    pinMode(WHEEL3_ENABLE_DRIVE, OUTPUT);
-    pinMode(WHEEL3_DIRECTION_DRIVE, OUTPUT);
-    pinMode(WHEEL3_PULSE_SWERVE, OUTPUT);
-    pinMode(WHEEL3_ENABLE_SWERVE, OUTPUT);
-    pinMode(WHEEL3_DIRECTION_SWERVE, OUTPUT);
+    // pinMode(WHEEL3_PULSE_LIFT, OUTPUT);
+    // pinMode(WHEEL3_ENABLE_LIFT, OUTPUT);
+    // pinMode(WHEEL3_DIRECTION_LIFT, OUTPUT);
+    // pinMode(WHEEL3_PULSE_DRIVE, OUTPUT);
+    // pinMode(WHEEL3_ENABLE_DRIVE, OUTPUT);
+    // pinMode(WHEEL3_DIRECTION_DRIVE, OUTPUT);
+    // pinMode(WHEEL3_PULSE_SWERVE, OUTPUT);
+    // pinMode(WHEEL3_ENABLE_SWERVE, OUTPUT);
+    // pinMode(WHEEL3_DIRECTION_SWERVE, OUTPUT);
 
-    pinMode(WHEEL4_PULSE_LIFT, OUTPUT);
-    pinMode(WHEEL4_ENABLE_LIFT, OUTPUT);
-    pinMode(WHEEL4_DIRECTION_LIFT, OUTPUT);
-    pinMode(WHEEL4_PULSE_DRIVE, OUTPUT);
-    pinMode(WHEEL4_ENABLE_DRIVE, OUTPUT);
-    pinMode(WHEEL4_DIRECTION_DRIVE, OUTPUT);
-    pinMode(WHEEL4_PULSE_SWERVE, OUTPUT);
-    pinMode(WHEEL4_ENABLE_SWERVE, OUTPUT);
-    pinMode(WHEEL4_DIRECTION_SWERVE, OUTPUT);
+    // pinMode(WHEEL4_PULSE_LIFT, OUTPUT);
+    // pinMode(WHEEL4_ENABLE_LIFT, OUTPUT);
+    // pinMode(WHEEL4_DIRECTION_LIFT, OUTPUT);
+    // pinMode(WHEEL4_PULSE_DRIVE, OUTPUT);
+    // pinMode(WHEEL4_ENABLE_DRIVE, OUTPUT);
+    // pinMode(WHEEL4_DIRECTION_DRIVE, OUTPUT);
+    // pinMode(WHEEL4_PULSE_SWERVE, OUTPUT);
+    // pinMode(WHEEL4_ENABLE_SWERVE, OUTPUT);
+    // pinMode(WHEEL4_DIRECTION_SWERVE, OUTPUT);
     
 
-    // MotorSettings_t wheel1_lift_settings = {WHEEL1_PULSE_LIFT, WHEEL1_ENABLE_LIFT, WHEEL1_DIRECTION_LIFT, 10000, 4000};
-    // MotorSettings_t wheel1_drive_settings = {WHEEL1_PULSE_DRIVE, WHEEL1_ENABLE_DRIVE, WHEEL1_DIRECTION_DRIVE, 8000, 8000};
-    // MotorSettings_t wheel1_turn_settings = {WHEEL1_PULSE_SWERVE, WHEEL1_ENABLE_SWERVE, WHEEL1_DIRECTION_SWERVE, 10000, 4000};
+    MotorSettings_t wheel1_lift_settings = {WHEEL1_PULSE_LIFT, WHEEL1_ENABLE_LIFT, WHEEL1_DIRECTION_LIFT, 10000, 4000};
+    MotorSettings_t wheel1_drive_settings = {WHEEL1_PULSE_DRIVE, WHEEL1_ENABLE_DRIVE, WHEEL1_DIRECTION_DRIVE, 8000, 8000};
+    MotorSettings_t wheel1_turn_settings = {WHEEL1_PULSE_SWERVE, WHEEL1_ENABLE_SWERVE, WHEEL1_DIRECTION_SWERVE, 10000, 4000};
     
-    // Wheel1 = new Wheel(wheel1_lift_settings, wheel1_drive_settings, wheel1_turn_settings);
-    // if (Wheel1 == nullptr) {
-    //     Serial.println("Wheel 1 is fucked");
-    // }
+    Wheel1 = new Wheel(wheel1_lift_settings, wheel1_drive_settings, wheel1_turn_settings);
+    if (Wheel1 == nullptr) {
+        Serial.println("Wheel 1 is fucked");
+    }
 
-    // MotorSettings_t wheel2_lift_settings = {WHEEL2_PULSE_LIFT, WHEEL2_ENABLE_LIFT, WHEEL2_DIRECTION_LIFT, 10000, 4000};
-    // MotorSettings_t wheel2_drive_settings = {WHEEL2_PULSE_DRIVE, WHEEL2_ENABLE_DRIVE, WHEEL2_DIRECTION_DRIVE, 8000, 8000};
-    // MotorSettings_t wheel2_turn_settings = {WHEEL2_PULSE_SWERVE, WHEEL2_ENABLE_SWERVE, WHEEL2_DIRECTION_SWERVE, 1000, 1000};
+    MotorSettings_t wheel2_lift_settings = {WHEEL2_PULSE_LIFT, WHEEL2_ENABLE_LIFT, WHEEL2_DIRECTION_LIFT, 10000, 4000};
+    MotorSettings_t wheel2_drive_settings = {WHEEL2_PULSE_DRIVE, WHEEL2_ENABLE_DRIVE, WHEEL2_DIRECTION_DRIVE, 8000, 8000};
+    MotorSettings_t wheel2_turn_settings = {WHEEL2_PULSE_SWERVE, WHEEL2_ENABLE_SWERVE, WHEEL2_DIRECTION_SWERVE, 1000, 1000};
     
-    // Wheel2 = new Wheel(wheel2_lift_settings, wheel2_drive_settings, wheel2_turn_settings);
-    // if (Wheel2 == nullptr) {
-    //     Serial.println("Wheel 2 is fucked");
-    // }
+    Wheel2 = new Wheel(wheel2_lift_settings, wheel2_drive_settings, wheel2_turn_settings);
+    if (Wheel2 == nullptr) {
+        Serial.println("Wheel 2 is fucked");
+    }
 
     //MotorSettings_t wheel3_lift_settings = {WHEEL3_PULSE_LIFT, WHEEL3_ENABLE_LIFT, WHEEL3_DIRECTION_LIFT, 10000, 4000};
     //MotorSettings_t wheel3_drive_settings = {WHEEL3_PULSE_DRIVE, WHEEL3_ENABLE_DRIVE, WHEEL3_DIRECTION_DRIVE, 8000, 8000};
@@ -121,9 +123,10 @@ void setup() {
     //hspi = new SPIClass(HSPI);
 
     // initializes all the pins to necessary modes
-    vspi->begin(SPI_CLK, VSPI_MISO, VSPI_MOSI, VSPI_SS); 
+    vspi->begin(SPI_CLK, VSPI_CIPO, VSPI_COPI, VSPI_CS); 
 
-    
+    //initialize to high to prevent unwanted communication
+    digitalWrite(VSPI_CS, HIGH);
     
 }
 
@@ -132,8 +135,8 @@ void loop() {
     // Wheel2->moveForward(48000);
     // Wheel1->moveForward(48000);
     // Wheel4->moveForward(48000);
-    Wheel3->turnRight(48000);
-    Wheel3->moveForward(48000);
+    // Wheel3->turnRight(48000);
+    // Wheel3->moveForward(48000);
 
     /* SPI */
     // Basicaly we need:
@@ -154,23 +157,20 @@ void loop() {
     vspi->beginTransaction(mySettings);
 
     // Set object's CS/SS pin to low to tell child peripheral/ESP32 to get ready
-    digitalWrite(VSPI_SS, LOW);
+    digitalWrite(VSPI_CS, LOW);
 
     //only transfer one byte
     vspi->transfer(0x00);
 
     //transfer array of bytes
-    uint8_t data_to_send{0x00, 0x01, 0x02};
-    vspi->transfer(data_to_send, sizeof(data_to_send));
+    char buff[] = "Hello World!";
+    vspi->transfer(buff, sizeof(buff));
     // to recieve this array you need to know the size already or put on heap
 
+    //set objects CS pin back high to cut off communication
+    digitalWrite(VSPI_CS, HIGH);
+    //any other library can't use SPI until endTransaction is called
     vspi->endTransaction();
-    // hspi.begin(HSPI_CLK, HSPI_MISO, HSPI_MOSI, HSPI_SS);
-
-    //pinMode(hspi->pinSS(), OUTPUT);  //HSPI SS
-
-    
-    
 
     delay(1000);
 }
