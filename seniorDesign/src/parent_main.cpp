@@ -33,8 +33,8 @@ SPIClass *vspi = NULL;
 SPISettings mySettings(20000000, MSBFIRST, SPI_MODE0);
 
 void setup() {
-    // Serial.begin(115200);
-    // Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2);
+    Serial.begin(115200);
+    Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2);
     Wheel::engineStartup();
 
     pinMode(WHEEL1_PULSE_LIFT, OUTPUT);
@@ -115,8 +115,7 @@ void setup() {
     // }
 
 
-    /* SPI SHIT - just vspi for now */
-
+    /* SPI Parent Init - just vspi for now */
     
     // need vspi object to determine which SPI bus you are using to transfer. 
     vspi = new SPIClass(VSPI);
