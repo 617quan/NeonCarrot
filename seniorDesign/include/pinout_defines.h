@@ -75,11 +75,9 @@
 
 /* SPI Pins - just use VSPI for now */
 #define SPI_CLK 18
-#define VSPI_CIPO 23
-#define VSPI_COPI 19
-#define VSPI_CS 5
-// #define HSPI_MISO
-// #define HSPI_MOSI 
-// #define HSPI_SS
+#define VSPI_CIPO 19 // controller in peripheral out
+#define VSPI_COPI 23 // controller out peripheral in
+#define VSPI_CS 5 
+
 
 #endif

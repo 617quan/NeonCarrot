@@ -26,14 +26,12 @@ acceleration time.
 Wheel *Wheel3 = nullptr;
 Wheel *Wheel4 = nullptr;
 
-// SPI settings object (SPI_MODE0 means read on rising edge write on next
-// falling edge, 20MHz is frequency for communication clock)
-SPISettings mySettings(20000000, MSBFIRST, SPI_MODE0);
 
 void setup() {
     Serial.begin(115200);
-    Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2);
-    Wheel::engineStartup();
+    Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
+    Serial.println("=====SERIAL BEGIN=====");
+    // Wheel::engineStartup();
 
     // pinMode(WHEEL1_PULSE_LIFT, OUTPUT);
     // pinMode(WHEEL1_ENABLE_LIFT, OUTPUT);
@@ -55,25 +53,25 @@ void setup() {
     // pinMode(WHEEL2_ENABLE_SWERVE, OUTPUT);
     // pinMode(WHEEL2_DIRECTION_SWERVE, OUTPUT);
 
-    pinMode(WHEEL3_PULSE_LIFT, OUTPUT);
-    pinMode(WHEEL3_ENABLE_LIFT, OUTPUT);
-    pinMode(WHEEL3_DIRECTION_LIFT, OUTPUT);
-    pinMode(WHEEL3_PULSE_DRIVE, OUTPUT);
-    pinMode(WHEEL3_ENABLE_DRIVE, OUTPUT);
-    pinMode(WHEEL3_DIRECTION_DRIVE, OUTPUT);
-    pinMode(WHEEL3_PULSE_SWERVE, OUTPUT);
-    pinMode(WHEEL3_ENABLE_SWERVE, OUTPUT);
-    pinMode(WHEEL3_DIRECTION_SWERVE, OUTPUT);
+    // pinMode(WHEEL3_PULSE_LIFT, OUTPUT);
+    // pinMode(WHEEL3_ENABLE_LIFT, OUTPUT);
+    // pinMode(WHEEL3_DIRECTION_LIFT, OUTPUT);
+    // pinMode(WHEEL3_PULSE_DRIVE, OUTPUT);
+    // pinMode(WHEEL3_ENABLE_DRIVE, OUTPUT);
+    // pinMode(WHEEL3_DIRECTION_DRIVE, OUTPUT);
+    // pinMode(WHEEL3_PULSE_SWERVE, OUTPUT);
+    // pinMode(WHEEL3_ENABLE_SWERVE, OUTPUT);
+    // pinMode(WHEEL3_DIRECTION_SWERVE, OUTPUT);
 
-    pinMode(WHEEL4_PULSE_LIFT, OUTPUT);
-    pinMode(WHEEL4_ENABLE_LIFT, OUTPUT);
-    pinMode(WHEEL4_DIRECTION_LIFT, OUTPUT);
-    pinMode(WHEEL4_PULSE_DRIVE, OUTPUT);
-    pinMode(WHEEL4_ENABLE_DRIVE, OUTPUT);
-    pinMode(WHEEL4_DIRECTION_DRIVE, OUTPUT);
-    pinMode(WHEEL4_PULSE_SWERVE, OUTPUT);
-    pinMode(WHEEL4_ENABLE_SWERVE, OUTPUT);
-    pinMode(WHEEL4_DIRECTION_SWERVE, OUTPUT);
+    // pinMode(WHEEL4_PULSE_LIFT, OUTPUT);
+    // pinMode(WHEEL4_ENABLE_LIFT, OUTPUT);
+    // pinMode(WHEEL4_DIRECTION_LIFT, OUTPUT);
+    // pinMode(WHEEL4_PULSE_DRIVE, OUTPUT);
+    // pinMode(WHEEL4_ENABLE_DRIVE, OUTPUT);
+    // pinMode(WHEEL4_DIRECTION_DRIVE, OUTPUT);
+    // pinMode(WHEEL4_PULSE_SWERVE, OUTPUT);
+    // pinMode(WHEEL4_ENABLE_SWERVE, OUTPUT);
+    // pinMode(WHEEL4_DIRECTION_SWERVE, OUTPUT);
     
 
     // MotorSettings_t wheel1_lift_settings = {WHEEL1_PULSE_LIFT, WHEEL1_ENABLE_LIFT, WHEEL1_DIRECTION_LIFT, 10000, 4000};
@@ -94,23 +92,23 @@ void setup() {
     //     Serial.println("Wheel 2 is fucked");
     // }
 
-    MotorSettings_t wheel3_lift_settings = {WHEEL3_PULSE_LIFT, WHEEL3_ENABLE_LIFT, WHEEL3_DIRECTION_LIFT, 10000, 4000};
-    MotorSettings_t wheel3_drive_settings = {WHEEL3_PULSE_DRIVE, WHEEL3_ENABLE_DRIVE, WHEEL3_DIRECTION_DRIVE, 8000, 8000};
-    MotorSettings_t wheel3_turn_settings = {WHEEL3_PULSE_SWERVE, WHEEL3_ENABLE_SWERVE, WHEEL3_DIRECTION_SWERVE, 1000, 1000};
+    // MotorSettings_t wheel3_lift_settings = {WHEEL3_PULSE_LIFT, WHEEL3_ENABLE_LIFT, WHEEL3_DIRECTION_LIFT, 10000, 4000};
+    // MotorSettings_t wheel3_drive_settings = {WHEEL3_PULSE_DRIVE, WHEEL3_ENABLE_DRIVE, WHEEL3_DIRECTION_DRIVE, 8000, 8000};
+    // MotorSettings_t wheel3_turn_settings = {WHEEL3_PULSE_SWERVE, WHEEL3_ENABLE_SWERVE, WHEEL3_DIRECTION_SWERVE, 1000, 1000};
     
-    Wheel3 = new Wheel(wheel3_lift_settings, wheel3_drive_settings, wheel3_turn_settings);
-    if (Wheel3 == nullptr) {
-        Serial.println("Wheel 3 is fucked");
-    }
+    // Wheel3 = new Wheel(wheel3_lift_settings, wheel3_drive_settings, wheel3_turn_settings);
+    // if (Wheel3 == nullptr) {
+    //     Serial.println("Wheel 3 is fucked");
+    // }
 
-    MotorSettings_t wheel4_lift_settings = {WHEEL4_PULSE_LIFT, WHEEL4_ENABLE_LIFT, WHEEL4_DIRECTION_LIFT, 10000, 4000};
-    MotorSettings_t wheel4_drive_settings = {WHEEL4_PULSE_DRIVE, WHEEL4_ENABLE_DRIVE, WHEEL4_DIRECTION_DRIVE, 8000, 8000};
-    MotorSettings_t wheel4_turn_settings = {WHEEL4_PULSE_SWERVE, WHEEL4_ENABLE_SWERVE, WHEEL4_DIRECTION_SWERVE, 10000, 4000};
+    // MotorSettings_t wheel4_lift_settings = {WHEEL4_PULSE_LIFT, WHEEL4_ENABLE_LIFT, WHEEL4_DIRECTION_LIFT, 10000, 4000};
+    // MotorSettings_t wheel4_drive_settings = {WHEEL4_PULSE_DRIVE, WHEEL4_ENABLE_DRIVE, WHEEL4_DIRECTION_DRIVE, 8000, 8000};
+    // MotorSettings_t wheel4_turn_settings = {WHEEL4_PULSE_SWERVE, WHEEL4_ENABLE_SWERVE, WHEEL4_DIRECTION_SWERVE, 10000, 4000};
     
-    Wheel4 = new Wheel(wheel4_lift_settings, wheel4_drive_settings, wheel4_turn_settings);
-    if (Wheel4 == nullptr) {
-        Serial.println("Wheel 4 is fucked");
-    }
+    // Wheel4 = new Wheel(wheel4_lift_settings, wheel4_drive_settings, wheel4_turn_settings);
+    // if (Wheel4 == nullptr) {
+    //     Serial.println("Wheel 4 is fucked");
+    // }
 
 
     /* SPI Child Init */
@@ -135,14 +133,19 @@ void setup() {
     pinMode(VSPI_COPI, INPUT_PULLUP);
     pinMode(SPI_CLK, INPUT_PULLUP);
     pinMode(VSPI_CS, INPUT_PULLUP);
+    // Controller in Peripheral out means child is sending data
+    pinMode(VSPI_CIPO, OUTPUT);
 
     // Initialize SPI into child mode
-    esp_err_t ret = spi_slave_initialize(HSPI_HOST, &buscfg, &chldcfg, SPI_DMA_CH_AUTO);
+    esp_err_t ret = spi_slave_initialize(VSPI_HOST, &buscfg, &chldcfg, SPI_DMA_CH_AUTO);
     if (ret != ESP_OK) {
-        Serial.print("SPI child init failed: %d\n", ret);
-        while (1);
-    }
-    
+        Serial.printf("SPI child init failed: %d\n", ret);
+        while(1);
+    } 
+
+    // debug LED
+    pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, LOW);
 }
 
 void loop() {  
@@ -150,8 +153,8 @@ void loop() {
     // Wheel2->moveForward(48000);
     // Wheel1->moveForward(48000);
     // Wheel4->moveForward(48000);
-    Wheel3->turnRight(48000);
-    Wheel3->moveForward(48000);
+    // Wheel3->turnRight(48000);
+    // Wheel3->moveForward(48000);
 
     /* SPI */
     // to put a esp in child mode you can't use arduino library since that
@@ -172,39 +175,74 @@ void loop() {
     t.length = 8; // 8 bits = 1 byte = length of transaction
     // assigns length_buf as the container for transferred bytes
     t.rx_buffer = length_buf;
+    t.tx_buffer = nullptr;
+
+    Serial.println("Before first SPI transaction");
 
     // waiting for parent to transmit (spi_slave_transmit() is a blocking call)
     esp_err_t t_status = spi_slave_transmit(VSPI_HOST, &t, portMAX_DELAY);
-    if (t_status != ESP_OK) {
+    if (t_status == ESP_OK) {
+        digitalWrite(LED_BUILTIN, HIGH);
+    } else if (t_status == ESP_ERR_TIMEOUT) {
         Serial.print("Error with spi_slave_transmit transaction 1\n");
-        return;
-    }
-
-    uint8_t msg_length = length_buf[0];
-    Serial.print("Message incoming, size: %d\n");
-
-
-    // intance of transaction struct "t2" 
-    spi_slave_transaction_t t2;
-    // set everything to 0 in the struct
-    memset(&t2, 0, sizeof(t2));
-    // data container 256 (max message length) bytes big all set to 0
-    uint8_t rec_buf[256] = {0}; 
-    t2.length = msg_length; // length of message is what we found above
-    t2.rx_buffer = rec_buf;
-
-    // waiting for parent esp to send data 
-    esp_err_t t2_status = spi_slave_transmit(VSPI_HOST, &t2, portMAX_DELAY);
-    if (t2_status == ESP_OK) {
-        Serial.print("Recieved message: \n");
-        for (int i = 0; i < msg_length; i++) {
-            Serial.write(rec_buf[i]);
-            Serial.println();
+        // Blink fast 3x to indicate SPI timeout
+        for (int i = 0; i < 3; i++) {
+            digitalWrite(LED_BUILTIN, HIGH);
+            delay(100);
+            digitalWrite(LED_BUILTIN, LOW);
+            delay(100);
         }
+        // return; // try again
+    } else if (t_status == ESP_ERR_INVALID_STATE) {
+        digitalWrite(LED_BUILTIN, HIGH);
+        delay(100);
+        digitalWrite(LED_BUILTIN, LOW);
+        delay(100);
+        digitalWrite(LED_BUILTIN, HIGH);
+    } else if (t_status == ESP_ERR_INVALID_ARG) {
+        // for (int i = 0; i < 3; i++) {
+        //     digitalWrite(LED_BUILTIN, HIGH);
+        //     delay(100);
+        //     digitalWrite(LED_BUILTIN, LOW);
+        //     delay(100);
+        // }
+        digitalWrite(LED_BUILTIN, LOW);
     } else {
-        Serial.print("Failed transaction 2\n");
+        for (int i = 0; i < 5; i++) {
+            digitalWrite(LED_BUILTIN, HIGH);
+            delay(100);
+            digitalWrite(LED_BUILTIN, LOW);
+            delay(100);
+        }
     }
-    
 
+    // uint8_t msg_length = length_buf[0];
+    // Serial.printf("Message incoming, size: %d\n");
+
+
+    // // intance of transaction struct "t2" 
+    // spi_slave_transaction_t t2;
+    // // set everything to 0 in the struct
+    // memset(&t2, 0, sizeof(t2));
+    // // data container 256 (max message length) bytes big all set to 0
+    // uint8_t rec_buf[256] = {0}; 
+    // t2.length = msg_length; // length of message is what we found above
+    // t2.rx_buffer = rec_buf;
+
+    // // waiting for parent esp to send data 
+    // esp_err_t t2_status = spi_slave_transmit(VSPI_HOST, &t2, portMAX_DELAY);
+    // if (t2_status == ESP_OK) {
+    //     Serial.print("Recieved message: \n");
+    //     digitalWrite(LED_BUILTIN, LOW); // turn back off debug LED
+    //     for (int i = 0; i < msg_length; i++) {
+    //         Serial.write(rec_buf[i]);
+    //         Serial.println();
+    //     }
+    // } else {
+    //     Serial.print("Failed transaction 2\n");
+    // }
+    
+    delay(1000);
+    digitalWrite(BUILTIN_LED, LOW);
     delay(1000);
 }
