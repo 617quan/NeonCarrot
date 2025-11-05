@@ -31,6 +31,8 @@
 // // falling edge, 20MHz is frequency for communication clock)
 // SPISettings mySettings(20000000, MSBFIRST, SPI_MODE0);
 
+// void sendMessageToChild(const char message[], size_t size_of_msg, SPIClass *spi);
+
 // void setup() {
 //     Serial.begin(115200);
 //     Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
@@ -156,43 +158,49 @@
 //     // SPI clock divider automatically set to 1/4 on chip system frequency
 //     // (don't use)
 
+//     char message[] = "Hello World!";
+//     sendMessageToChild(message, sizeof(message), vspi);
+//     delay(1000);
+// }
 
-    
-//     // to send packets over vspi pins use begintransaction(mySettings), transfer(),
-//     // then endTransaction()
-//     vspi->beginTransaction(mySettings);
+// /*** sendMessageToChild ***
+//  * Description: 
+//  *       Sends a character array message to the child peripheral/ESP32
+//  * Inputs: 
+//  *       char message[] - array of characters to send to child
+//  *       SPIClass spi - SPI bus to use (vspi or hspi)
+//  * Notes:
+//  *     - Use begintransaction(mySettings), transfer(), and then endTransaction()
+//  *     - Set object's CS/SS pin to low to tell child peripheral/ESP32 to get
+//  *       ready, and then set it back to high when done
+//  *     - Any other library can't use SPI until endTransaction is called
+//  */
+// void sendMessageToChild(const char message[], size_t size_of_msg, SPIClass *spi) {
+//     /* Create buffer to hold message */
+//     uint8_t buf[size_of_msg];
+//     memcpy(buf, message, size_of_msg);
 
-//     // Set object's CS/SS pin to low to tell child peripheral/ESP32 to get ready
+//     /* Transfer size of message */
+//     spi->beginTransaction(mySettings);
+//     // delay(1000);
 //     digitalWrite(VSPI_CS, LOW);
 
-//     // message
-//     char buff[] = "Hello World!";
+//     // send size as a single byte (will truncate if >255)
+//     uint8_t size_byte = (uint8_t)size_of_msg;
+//     spi->transfer(size_byte);
 
-//     digitalWrite(LED_BUILTIN, HIGH);
-//     delay(500);
-
-//     // only transfer size of message
-//     uint8_t size_of_msg = sizeof(buff);
-//     vspi->transfer(size_of_msg);
-
-//     digitalWrite(LED_BUILTIN, LOW);
-//     delay(500);
-
-//     // // set the VSPI_CS back to high to say it finsiehd sending length
-//     // digitalWrite(VSPI_CS, HIGH);
-    
-//     // delay(100);
-
-//     // //initialize second transaction
-//     // digitalWrite(VSPI_CS, LOW);
-
-//     // // transfer array of bytes
-//     // vspi->transfer(buff, sizeof(buff));
-
-//     // set objects CS pin back high to cut off communication
 //     digitalWrite(VSPI_CS, HIGH);
-//     // any other library can't use SPI until endTransaction is called
-//     vspi->endTransaction();
+//     spi->endTransaction();
 
-//     delay(1000);
+//     delay(100);
+
+//     /* Transfer message itself */
+//     spi->beginTransaction(mySettings);
+//     digitalWrite(VSPI_CS, LOW);
+
+//     // transfer the buffer (cast away const for API)
+//     spi->transfer(buf, size_of_msg);
+
+//     digitalWrite(VSPI_CS, HIGH);
+//     spi->endTransaction();
 // }

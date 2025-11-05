@@ -26,10 +26,11 @@ acceleration time.
 Wheel *Wheel3 = nullptr;
 Wheel *Wheel4 = nullptr;
 
+uint8_t* recieveMessageFromParent();
 
 void setup() {
     Serial.begin(115200);
-    Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
+    //Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
     Serial.println("=====SERIAL BEGIN=====");
     // Wheel::engineStartup();
 
@@ -114,8 +115,8 @@ void setup() {
     /* SPI Child Init */
     // SPI bus configuration
     spi_bus_config_t buscfg = {
-        .mosi_io_num = VSPI_CIPO,
-        .miso_io_num = VSPI_COPI,
+        .mosi_io_num = VSPI_COPI,
+        .miso_io_num = VSPI_CIPO,
         .sclk_io_num = SPI_CLK,
         .quadwp_io_num = -1,
         .quadhd_io_num = -1
@@ -139,8 +140,9 @@ void setup() {
     // Initialize SPI into child mode
     esp_err_t ret = spi_slave_initialize(VSPI_HOST, &buscfg, &chldcfg, SPI_DMA_CH_AUTO);
     if (ret != ESP_OK) {
-        Serial.printf("SPI child init failed: %d\n", ret);
-        while(1);
+        while(1) {
+            Serial.printf("SPI child init failed: %d\n", ret);
+        }
     } 
 
     // debug LED
@@ -149,12 +151,14 @@ void setup() {
 }
 
 void loop() {  
-    // Wheel3->moveForward(48000); 
-    // Wheel2->moveForward(48000);
-    // Wheel1->moveForward(48000);
-    // Wheel4->moveForward(48000);
-    // Wheel3->turnRight(48000);
-    // Wheel3->moveForward(48000);
+    Serial.print("inside loop!");
+
+//     // Wheel3->moveForward(48000); 
+//     // Wheel2->moveForward(48000);
+//     // Wheel1->moveForward(48000);
+//     // Wheel4->moveForward(48000);
+//     // Wheel3->turnRight(48000);
+//     // Wheel3->moveForward(48000);
 
     /* SPI */
     // to put a esp in child mode you can't use arduino library since that
@@ -166,58 +170,43 @@ void loop() {
     // the whole message:
 
     // instance of transaction struct "t" 
-    spi_slave_transaction_t t;
-    // set everything in child struct to 0
-    memset(&t, 0, sizeof(t));
+    //spi_slave_transaction_t t;
 
-    // first byte array of size 1 to get length of message
-    uint8_t length_buf[1];
-    t.length = 8; // 8 bits = 1 byte = length of transaction
-    // assigns length_buf as the container for transferred bytes
-    t.rx_buffer = length_buf;
-    t.tx_buffer = nullptr;
+    uint8_t* message;
+    message = recieveMessageFromParent();
+    
+    Serial.print(*message);
+    
+    // // set everything in child struct to 0
+    // memset(&t, 0, sizeof(t));
+    
+    // // first byte array of size 1 to get length of message
+    // uint8_t length_buf[128];
+    // t.length = 8; // 8 bits = 1 byte = length of transaction
+    // // assigns length_buf as the container for transferred bytes
+    // t.rx_buffer = length_buf;
+    // t.tx_buffer = nullptr;
 
-    Serial.println("Before first SPI transaction");
-
-    // waiting for parent to transmit (spi_slave_transmit() is a blocking call)
-    esp_err_t t_status = spi_slave_transmit(VSPI_HOST, &t, portMAX_DELAY);
-    if (t_status == ESP_OK) {
-        digitalWrite(LED_BUILTIN, HIGH);
-    } else if (t_status == ESP_ERR_TIMEOUT) {
-        Serial.print("Error with spi_slave_transmit transaction 1\n");
-        // Blink fast 3x to indicate SPI timeout
-        for (int i = 0; i < 3; i++) {
-            digitalWrite(LED_BUILTIN, HIGH);
-            delay(100);
-            digitalWrite(LED_BUILTIN, LOW);
-            delay(100);
-        }
-        // return; // try again
-    } else if (t_status == ESP_ERR_INVALID_STATE) {
-        digitalWrite(LED_BUILTIN, HIGH);
-        delay(100);
-        digitalWrite(LED_BUILTIN, LOW);
-        delay(100);
-        digitalWrite(LED_BUILTIN, HIGH);
-    } else if (t_status == ESP_ERR_INVALID_ARG) {
-        // for (int i = 0; i < 3; i++) {
-        //     digitalWrite(LED_BUILTIN, HIGH);
-        //     delay(100);
-        //     digitalWrite(LED_BUILTIN, LOW);
-        //     delay(100);
-        // }
-        digitalWrite(LED_BUILTIN, LOW);
-    } else {
-        for (int i = 0; i < 5; i++) {
-            digitalWrite(LED_BUILTIN, HIGH);
-            delay(100);
-            digitalWrite(LED_BUILTIN, LOW);
-            delay(100);
-        }
-    }
+    // // waiting for parent to transmit (spi_slave_transmit() is a blocking call)
+    // esp_err_t t_status = spi_slave_transmit(VSPI_HOST, &t, portMAX_DELAY);
+    // if (t_status == ESP_OK) {
+    //     Serial.print("Nothing wong\n");
+    // } else if (t_status == ESP_ERR_TIMEOUT) {
+    //     Serial.print("Took too wong\n");
+    //     return;
+    // } else if (t_status == ESP_ERR_INVALID_STATE) {
+    //     Serial.print("Invalid state\n");
+    //     return;
+    // } else if (t_status == ESP_ERR_INVALID_ARG) {
+    //     Serial.print("Invalid argument\n");
+    //     return;
+    // } else {
+    //     Serial.print("Someting wong\n");
+    //     return;
+    // }
 
     // uint8_t msg_length = length_buf[0];
-    // Serial.printf("Message incoming, size: %d\n");
+    // Serial.printf("Message incoming, size: %d\n", msg_length);
 
 
     // // intance of transaction struct "t2" 
@@ -226,7 +215,7 @@ void loop() {
     // memset(&t2, 0, sizeof(t2));
     // // data container 256 (max message length) bytes big all set to 0
     // uint8_t rec_buf[256] = {0}; 
-    // t2.length = msg_length; // length of message is what we found above
+    // t2.length = msg_length * 8; // length of message is what we found above * 8 (in bits)
     // t2.rx_buffer = rec_buf;
 
     // // waiting for parent esp to send data 
@@ -241,8 +230,67 @@ void loop() {
     // } else {
     //     Serial.print("Failed transaction 2\n");
     // }
+
+    // clear the buffers?
+
+
+    delay(1000);
+}
+
+uint8_t* recieveMessageFromParent() {
+    spi_slave_transaction_t t;
+    // set everything in child struct to 0
+    memset(&t, 0, sizeof(t));
     
-    delay(1000);
-    digitalWrite(BUILTIN_LED, LOW);
-    delay(1000);
+    // first byte array of size 1 to get length of message
+    uint8_t length_buf[128];
+    t.length = 8; // 8 bits = 1 byte = length of transaction
+    // assigns length_buf as the container for transferred bytes
+    t.rx_buffer = length_buf;
+    t.tx_buffer = nullptr;
+
+    // waiting for parent to transmit (spi_slave_transmit() is a blocking call)
+    esp_err_t t_status = spi_slave_transmit(VSPI_HOST, &t, portMAX_DELAY);
+    if (t_status == ESP_OK) {
+        Serial.print("Nothing wong\n");
+    } else if (t_status == ESP_ERR_TIMEOUT) {
+        Serial.print("Took too wong\n");
+        //return;
+    } else if (t_status == ESP_ERR_INVALID_STATE) {
+        Serial.print("Invalid state\n");
+        //break;
+    } else if (t_status == ESP_ERR_INVALID_ARG) {
+        Serial.print("Invalid argument\n");
+        //return;
+    } else {
+        Serial.print("Someting wong\n");
+        //return;
+    }
+
+    uint8_t msg_length = length_buf[0];
+    Serial.printf("Message incoming, size: %d\n", msg_length);
+
+
+    // intance of transaction struct "t2" 
+    spi_slave_transaction_t t2;
+    // set everything to 0 in the struct
+    memset(&t2, 0, sizeof(t2));
+    // data container 256 (max message length) bytes big all set to 0
+    uint8_t rec_buf[256] = {0}; 
+    t2.length = msg_length * 8; // length of message is what we found above * 8 (in bits)
+    t2.rx_buffer = rec_buf;
+
+    // waiting for parent esp to send data 
+    esp_err_t t2_status = spi_slave_transmit(VSPI_HOST, &t2, portMAX_DELAY);
+    if (t2_status == ESP_OK) {
+        Serial.print("Recieved message: \n");
+        digitalWrite(LED_BUILTIN, LOW); // turn back off debug LED
+        for (int i = 0; i < msg_length; i++) {
+            Serial.write(rec_buf[i]);
+            Serial.println();
+        }
+    } else {
+        Serial.print("Failed transaction 2\n");
+    }
+    return rec_buf;
 }
