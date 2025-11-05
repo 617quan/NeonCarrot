@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "pinout_defines.h"
 #include "wheel.h"
-// #include <SPI.h>
+#include <string>
 // ESP Framework
 #include "driver/spi_slave.h"
 
@@ -26,7 +26,7 @@ acceleration time.
 Wheel *Wheel3 = nullptr;
 Wheel *Wheel4 = nullptr;
 
-uint8_t* recieveMessageFromParent();
+std::string recieveMessageFromParent();
 
 void setup() {
     Serial.begin(115200);
@@ -172,10 +172,10 @@ void loop() {
     // instance of transaction struct "t" 
     //spi_slave_transaction_t t;
 
-    uint8_t* message;
-    message = recieveMessageFromParent();
+    std::string message = recieveMessageFromParent();
     
-    Serial.print(*message);
+    
+    Serial.println(message.c_str());
     
     // // set everything in child struct to 0
     // memset(&t, 0, sizeof(t));
@@ -237,7 +237,7 @@ void loop() {
     delay(1000);
 }
 
-uint8_t* recieveMessageFromParent() {
+std::string recieveMessageFromParent() {
     spi_slave_transaction_t t;
     // set everything in child struct to 0
     memset(&t, 0, sizeof(t));
@@ -255,16 +255,12 @@ uint8_t* recieveMessageFromParent() {
         Serial.print("Nothing wong\n");
     } else if (t_status == ESP_ERR_TIMEOUT) {
         Serial.print("Took too wong\n");
-        //return;
     } else if (t_status == ESP_ERR_INVALID_STATE) {
         Serial.print("Invalid state\n");
-        //break;
     } else if (t_status == ESP_ERR_INVALID_ARG) {
         Serial.print("Invalid argument\n");
-        //return;
     } else {
         Serial.print("Someting wong\n");
-        //return;
     }
 
     uint8_t msg_length = length_buf[0];
@@ -280,17 +276,21 @@ uint8_t* recieveMessageFromParent() {
     t2.length = msg_length * 8; // length of message is what we found above * 8 (in bits)
     t2.rx_buffer = rec_buf;
 
+    // return string
+    char parent_msg_array [msg_length];
+    std::string parent_msg = "";
     // waiting for parent esp to send data 
     esp_err_t t2_status = spi_slave_transmit(VSPI_HOST, &t2, portMAX_DELAY);
     if (t2_status == ESP_OK) {
         Serial.print("Recieved message: \n");
-        digitalWrite(LED_BUILTIN, LOW); // turn back off debug LED
         for (int i = 0; i < msg_length; i++) {
             Serial.write(rec_buf[i]);
+            parent_msg_array[i] = rec_buf[i];
+            parent_msg += parent_msg_array[i];
             Serial.println();
         }
     } else {
         Serial.print("Failed transaction 2\n");
     }
-    return rec_buf;
+    return parent_msg;
 }
