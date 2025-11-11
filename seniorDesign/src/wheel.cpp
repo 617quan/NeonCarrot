@@ -1,5 +1,5 @@
-/* wheel.cpp
- * Purpose:
+/********** wheel.cpp **********
+ * Purpose: Defines all functions for the Wheel class.
  * Notes: Microstep setting: 1/8
  *        Pulses per revolution: Motor requires 1600 input pulses to complete 360° rotation
  *        Micro step at 8 = 1600 micro steps per step
@@ -9,24 +9,22 @@
 
 #include "wheel.h"
 #include "pinout_defines.h"
+
 FastAccelStepperEngine Wheel::engine;
 
 void Wheel::engineStartup() {
     engine.init();
 }
 
-/********** Wheel Constructor ********
+/********** Wheel Constructor **********
  *
  * Takes in all information about all 3 motors (pin numbers, speeds, and
  * accelerations) and initializes them.
  *
  * Parameters:
- *      MotorSettings_t lift_motor_settings: pinout, speed, and accel for the
- *      lift motor
- *      MotorSettings_t drive_motor_settings: pinout, speed, and accel for the
- *      drive motor
- *      MotorSettings_t turn_motor_settings: pinout, speed, and accel for the
- *      turn motor
+ *      MotorSettings_t lift_motor_settings: pinout, speed, and accel for lift motor
+ *      MotorSettings_t drive_motor_settings: pinout, speed, and accel for drive motor
+ *      MotorSettings_t turn_motor_settings: pinout, speed, and accel for turn motor
  * 
  * Return:
  *      A Wheel object with 3 initialized motors.
@@ -36,7 +34,7 @@ void Wheel::engineStartup() {
  *      They'll just be set to 0.
  *
  * Notes:
- *      Nada
+ *      None.
  *      
  ************************/
 Wheel::Wheel(MotorSettings_t lift_motor_settings, 
@@ -66,7 +64,7 @@ Wheel::~Wheel() {
 }
 
 
-/********** initMotor ********
+/********** initMotor **********
  *
  * Takes in a motor pointer and a struct containing the pins, max speed, and
  * acceleration, and initializes the motor with that information
@@ -100,7 +98,7 @@ FastAccelStepper* Wheel::initMotor(MotorSettings_t motor_settings) {
     return motor;
 }
 
-/********** moveUp ********
+/********** moveUp **********
  *
  * Move the lift motor up num_steps number of steps.
  *
@@ -114,9 +112,6 @@ FastAccelStepper* Wheel::initMotor(MotorSettings_t motor_settings) {
  * Expects:
  *      Unsigned number. 
  *
- * Notes:
- *      TODO: 
- *      
  ************************/
 void Wheel::moveUp(uint32_t num_steps) {
 
@@ -126,7 +121,7 @@ void Wheel::moveUp(uint32_t num_steps) {
     lift_motor->move(num_steps);
 }
 
-/********** moveDown ********
+/********** moveDown **********
  *
  * Move the lift motor down num_steps number of steps.
  *
@@ -150,7 +145,7 @@ void Wheel::moveDown(uint32_t num_steps) {
     lift_motor->move((int32_t)-num_steps);
 }
 
-/********** turnRight ********
+/********** turnRight **********
  *
  * Turn the motor right degrees number of degrees
  *
@@ -176,7 +171,7 @@ void Wheel::turnRight(uint32_t degrees) {
     turn_motor->move(degrees, false);
 }
 
-/********** turnLeft ********
+/********** turnLeft **********
  *
  * Turn the motor left degrees number of degrees
  *
@@ -217,29 +212,80 @@ void Wheel::moveForward(uint32_t num_inches) {
     // testing_bool = !testing_bool;
 }
 
+/********** moveBackwards **********
+ * 
+ * Move the wheel backwards by given steps.
+ * 
+ * Inputs:
+ *   uint32_t num_inches: Number of inches to move backwards.
+ * 
+ * Returns:
+ *    None.
+ * 
+ ************************/
 void Wheel::moveBackwards(uint32_t num_inches) {
     float steps_needed = (num_inches / WHEEL_CIRCUMFERENCE) * FULL_DRIVE_ROTATION;
     drive_motor->move((int32_t)-steps_needed);
 }
 
+/********** stopMoving **********
+ * 
+ * Stop the wheel from moving.
+ * 
+ * Inputs/Returns:
+ *      None.
+ * 
+ ************************/
 void Wheel::stopMoving() {
         drive_motor->stopMove();
 }
 
-/*** getCurrentPosition ***
- * Retrieve the current position of the stepper
+/********** getCurrentPosition **********
+ * 
+ * Retrieve the current position of the lift stepper motor.
+ * 
+ * Inputs:
+ *   None.
+ * 
+ * Returns:
+ *    int32_t: Current position of the stepper in steps.
+ * 
  * Notes: 
  * - The actual position may be off by the number of steps in the ongoing
  *   command. If precise real time position is needed, attaching a pulse 
- *   counter may be of help. */
+ *   counter may be of help.
+ *  
+ ************************/
 int32_t Wheel::getLiftCurrentPosition() {
     return lift_motor->getCurrentPosition();
 }
 
+/********** getTurnCurrentPosition **********
+ * 
+ * Retrieve the current position of the turn stepper motor.
+ * 
+ * Inputs:
+ *   None.
+ * 
+ * Returns:
+ *    int32_t: Current position of the stepper in steps.
+ *  
+ ************************/
 int32_t Wheel::getTurnCurrentPosition() {
     return turn_motor->getCurrentPosition();
 }
 
+/********** getDriveCurrentPosition **********
+ * 
+ * Retrieve the current position of the drive stepper motor.
+ * 
+ * Inputs:
+ *   None.
+ * 
+ * Returns:
+ *    int32_t: Current position of the stepper in steps.
+ *  
+ ************************/
 int32_t Wheel::getDriveCurrentPosition() {
     return drive_motor->getCurrentPosition();
 }

@@ -1,32 +1,29 @@
+/********** child_main.cpp **********
+ *  
+ *  Configure wheels 3 & 4
+ *  - Uses SPI in child mode to recieve commands from parent ESP32
+ * 
+ *  Notes:
+ *  - To put a esp in child mode you can't use arduino library since that
+ *    initiliazes it as a parent, instead we use ESP libraries to configure it
+ *    into child mode 
+ */
+
 #include <Arduino.h>
 #include "pinout_defines.h"
 #include "wheel.h"
 #include <string>
-// ESP Framework
 #include "driver/spi_slave.h"
 
-/* CHILD MAIN WHEELS 3 & 4*/
-
-/* If the microstep is on 8, then we need 1600 steps per one rotation
-(Hypothetically). TODO: It's not actually doing that.
-
-Set acceration time to .5 seconds (0 to max speed in half a second)
-
-Set max speed to 6400hz (This shouldn't matter I think it should do a whole
-rotation no matter the speed).
-
-Acceleration (steps/s/s) should just be the max speed divided by the
-acceleration time.
-*/
 #define RXD2 16
 #define TXD2 17
 
-// Wheel *Wheel1 = nullptr;
-// Wheel *Wheel2 = nullptr;
 Wheel *Wheel3 = nullptr;
 Wheel *Wheel4 = nullptr;
 
 std::string recieveMessageFromParent();
+void initWheels();
+void parseCommand(std::string command);
 
 void setup() {
     Serial.begin(115200);
@@ -34,64 +31,7 @@ void setup() {
     Serial.println("=====SERIAL BEGIN=====");
     // Wheel::engineStartup();
 
-    // pinMode(WHEEL1_PULSE_LIFT, OUTPUT);
-    // pinMode(WHEEL1_ENABLE_LIFT, OUTPUT);
-    // pinMode(WHEEL1_DIRECTION_LIFT, OUTPUT);
-    // pinMode(WHEEL1_PULSE_DRIVE, OUTPUT);
-    // pinMode(WHEEL1_ENABLE_DRIVE, OUTPUT);
-    // pinMode(WHEEL1_DIRECTION_DRIVE, OUTPUT);
-    // pinMode(WHEEL1_PULSE_SWERVE, OUTPUT);
-    // pinMode(WHEEL1_ENABLE_SWERVE, OUTPUT);
-    // pinMode(WHEEL1_DIRECTION_SWERVE, OUTPUT);
-
-    // pinMode(WHEEL2_PULSE_LIFT, OUTPUT);
-    // pinMode(WHEEL2_ENABLE_LIFT, OUTPUT);
-    // pinMode(WHEEL2_DIRECTION_LIFT, OUTPUT);
-    // pinMode(WHEEL2_PULSE_DRIVE, OUTPUT);
-    // pinMode(WHEEL2_ENABLE_DRIVE, OUTPUT);
-    // pinMode(WHEEL2_DIRECTION_DRIVE, OUTPUT);
-    // pinMode(WHEEL2_PULSE_SWERVE, OUTPUT);
-    // pinMode(WHEEL2_ENABLE_SWERVE, OUTPUT);
-    // pinMode(WHEEL2_DIRECTION_SWERVE, OUTPUT);
-
-    // pinMode(WHEEL3_PULSE_LIFT, OUTPUT);
-    // pinMode(WHEEL3_ENABLE_LIFT, OUTPUT);
-    // pinMode(WHEEL3_DIRECTION_LIFT, OUTPUT);
-    // pinMode(WHEEL3_PULSE_DRIVE, OUTPUT);
-    // pinMode(WHEEL3_ENABLE_DRIVE, OUTPUT);
-    // pinMode(WHEEL3_DIRECTION_DRIVE, OUTPUT);
-    // pinMode(WHEEL3_PULSE_SWERVE, OUTPUT);
-    // pinMode(WHEEL3_ENABLE_SWERVE, OUTPUT);
-    // pinMode(WHEEL3_DIRECTION_SWERVE, OUTPUT);
-
-    // pinMode(WHEEL4_PULSE_LIFT, OUTPUT);
-    // pinMode(WHEEL4_ENABLE_LIFT, OUTPUT);
-    // pinMode(WHEEL4_DIRECTION_LIFT, OUTPUT);
-    // pinMode(WHEEL4_PULSE_DRIVE, OUTPUT);
-    // pinMode(WHEEL4_ENABLE_DRIVE, OUTPUT);
-    // pinMode(WHEEL4_DIRECTION_DRIVE, OUTPUT);
-    // pinMode(WHEEL4_PULSE_SWERVE, OUTPUT);
-    // pinMode(WHEEL4_ENABLE_SWERVE, OUTPUT);
-    // pinMode(WHEEL4_DIRECTION_SWERVE, OUTPUT);
-    
-
-    // MotorSettings_t wheel1_lift_settings = {WHEEL1_PULSE_LIFT, WHEEL1_ENABLE_LIFT, WHEEL1_DIRECTION_LIFT, 10000, 4000};
-    // MotorSettings_t wheel1_drive_settings = {WHEEL1_PULSE_DRIVE, WHEEL1_ENABLE_DRIVE, WHEEL1_DIRECTION_DRIVE, 8000, 8000};
-    // MotorSettings_t wheel1_turn_settings = {WHEEL1_PULSE_SWERVE, WHEEL1_ENABLE_SWERVE, WHEEL1_DIRECTION_SWERVE, 10000, 4000};
-    
-    // Wheel1 = new Wheel(wheel1_lift_settings, wheel1_drive_settings, wheel1_turn_settings);
-    // if (Wheel1 == nullptr) {
-    //     Serial.println("Wheel 1 is fucked");
-    // }
-
-    // MotorSettings_t wheel2_lift_settings = {WHEEL2_PULSE_LIFT, WHEEL2_ENABLE_LIFT, WHEEL2_DIRECTION_LIFT, 10000, 4000};
-    // MotorSettings_t wheel2_drive_settings = {WHEEL2_PULSE_DRIVE, WHEEL2_ENABLE_DRIVE, WHEEL2_DIRECTION_DRIVE, 8000, 8000};
-    // MotorSettings_t wheel2_turn_settings = {WHEEL2_PULSE_SWERVE, WHEEL2_ENABLE_SWERVE, WHEEL2_DIRECTION_SWERVE, 1000, 1000};
-    
-    // Wheel2 = new Wheel(wheel2_lift_settings, wheel2_drive_settings, wheel2_turn_settings);
-    // if (Wheel2 == nullptr) {
-    //     Serial.println("Wheel 2 is fucked");
-    // }
+    initWheels();
 
     // MotorSettings_t wheel3_lift_settings = {WHEEL3_PULSE_LIFT, WHEEL3_ENABLE_LIFT, WHEEL3_DIRECTION_LIFT, 10000, 4000};
     // MotorSettings_t wheel3_drive_settings = {WHEEL3_PULSE_DRIVE, WHEEL3_ENABLE_DRIVE, WHEEL3_DIRECTION_DRIVE, 8000, 8000};
@@ -111,9 +51,7 @@ void setup() {
     //     Serial.println("Wheel 4 is fucked");
     // }
 
-
-    /* SPI Child Init */
-    // SPI bus configuration
+    /* SPI Child Init - SPI bus configuration */
     spi_bus_config_t buscfg = {
         .mosi_io_num = VSPI_COPI,
         .miso_io_num = VSPI_CIPO,
@@ -122,7 +60,7 @@ void setup() {
         .quadhd_io_num = -1
     };
 
-    // SPI child interface configuration
+    /* SPI child interface configuration */
     spi_slave_interface_config_t chldcfg = {
         .spics_io_num = VSPI_CS,
         .flags = 0,
@@ -150,106 +88,76 @@ void setup() {
     digitalWrite(LED_BUILTIN, LOW);
 }
 
+/********** initWheels **********
+ * 
+ * Intializes the pulse, enable, and direction pins of the lift, drive, and
+ * swerve motors to output mode.
+ * 
+ * Inputs/Returns: 
+ *      None.
+ * 
+ ************************/
+void initWheels() {
+    pinMode(WHEEL3_PULSE_LIFT, OUTPUT);
+    pinMode(WHEEL3_ENABLE_LIFT, OUTPUT);
+    pinMode(WHEEL3_DIRECTION_LIFT, OUTPUT);
+    pinMode(WHEEL3_PULSE_DRIVE, OUTPUT);
+    pinMode(WHEEL3_ENABLE_DRIVE, OUTPUT);
+    pinMode(WHEEL3_DIRECTION_DRIVE, OUTPUT);
+    pinMode(WHEEL3_PULSE_SWERVE, OUTPUT);
+    pinMode(WHEEL3_ENABLE_SWERVE, OUTPUT);
+    pinMode(WHEEL3_DIRECTION_SWERVE, OUTPUT);
+
+    pinMode(WHEEL4_PULSE_LIFT, OUTPUT);
+    pinMode(WHEEL4_ENABLE_LIFT, OUTPUT);
+    pinMode(WHEEL4_DIRECTION_LIFT, OUTPUT);
+    pinMode(WHEEL4_PULSE_DRIVE, OUTPUT);
+    pinMode(WHEEL4_ENABLE_DRIVE, OUTPUT);
+    pinMode(WHEEL4_DIRECTION_DRIVE, OUTPUT);
+    pinMode(WHEEL4_PULSE_SWERVE, OUTPUT);
+    pinMode(WHEEL4_ENABLE_SWERVE, OUTPUT);
+    pinMode(WHEEL4_DIRECTION_SWERVE, OUTPUT);
+}
+
 void loop() {  
     Serial.print("inside loop!");
 
-//     // Wheel3->moveForward(48000); 
-//     // Wheel2->moveForward(48000);
-//     // Wheel1->moveForward(48000);
-//     // Wheel4->moveForward(48000);
-//     // Wheel3->turnRight(48000);
-//     // Wheel3->moveForward(48000);
-
-    /* SPI */
-    // to put a esp in child mode you can't use arduino library since that
-    // initiliazes it as a parent, instead we use ESP libraries to configure it
-    // into child mode
-
-    // since there is no heap and we don't know how long of a message will come
-    // across we first send across size (in bytes) then make a buffer to recieve
-    // the whole message:
-
-    // instance of transaction struct "t" 
-    //spi_slave_transaction_t t;
-
-    std::string message = recieveMessageFromParent();
-    
-    
-    Serial.println(message.c_str());
-    
-    // // set everything in child struct to 0
-    // memset(&t, 0, sizeof(t));
-    
-    // // first byte array of size 1 to get length of message
-    // uint8_t length_buf[128];
-    // t.length = 8; // 8 bits = 1 byte = length of transaction
-    // // assigns length_buf as the container for transferred bytes
-    // t.rx_buffer = length_buf;
-    // t.tx_buffer = nullptr;
-
-    // // waiting for parent to transmit (spi_slave_transmit() is a blocking call)
-    // esp_err_t t_status = spi_slave_transmit(VSPI_HOST, &t, portMAX_DELAY);
-    // if (t_status == ESP_OK) {
-    //     Serial.print("Nothing wong\n");
-    // } else if (t_status == ESP_ERR_TIMEOUT) {
-    //     Serial.print("Took too wong\n");
-    //     return;
-    // } else if (t_status == ESP_ERR_INVALID_STATE) {
-    //     Serial.print("Invalid state\n");
-    //     return;
-    // } else if (t_status == ESP_ERR_INVALID_ARG) {
-    //     Serial.print("Invalid argument\n");
-    //     return;
-    // } else {
-    //     Serial.print("Someting wong\n");
-    //     return;
-    // }
-
-    // uint8_t msg_length = length_buf[0];
-    // Serial.printf("Message incoming, size: %d\n", msg_length);
-
-
-    // // intance of transaction struct "t2" 
-    // spi_slave_transaction_t t2;
-    // // set everything to 0 in the struct
-    // memset(&t2, 0, sizeof(t2));
-    // // data container 256 (max message length) bytes big all set to 0
-    // uint8_t rec_buf[256] = {0}; 
-    // t2.length = msg_length * 8; // length of message is what we found above * 8 (in bits)
-    // t2.rx_buffer = rec_buf;
-
-    // // waiting for parent esp to send data 
-    // esp_err_t t2_status = spi_slave_transmit(VSPI_HOST, &t2, portMAX_DELAY);
-    // if (t2_status == ESP_OK) {
-    //     Serial.print("Recieved message: \n");
-    //     digitalWrite(LED_BUILTIN, LOW); // turn back off debug LED
-    //     for (int i = 0; i < msg_length; i++) {
-    //         Serial.write(rec_buf[i]);
-    //         Serial.println();
-    //     }
-    // } else {
-    //     Serial.print("Failed transaction 2\n");
-    // }
-
-    // clear the buffers?
-
-
+    /* Get command from parent */
+    std::string command = recieveMessageFromParent();
+    Serial.println(command.c_str());
     delay(1000);
+    parseCommand(command);
 }
 
+/********** recieveMessageFromParent **********
+  * Description: 
+  *     Recieves a character array message from the parent ESP32.
+  * 
+  * Inputs: 
+  *     None.
+  * 
+  * Returns:
+  *     std::string: message from parent.
+  * 
+  * Notes:
+  *     - Since there is no heap and we don't know how long of a message will
+  *       come across we first send across size (in bytes) then make a buffer 
+  *       to recieve the whole message
+  *     - Use memset tp set everything in child struct to 0
+  *     - Uses spi_slave_transmit() blocking call to wait for parent to send
+  * 
+  ************************/
 std::string recieveMessageFromParent() {
     spi_slave_transaction_t t;
-    // set everything in child struct to 0
     memset(&t, 0, sizeof(t));
     
-    // first byte array of size 1 to get length of message
+    /* First byte array of size 1 to get length of message */
     uint8_t length_buf[128];
     t.length = 8; // 8 bits = 1 byte = length of transaction
-    // assigns length_buf as the container for transferred bytes
+    /* assigns length_buf as the container for transferred bytes */
     t.rx_buffer = length_buf;
     t.tx_buffer = nullptr;
 
-    // waiting for parent to transmit (spi_slave_transmit() is a blocking call)
     esp_err_t t_status = spi_slave_transmit(VSPI_HOST, &t, portMAX_DELAY);
     if (t_status == ESP_OK) {
         Serial.print("Nothing wong\n");
@@ -266,14 +174,12 @@ std::string recieveMessageFromParent() {
     uint8_t msg_length = length_buf[0];
     Serial.printf("Message incoming, size: %d\n", msg_length);
 
-
-    // intance of transaction struct "t2" 
     spi_slave_transaction_t t2;
-    // set everything to 0 in the struct
     memset(&t2, 0, sizeof(t2));
-    // data container 256 (max message length) bytes big all set to 0
+    
+    /* data container 256 (max message length) bytes big all set to 0 */
     uint8_t rec_buf[256] = {0}; 
-    t2.length = msg_length * 8; // length of message is what we found above * 8 (in bits)
+    t2.length = msg_length * 8;
     t2.rx_buffer = rec_buf;
 
     // return string
@@ -293,4 +199,42 @@ std::string recieveMessageFromParent() {
         Serial.print("Failed transaction 2\n");
     }
     return parent_msg;
+}
+
+/********** parseCommands **********
+ * 
+ *     Handles commands from parent and calls appropriate wheel functions.
+ * 
+ * Inputs:
+ *    std::string command - command from parent
+ * 
+ * Returns:
+ *    None.
+ * 
+ * Expects:
+ *   - Commands apply to both wheel 3 and wheel 4
+ * 
+ * Notes:
+ *   - Commands could be like "MOVE_FORWARD", "TURN_RIGHT", etc.
+ * 
+ ************************/
+ void parseCommand(std::string command) {
+    if (command == "MOVE_FORWARD") {
+        Wheel3->moveForward(48000); 
+        Wheel4->moveForward(48000);
+    } else if (command == "MOVE_BACKWARDS") {
+        Wheel3->moveBackwards(48000);
+        Wheel4->moveBackwards(48000);
+    } else if (command == "TURN_RIGHT") {
+        Wheel3->turnRight(48000);
+        Wheel4->turnRight(48000);
+    } else if (command == "TURN_LEFT") {
+        Wheel3->turnLeft(48000);
+        Wheel4->turnLeft(48000);
+    } else if (command == "STOP") {
+        Wheel3->stopMoving();
+        Wheel4->stopMoving();
+    } else {
+        Serial.println("Unknown command received");
+    }
 }
