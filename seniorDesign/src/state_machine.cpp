@@ -13,6 +13,25 @@
  ************************/
 StateMachine::StateMachine() {
     currentState = STATE_STOP;
+    currentCommand = CMD_MOVE_TO_P1;
+}
+
+/********** sendCommandToStateMachine **********
+ * 
+ * Sends a command to the state machine.
+ * 
+ * Inputs:
+ *   uint8_t command - command to send.
+ * 
+ * Returns:
+ *   None.
+ * 
+ * Notes:
+ *   - Commands defined in state_machine.h
+ * 
+ ************************/
+void StateMachine::sendCommandToStateMachine(uint8_t command) {
+    currentCommand = command;
 }
 
 /********** updateState **********
@@ -35,18 +54,22 @@ void StateMachine::updateState() {
     uint8_t command = getCommand();
 
     if ((state == STATE_STOP) and (command == CMD_MOVE_TO_P1)) {
+        Serial.printf("in stop state moving to P1\n");
         currentCommand = CMD_MOVE_TO_P1;
         currentState   = STATE_AT_P1;
 
     } else if ((state == STATE_AT_P1) and (command == CMD_MOVE_TO_P2)) {
+        Serial.printf("in state P1 moving to P2\n");
         currentCommand = CMD_MOVE_TO_P2;
         currentState   = STATE_AT_P2;
 
     } else if ((state == STATE_AT_P2) and (command == CMD_MOVE_TO_P3)) {
+        Serial.printf("in state P2 moving to P3\n");
         currentCommand = CMD_MOVE_TO_P3;
         currentState   = STATE_AT_P3;
 
     } else if ((state == STATE_AT_P3) and (command == CMD_MOVE_TO_P4)) {
+        Serial.printf("in state P3 moving to P4\n");
         currentCommand = CMD_MOVE_TO_P4;
         currentState   = STATE_AT_P4;
 

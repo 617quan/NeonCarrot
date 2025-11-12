@@ -23,7 +23,7 @@ Wheel *Wheel3 = nullptr;
 Wheel *Wheel4 = nullptr;
 
 uint8_t recieveMessageFromParent();
-void initWheels();
+void initWheels34();
 void parseCommand(uint8_t command);
 
 void setup() {
@@ -32,7 +32,7 @@ void setup() {
     Serial.println("=====SERIAL BEGIN=====");
     // Wheel::engineStartup();
 
-    initWheels();
+    initWheels34();
 
     // MotorSettings_t wheel3_lift_settings = {WHEEL3_PULSE_LIFT, WHEEL3_ENABLE_LIFT, WHEEL3_DIRECTION_LIFT, 10000, 4000};
     // MotorSettings_t wheel3_drive_settings = {WHEEL3_PULSE_DRIVE, WHEEL3_ENABLE_DRIVE, WHEEL3_DIRECTION_DRIVE, 8000, 8000};
@@ -89,7 +89,7 @@ void setup() {
     digitalWrite(LED_BUILTIN, LOW);
 }
 
-/********** initWheels **********
+/********** initWheels34 **********
  * 
  * Intializes the pulse, enable, and direction pins of the lift, drive, and
  * swerve motors to output mode.
@@ -98,7 +98,7 @@ void setup() {
  *      None.
  * 
  ************************/
-void initWheels() {
+void initWheels34() {
     pinMode(WHEEL3_PULSE_LIFT, OUTPUT);
     pinMode(WHEEL3_ENABLE_LIFT, OUTPUT);
     pinMode(WHEEL3_DIRECTION_LIFT, OUTPUT);
@@ -121,11 +121,10 @@ void initWheels() {
 }
 
 void loop() {  
-    Serial.print("inside loop!");
 
     /* Get command from parent */
-    int command = recieveMessageFromParent();
-    Serial.println(command);
+    uint8_t command = recieveMessageFromParent();
+    Serial.printf("Command to be parsed: %u\n", command);
     delay(1000);
     parseCommand(command);
 }
@@ -153,7 +152,7 @@ uint8_t recieveMessageFromParent() {
     memset(&t, 0, sizeof(t));
     
     /* Receive 1-byte uint8_t */
-    uint8_t rec_buf[1] = {0};
+    uint8_t rec_buf[128] = {0};
     t.length = 8; // 8 bits = 1 byte for uint8_t
     t.rx_buffer = rec_buf;
     t.tx_buffer = nullptr;
@@ -172,7 +171,7 @@ uint8_t recieveMessageFromParent() {
     }
 
     uint8_t command = rec_buf[0];
-    Serial.printf("Command received: %u\n", command);
+    Serial.printf("Receiving message from parent, command: %u\n", command);
     
     return command;
 }
@@ -215,59 +214,3 @@ uint8_t recieveMessageFromParent() {
         Serial.println("Unknown command received");
     }
 }
-
-
-/* OLD VERSION */
-// int recieveMessageFromParent() {
-//     spi_slave_transaction_t t;
-//     memset(&t, 0, sizeof(t));
-    
-//     /* First byte array of size 1 to get length of message */
-//     uint8_t length_buf[128];
-//     t.length = 8; // 8 bits = 1 byte = length of transaction
-//     /* assigns length_buf as the container for transferred bytes */
-//     t.rx_buffer = length_buf;
-//     t.tx_buffer = nullptr;
-
-//     esp_err_t t_status = spi_slave_transmit(VSPI_HOST, &t, portMAX_DELAY);
-//     if (t_status == ESP_OK) {
-//         Serial.print("Nothing wong\n");
-//     } else if (t_status == ESP_ERR_TIMEOUT) {
-//         Serial.print("Took too wong\n");
-//     } else if (t_status == ESP_ERR_INVALID_STATE) {
-//         Serial.print("Invalid state\n");
-//     } else if (t_status == ESP_ERR_INVALID_ARG) {
-//         Serial.print("Invalid argument\n");
-//     } else {
-//         Serial.print("Someting wong\n");
-//     }
-
-//     uint8_t msg_length = length_buf[0];
-//     Serial.printf("Message incoming, size: %d\n", msg_length);
-
-//     spi_slave_transaction_t t2;
-//     memset(&t2, 0, sizeof(t2));
-    
-//     /* data container 256 (max message length) bytes big all set to 0 */
-//     uint8_t rec_buf[256] = {0}; 
-//     t2.length = msg_length * 8;
-//     t2.rx_buffer = rec_buf;
-
-//     // return string
-//     char parent_msg_array [msg_length];
-//     std::string parent_msg = "";
-//     // waiting for parent esp to send data 
-//     esp_err_t t2_status = spi_slave_transmit(VSPI_HOST, &t2, portMAX_DELAY);
-//     if (t2_status == ESP_OK) {
-//         Serial.print("Recieved message: \n");
-//         for (int i = 0; i < msg_length; i++) {
-//             Serial.write(rec_buf[i]);
-//             parent_msg_array[i] = rec_buf[i];
-//             parent_msg += parent_msg_array[i];
-//             Serial.println();
-//         }
-//     } else {
-//         Serial.print("Failed transaction 2\n");
-//     }
-//     return parent_msg;
-// }

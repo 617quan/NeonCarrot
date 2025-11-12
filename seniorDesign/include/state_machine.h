@@ -22,6 +22,7 @@ class StateMachine {
 public:
     StateMachine();
 
+    void sendCommandToStateMachine(uint8_t command);
     void updateState();
     void stop();
 
