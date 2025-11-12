@@ -14,6 +14,7 @@
 #include "wheel.h"
 #include <string>
 #include "driver/spi_slave.h"
+#include "state_machine.h"
 
 #define RXD2 16
 #define TXD2 17
@@ -21,9 +22,9 @@
 Wheel *Wheel3 = nullptr;
 Wheel *Wheel4 = nullptr;
 
-std::string recieveMessageFromParent();
+uint8_t recieveMessageFromParent();
 void initWheels();
-void parseCommand(std::string command);
+void parseCommand(uint8_t command);
 
 void setup() {
     Serial.begin(115200);
@@ -123,21 +124,21 @@ void loop() {
     Serial.print("inside loop!");
 
     /* Get command from parent */
-    std::string command = recieveMessageFromParent();
-    Serial.println(command.c_str());
+    int command = recieveMessageFromParent();
+    Serial.println(command);
     delay(1000);
     parseCommand(command);
 }
 
 /********** recieveMessageFromParent **********
   * Description: 
-  *     Recieves a character array message from the parent ESP32.
+  *     Recieves an uint8_t message from the parent ESP32.
   * 
   * Inputs: 
   *     None.
   * 
   * Returns:
-  *     std::string: message from parent.
+  *     uint8_t - message from parent.
   * 
   * Notes:
   *     - Since there is no heap and we don't know how long of a message will
@@ -147,15 +148,14 @@ void loop() {
   *     - Uses spi_slave_transmit() blocking call to wait for parent to send
   * 
   ************************/
-std::string recieveMessageFromParent() {
+uint8_t recieveMessageFromParent() {
     spi_slave_transaction_t t;
     memset(&t, 0, sizeof(t));
     
-    /* First byte array of size 1 to get length of message */
-    uint8_t length_buf[128];
-    t.length = 8; // 8 bits = 1 byte = length of transaction
-    /* assigns length_buf as the container for transferred bytes */
-    t.rx_buffer = length_buf;
+    /* Receive 1-byte uint8_t */
+    uint8_t rec_buf[1] = {0};
+    t.length = 8; // 8 bits = 1 byte for uint8_t
+    t.rx_buffer = rec_buf;
     t.tx_buffer = nullptr;
 
     esp_err_t t_status = spi_slave_transmit(VSPI_HOST, &t, portMAX_DELAY);
@@ -168,45 +168,21 @@ std::string recieveMessageFromParent() {
     } else if (t_status == ESP_ERR_INVALID_ARG) {
         Serial.print("Invalid argument\n");
     } else {
-        Serial.print("Someting wong\n");
+        Serial.print("Transaction failed\n");
     }
 
-    uint8_t msg_length = length_buf[0];
-    Serial.printf("Message incoming, size: %d\n", msg_length);
-
-    spi_slave_transaction_t t2;
-    memset(&t2, 0, sizeof(t2));
+    uint8_t command = rec_buf[0];
+    Serial.printf("Command received: %u\n", command);
     
-    /* data container 256 (max message length) bytes big all set to 0 */
-    uint8_t rec_buf[256] = {0}; 
-    t2.length = msg_length * 8;
-    t2.rx_buffer = rec_buf;
-
-    // return string
-    char parent_msg_array [msg_length];
-    std::string parent_msg = "";
-    // waiting for parent esp to send data 
-    esp_err_t t2_status = spi_slave_transmit(VSPI_HOST, &t2, portMAX_DELAY);
-    if (t2_status == ESP_OK) {
-        Serial.print("Recieved message: \n");
-        for (int i = 0; i < msg_length; i++) {
-            Serial.write(rec_buf[i]);
-            parent_msg_array[i] = rec_buf[i];
-            parent_msg += parent_msg_array[i];
-            Serial.println();
-        }
-    } else {
-        Serial.print("Failed transaction 2\n");
-    }
-    return parent_msg;
+    return command;
 }
 
 /********** parseCommands **********
  * 
- *     Handles commands from parent and calls appropriate wheel functions.
+ * Handles commands from parent and calls appropriate wheel functions.
  * 
  * Inputs:
- *    std::string command - command from parent
+ *    uint8_t command - command from parent
  * 
  * Returns:
  *    None.
@@ -215,26 +191,83 @@ std::string recieveMessageFromParent() {
  *   - Commands apply to both wheel 3 and wheel 4
  * 
  * Notes:
- *   - Commands could be like "MOVE_FORWARD", "TURN_RIGHT", etc.
+ *  - Commands defined in state_machine.h
  * 
  ************************/
- void parseCommand(std::string command) {
-    if (command == "MOVE_FORWARD") {
+ void parseCommand(uint8_t command) {
+    if (command == CMD_MOVE_TO_P2) {
         Wheel3->moveForward(48000); 
         Wheel4->moveForward(48000);
-    } else if (command == "MOVE_BACKWARDS") {
-        Wheel3->moveBackwards(48000);
-        Wheel4->moveBackwards(48000);
-    } else if (command == "TURN_RIGHT") {
+    } else if (command == CMD_MOVE_TO_P3) {
         Wheel3->turnRight(48000);
         Wheel4->turnRight(48000);
-    } else if (command == "TURN_LEFT") {
-        Wheel3->turnLeft(48000);
-        Wheel4->turnLeft(48000);
-    } else if (command == "STOP") {
+        Wheel3->moveForward(48000); 
+        Wheel4->moveForward(48000);
+    } else if (command == CMD_MOVE_TO_P4) {
+        Wheel3->turnRight(48000);
+        Wheel4->turnRight(48000);
+        Wheel3->moveForward(48000); 
+        Wheel4->moveForward(48000);
+    } else if (command == CMD_STOP_MOVE) {
         Wheel3->stopMoving();
         Wheel4->stopMoving();
     } else {
         Serial.println("Unknown command received");
     }
 }
+
+
+/* OLD VERSION */
+// int recieveMessageFromParent() {
+//     spi_slave_transaction_t t;
+//     memset(&t, 0, sizeof(t));
+    
+//     /* First byte array of size 1 to get length of message */
+//     uint8_t length_buf[128];
+//     t.length = 8; // 8 bits = 1 byte = length of transaction
+//     /* assigns length_buf as the container for transferred bytes */
+//     t.rx_buffer = length_buf;
+//     t.tx_buffer = nullptr;
+
+//     esp_err_t t_status = spi_slave_transmit(VSPI_HOST, &t, portMAX_DELAY);
+//     if (t_status == ESP_OK) {
+//         Serial.print("Nothing wong\n");
+//     } else if (t_status == ESP_ERR_TIMEOUT) {
+//         Serial.print("Took too wong\n");
+//     } else if (t_status == ESP_ERR_INVALID_STATE) {
+//         Serial.print("Invalid state\n");
+//     } else if (t_status == ESP_ERR_INVALID_ARG) {
+//         Serial.print("Invalid argument\n");
+//     } else {
+//         Serial.print("Someting wong\n");
+//     }
+
+//     uint8_t msg_length = length_buf[0];
+//     Serial.printf("Message incoming, size: %d\n", msg_length);
+
+//     spi_slave_transaction_t t2;
+//     memset(&t2, 0, sizeof(t2));
+    
+//     /* data container 256 (max message length) bytes big all set to 0 */
+//     uint8_t rec_buf[256] = {0}; 
+//     t2.length = msg_length * 8;
+//     t2.rx_buffer = rec_buf;
+
+//     // return string
+//     char parent_msg_array [msg_length];
+//     std::string parent_msg = "";
+//     // waiting for parent esp to send data 
+//     esp_err_t t2_status = spi_slave_transmit(VSPI_HOST, &t2, portMAX_DELAY);
+//     if (t2_status == ESP_OK) {
+//         Serial.print("Recieved message: \n");
+//         for (int i = 0; i < msg_length; i++) {
+//             Serial.write(rec_buf[i]);
+//             parent_msg_array[i] = rec_buf[i];
+//             parent_msg += parent_msg_array[i];
+//             Serial.println();
+//         }
+//     } else {
+//         Serial.print("Failed transaction 2\n");
+//     }
+//     return parent_msg;
+// }

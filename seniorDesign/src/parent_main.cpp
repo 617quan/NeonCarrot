@@ -32,7 +32,7 @@ StateMachine state_machine;
 // falling edge, 20MHz is frequency for communication clock)
 SPISettings mySettings(20000000, MSBFIRST, SPI_MODE0);
 
-void sendMessageToChild(const char message[], size_t size_of_msg, SPIClass *spi);
+void sendMessageToChild(uint8_t message, SPIClass *spi);
 void initWheels();
 
 void setup() {
@@ -117,55 +117,75 @@ void loop() {
      * (don't use) */
 
     /* Send test message to child ESP32 */
-    char message[] = "Hello World!";
-    sendMessageToChild(message, sizeof(message), vspi);
+    uint8_t message = 5;
+    sendMessageToChild(message, vspi);
     delay(1000);
 
     /* State Machine */
-    char command[] = state_machine.getCommand();
-    sendMessageToChild(command, sizeof(command), vspi);
+    uint8_t command = state_machine.getCommand();
+    sendMessageToChild(command, vspi);
 }
 
 /********** sendMessageToChild **********
  * Description: 
- *       Sends a character array message to the child peripheral/ESP32
+ *       Sends a message to the child peripheral/ESP32
+ * 
  * Inputs: 
- *       char message[] - array of characters to send to child
- *       SPIClass spi   - SPI bus to use (vspi or hspi)
+ *       int message  - integer message to send to child
+ *       SPIClass spi - SPI bus to use (vspi or hspi)
+ * 
  * Returns: 
  *       None.
+ * 
  * Notes:
  *     - Use begintransaction(mySettings), transfer(), and then endTransaction()
  *     - Set object's CS/SS pin to low to tell child peripheral/ESP32 to get
  *       ready, and then set it back to high when done
  *     - Any other library can't use SPI until endTransaction is called
  ************************/
-void sendMessageToChild(const char message[], size_t size_of_msg, SPIClass *spi) {
+void sendMessageToChild(uint8_t message, SPIClass *spi) {
     /* Create buffer to hold message */
-    uint8_t buf[size_of_msg];
-    memcpy(buf, message, size_of_msg);
+    uint8_t buf[sizeof(uint8_t)];
+    memcpy(buf, &message, sizeof(uint8_t));
 
-    /* Transfer size of message */
-    spi->beginTransaction(mySettings);
-    // delay(1000);
-    digitalWrite(VSPI_CS, LOW);
-
-    // send size as a single byte (will truncate if >255)
-    uint8_t size_byte = (uint8_t)size_of_msg;
-    spi->transfer(size_byte);
-
-    digitalWrite(VSPI_CS, HIGH);
-    spi->endTransaction();
-
-    delay(100);
-
-    /* Transfer message itself */
+    /* Transfer message */
     spi->beginTransaction(mySettings);
     digitalWrite(VSPI_CS, LOW);
 
-    // transfer the buffer (cast away const for API)
-    spi->transfer(buf, size_of_msg);
+    /* Transfer the buffer (cast away const for API) */
+    spi->transfer(buf, sizeof(uint8_t));
 
     digitalWrite(VSPI_CS, HIGH);
     spi->endTransaction();
 }
+
+// OLD VERSION
+// void sendMessageToChild(const char message[], size_t size_of_msg, SPIClass *spi) {
+//     /* Create buffer to hold message */
+//     uint8_t buf[size_of_msg];
+//     memcpy(buf, message, size_of_msg);
+
+//     /* Transfer size of message */
+//     spi->beginTransaction(mySettings);
+//     // delay(1000);
+//     digitalWrite(VSPI_CS, LOW);
+
+//     // send size as a single byte (will truncate if >255)
+//     uint8_t size_byte = (uint8_t)size_of_msg;
+//     spi->transfer(size_byte);
+
+//     digitalWrite(VSPI_CS, HIGH);
+//     spi->endTransaction();
+
+//     delay(100);
+
+//     /* Transfer message itself */
+//     spi->beginTransaction(mySettings);
+//     digitalWrite(VSPI_CS, LOW);
+
+//     // transfer the buffer (cast away const for API)
+//     spi->transfer(buf, size_of_msg);
+
+//     digitalWrite(VSPI_CS, HIGH);
+//     spi->endTransaction();
+// }
