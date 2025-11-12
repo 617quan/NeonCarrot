@@ -31,8 +31,8 @@ StateMachine::StateMachine() {
  * 
  ************************/
 void StateMachine::updateState() {
-    int state = getState();
-    int command = getCommand();
+    uint8_t state = getState();
+    uint8_t command = getCommand();
 
     if ((state == STATE_STOP) and (command == CMD_MOVE_TO_P1)) {
         currentCommand = CMD_MOVE_TO_P1;
@@ -60,13 +60,13 @@ void StateMachine::updateState() {
  * Returns the current state of the state machine.
  * 
  * Inputs:
- *   None.
+ *       None.
  * 
  * Returns:
- *  int: Current state.
+ *      uint8_t: Current state.
  * 
  ************************/
-int StateMachine::getState() {
+uint8_t StateMachine::getState() {
     return currentState;
 }
 
@@ -78,10 +78,10 @@ int StateMachine::getState() {
  *   None.
  * 
  * Returns:
- *  
+ *      uint8_t: Current command.
  * 
  ************************/
-int StateMachine::getCommand() {
+uint8_t StateMachine::getCommand() {
     return currentCommand;
 }
 

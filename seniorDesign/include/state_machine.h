@@ -1,6 +1,9 @@
 #ifndef STATE_MACHINE_H
 #define STATE_MACHINE_H
 
+#include <stdint.h>
+#include <Arduino.h>
+
 /* Define states */
 #define STATE_STOP  0
 #define STATE_AT_P1 1
@@ -22,12 +25,12 @@ public:
     void updateState();
     void stop();
 
-    int getState();
-    int getCommand();
+    uint8_t getState();
+    uint8_t getCommand();
     
 private:
-    int currentState;
-    int currentCommand;
+    uint8_t currentState;
+    uint8_t currentCommand;
 };
 
 #endif
