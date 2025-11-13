@@ -14,7 +14,7 @@
 #define WHEEL_CIRCUMFERENCE (2 * PI * WHEEL_RADIUS)
 #define TURN_GEARBOX_RATIO 100
 #define DRIVE_GEARBOX_RATIO 30
-#define MICROSTEP 8
+#define MICROSTEP 16
 #define STEPS_PER_REV MICROSTEP * 200
 
 #define FULL_DRIVE_ROTATION (STEPS_PER_REV * DRIVE_GEARBOX_RATIO)
@@ -24,8 +24,8 @@
 
 struct MotorSettings_t {
     uint8_t pulse_pin, enable_pin, dir_pin;
-    uint32_t max_speed = 0;
-    int32_t accel = 0;
+    uint32_t max_speed;
+    int32_t accel;
 };
 
 class Wheel {

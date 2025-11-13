@@ -167,7 +167,7 @@ void Wheel::moveDown(uint32_t num_steps) {
  *      
  ************************/
 void Wheel::turnRight(uint32_t degrees) {
-    // float steps_needed = (degrees / 360) * FULL_TURN_ROTATION;
+    float steps_needed = ((float)degrees / 360) * FULL_TURN_ROTATION;
     turn_motor->move(degrees, false);
 }
 

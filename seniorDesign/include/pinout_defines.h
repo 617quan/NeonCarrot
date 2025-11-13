@@ -5,73 +5,27 @@
 #ifndef _PINOUT_DEFINES
 #define _PINOUT_DEFINES
 
+#define DRIVE_PULSE 13
+#define DRIVE_DIRECTION 33
+#define DRIVE_ENABLE 32
+
+#define LIFT_PULSE 14
+#define LIFT_DIRECTION 22
+#define LIFT_ENABLE 4
+
+#define TURN_DIRECTION 15
+#define TURN_ENABLE 2
+
+
 /* WHEEL 1 PIN DEFINES */
 
-/* Controls the Pulse pins for All 3 Motors on Wheel 1 */
-#define WHEEL1_PULSE_LIFT 33
-#define WHEEL1_PULSE_SWERVE 25
-#define WHEEL1_PULSE_DRIVE 26
+#define WHEEL_1_TURN_PULSE 12
 
-/* Controls the Enable pins for All 3 Motors on Wheel 1 */
-#define WHEEL1_ENABLE_LIFT 23
-#define WHEEL1_ENABLE_SWERVE 23
-#define WHEEL1_ENABLE_DRIVE 23
-
-/* Controls the Direction pins for All 3 Motors on Wheel 1 */
-#define WHEEL1_DIRECTION_LIFT 16
-#define WHEEL1_DIRECTION_SWERVE 17
-#define WHEEL1_DIRECTION_DRIVE 5
 
 /* WHEEL 2 PIN DEFINES */
 
-/* Controls the Pulse pins for All 3 Motors on Wheel 2 */
-#define WHEEL2_PULSE_LIFT 27
-#define WHEEL2_PULSE_SWERVE 14
-#define WHEEL2_PULSE_DRIVE 12
+#define WHEEL_2_TURN_PULSE 26
 
-/* Controls the Enable pins for All 3 Motors on Wheel 2 */
-#define WHEEL2_ENABLE_LIFT 23
-#define WHEEL2_ENABLE_SWERVE 23
-#define WHEEL2_ENABLE_DRIVE 23
-
-/* Controls the Direction pins for All 3 Motors on Wheel 2 */
-#define WHEEL2_DIRECTION_LIFT 16
-#define WHEEL2_DIRECTION_SWERVE 17
-#define WHEEL2_DIRECTION_DRIVE 5
-
-/* WHEEL 3 PIN DEFINES */
-
-/* Controls the Pulse pins for All 3 Motors on Wheel 3 */
-#define WHEEL3_PULSE_LIFT 4 /* According to Quan's Big Diagram */
-#define WHEEL3_PULSE_SWERVE 2 /* According to Quan's Big Diagram */
-#define WHEEL3_PULSE_DRIVE 15 /* According to Quan's Big Diagram */
-
-/* Controls the Enable pins for All 3 Motors on Wheel 3 */
-#define WHEEL3_ENABLE_LIFT 23 /* According to Quan's Big Diagram */
-#define WHEEL3_ENABLE_SWERVE 23 /* According to Quan's Big Diagram */
-#define WHEEL3_ENABLE_DRIVE 23 /* According to Quan's Big Diagram */
-
-/* Controls the Direction pins for All 3 Motors on Wheel 3 */
-#define WHEEL3_DIRECTION_LIFT 16 /* NOTE: GRIFFIN THINKS WE NEED THIS. UNIVERSAL FOR ALL LIFT DIRECTIONS */
-#define WHEEL3_DIRECTION_SWERVE 17 /* NOTE: GRIFFIN THINKS WE NEED THIS. UNIVERSAL FOR ALL SWERVE DIRECTIONS */
-#define WHEEL3_DIRECTION_DRIVE 5 /* According to Quan's Big Diagram */
-
-/* WHEEL 4 PIN DEFINES */
-
-/* Controls the Pulse pins for All 3 Motors on Wheel 4 */
-#define WHEEL4_PULSE_LIFT 21
-#define WHEEL4_PULSE_SWERVE 19
-#define WHEEL4_PULSE_DRIVE 18
-
-/* Controls the Enable pins for All 3 Motors on Wheel 4 */
-#define WHEEL4_ENABLE_LIFT 23
-#define WHEEL4_ENABLE_SWERVE 23
-#define WHEEL4_ENABLE_DRIVE 23
-
-/* Controls the Direction pins for All 3 Motors on Wheel 4 */
-#define WHEEL4_DIRECTION_LIFT 16
-#define WHEEL4_DIRECTION_SWERVE 17
-#define WHEEL4_DIRECTION_DRIVE 5
 
 /* SPI Pins - just use VSPI for now */
 #define SPI_CLK 18
