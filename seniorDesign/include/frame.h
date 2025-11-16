@@ -2,8 +2,8 @@
  * Purpose: Wheel class
  */
 
-#ifndef _WHEEL
-#define _WHEEL
+#ifndef _MOTOR
+#define _MOTOR
 
 #include <stdint.h>
 #include <Arduino.h>
@@ -28,14 +28,14 @@ struct MotorSettings_t {
     int32_t accel;
 };
 
-class Wheel {
+class Frame {
 public:
-    Wheel(MotorSettings_t lift_motor_settings, 
-          MotorSettings_t drive_motor_settings, 
-          MotorSettings_t turn_motor_settings
+    Frame(MotorSettings_t drive_motor_settings, 
+          MotorSettings_t lift_motor_settings, 
+          MotorSettings_t turn_motor_settings[]
          );
 
-    ~Wheel();
+    ~Frame();
 
     static void engineStartup(); /* Call this at the beginning of setup to get the engine setup */
     
@@ -50,8 +50,6 @@ public:
 
     void calibratePosition();
 
-    FastAccelStepper *lift_motor, *turn_motor, *drive_motor = nullptr;
-
 private:
 
     /* Call these in the constructor to initialize all the pins */
@@ -59,17 +57,18 @@ private:
 
     /* Get the current position of each motor */
     int32_t getLiftCurrentPosition();
-    int32_t getTurnCurrentPosition();
+    std::array<int32_t, 4> getTurnCurrentPositions();
     int32_t getDriveCurrentPosition();
 
     /* Define the three motors and the engine. NOTE: static only instantiates
     one engine */
     static FastAccelStepperEngine engine;
 
-    /* Three structs to hold all of the pin numbers */
-    MotorSettings_t lift_motor_settings, turn_motor_settings, drive_motor_settings;
+    FastAccelStepper *drive_motors, *lift_motors, *turn1_motor, *turn2_motor, *turn3_motor, *turn4_motor;
 
-    bool testing_bool = 0;
+    /* Three structs to hold all of the pin numbers */
+    MotorSettings_t drive_motor_settings, lift_motor_settings, turn1_motor_settings;
+    MotorSettings_t turn2_motor_settings, turn3_motor_settings, turn4_motor_settings;
 
 };
 

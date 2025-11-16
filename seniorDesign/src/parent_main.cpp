@@ -92,7 +92,7 @@ void initWheels12() {
     }
 
     MotorSettings_t wheel2_lift_settings = {LIFT_PULSE, LIFT_ENABLE, LIFT_DIRECTION, 150000, 20000};
-    MotorSettings_t wheel2_drive_settings = {DRIVE_PULSE, DRIVE_ENABLE, DRIVE_DIRECTION, 30000, 20000};
+    MotorSettings_t wheel2_drive_settings = {27, DRIVE_ENABLE, 16, 30000, 20000};
     MotorSettings_t wheel2_turn_settings = {WHEEL_2_TURN_PULSE, TURN_ENABLE, TURN_DIRECTION, 20000, 10000};
     
     Wheel2 = new Wheel(wheel2_lift_settings, wheel2_drive_settings, wheel2_turn_settings);
@@ -112,8 +112,10 @@ void loop() {
      * (don't use) */
 
 
-    Wheel1->moveForward(60000);
-    Wheel2->moveForward(60000);
+    // Wheel1->moveForward(60000);
+    // Wheel2->moveForward(60000);
+    Wheel1->drive_motor->move(60000, false);
+    Wheel2->drive_motor->move(60000, false);
 
     delay(15000);
     /* Test */
