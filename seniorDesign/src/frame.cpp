@@ -127,7 +127,9 @@ FastAccelStepper* Frame::initMotor(MotorSettings_t motor_settings) {
     if (motor == nullptr) {
         char strBuf[60];
         sprintf(strBuf, "Motor with pulse pin %u cannot be initialized correctly", motor_settings.pulse_pin);
-        Serial.println(strBuf);
+        while (1) {
+            Serial.println(strBuf);
+        }
         return nullptr;
     }
     motor->setDirectionPin(motor_settings.dir_pin, true, 0);
