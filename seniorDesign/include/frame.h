@@ -1,5 +1,11 @@
-/* wheel.h
- * Purpose: Wheel class
+/* frame.h
+ * Purpose: Headder file for the frame class. Defines important motor
+ * information (wheel circumference, gearbox ratios, and microstep),
+ * MotorSettings_t struct, and all of the frame methods. Relies heavily on the
+ * FastAccelStepper github repository:
+ * https://github.com/gin66/FastAccelStepper/tree/00462dea3e96813f6cbdc04bb2079be33c409ece
+ * 
+ * 
  */
 
 #ifndef _MOTOR
@@ -52,21 +58,26 @@ public:
 
 private:
 
-    /* Call these in the constructor to initialize all the pins */
+    /* Call this in the constructor to initialize all motors to correct pins */
     FastAccelStepper* initMotor(MotorSettings_t lift_motor_settings);
 
-    /* Get the current position of each motor */
+    /* Getters for motor position. One function for each type of motor */
     int32_t getLiftCurrentPosition();
     std::array<int32_t, 4> getTurnCurrentPositions();
     int32_t getDriveCurrentPosition();
 
-    /* Define the three motors and the engine. NOTE: static only instantiates
-    one engine */
+    /* Define the engine used to initialize motors. NOTE: one one engine is
+    needed for all motors */
     static FastAccelStepperEngine engine;
 
+    /* Define stepper motor objects. These represent the physical motors on the
+    frame. NOTE: All 4 drive motors share the same 3 pins. All 4 lift motors
+    share the same 3 pins. Each turn motor has an individual pulse and direction
+    pin, but they all share the same enable pin. */
     FastAccelStepper *drive_motors, *lift_motors, *turn1_motor, *turn2_motor, *turn3_motor, *turn4_motor;
 
-    /* Three structs to hold all of the pin numbers */
+    /* Structs to hold the information about each motor (pinouts, max speed,
+    acceleration) */
     MotorSettings_t drive_motor_settings, lift_motor_settings, turn1_motor_settings;
     MotorSettings_t turn2_motor_settings, turn3_motor_settings, turn4_motor_settings;
 
