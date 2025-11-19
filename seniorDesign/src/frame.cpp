@@ -133,9 +133,10 @@ FastAccelStepper* Frame::initMotor(MotorSettings_t motor_settings) {
         return nullptr;
     }
     motor->setDirectionPin(motor_settings.dir_pin, true, 0);
-    motor->setEnablePin(motor_settings.enable_pin, false);
+    motor->setEnablePin(motor_settings.enable_pin, true);
     motor->setSpeedInHz(motor_settings.max_speed);
     motor->setAcceleration(motor_settings.accel);
+    motor->setAutoEnable(true);
     return motor;
 }
 
@@ -160,7 +161,7 @@ void Frame::moveUp(uint32_t num_steps) {
     /* TODO: Incorporate logic to be specific in how many inches the motor
     lifts */
 
-    lift_motors->move((int32_t)num_steps, false);
+    lift_motors->move(-int32_t(num_steps), false);
 }
 
 /********** moveDown **********
@@ -180,7 +181,7 @@ void Frame::moveUp(uint32_t num_steps) {
  * 
  ************************/
 void Frame::moveDown(uint32_t num_steps) {
-    lift_motors->move((int32_t)-num_steps, false);
+    lift_motors->move(int32_t(num_steps), true);
 }
 
 /********** turnRight **********
@@ -210,11 +211,11 @@ void Frame::moveDown(uint32_t num_steps) {
  *      
  ************************/
 void Frame::turnRight(uint32_t degrees) {
-    float steps_needed = ((float)degrees / 360) * (float)FULL_TURN_ROTATION;
-    turn1_motor->move((int32_t)steps_needed, false);
-    turn2_motor->move((int32_t)steps_needed, false);
-    turn3_motor->move((int32_t)steps_needed, false);
-    turn4_motor->move((int32_t)steps_needed, false);
+    // float steps_needed = ((float)degrees / 360) * (float)FULL_TURN_ROTATION;
+    turn1_motor->move((int32_t)degrees, false);
+    turn2_motor->move((int32_t)degrees, false);
+    turn3_motor->move((int32_t)degrees, false);
+    turn4_motor->move((int32_t)degrees, false);
 }
 
 /********** turnLeft **********
@@ -245,11 +246,11 @@ void Frame::turnRight(uint32_t degrees) {
  *      
  ************************/
 void Frame::turnLeft(uint32_t degrees) {
-    float steps_needed = (degrees / 360) * (float)FULL_TURN_ROTATION;
-    turn1_motor->move((int32_t)-steps_needed);
-    turn2_motor->move((int32_t)-steps_needed);
-    turn3_motor->move((int32_t)-steps_needed);
-    turn4_motor->move((int32_t)-steps_needed);
+    // float steps_needed = (degrees / 360) * (float)FULL_TURN_ROTATION;
+    turn1_motor->move((int32_t)degrees, false);
+    turn2_motor->move((int32_t)degrees, false);
+    turn3_motor->move((int32_t)degrees, false);
+    turn4_motor->move((int32_t)degrees, false);
 }
 
 /********** moveForward **********
@@ -274,8 +275,8 @@ void Frame::turnLeft(uint32_t degrees) {
  *      
  ************************/
 void Frame::moveForward(uint32_t num_inches) {
-    float steps_needed = ((float)num_inches / (float)WHEEL_CIRCUMFERENCE) * (float)FULL_DRIVE_ROTATION;
-    drive_motors->move((uint32_t)steps_needed, false);
+    // float steps_needed = ((float)num_inches / (float)WHEEL_CIRCUMFERENCE) * (float)FULL_DRIVE_ROTATION;
+    drive_motors->move(num_inches, false);
 }
 
 /********** moveBackward **********

@@ -36,15 +36,15 @@ void parseCommand(uint8_t command);
 
 
 void setup() {
-    Serial.begin(115200);
+    // Serial.begin(115200);
+
+    Frame::engineStartup();
     //Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
-    Serial.println("=====SERIAL BEGIN=====");
+    pinMode(LED_BUILTIN, OUTPUT);
     initFrame();
     initSPI();    
 
-    // debug LED
-    pinMode(LED_BUILTIN, OUTPUT);
-    digitalWrite(LED_BUILTIN, LOW);
+    
 }
 
 /********** initSPI **********
@@ -112,8 +112,6 @@ void initSPI() {
  ************************/
 void initFrame() {
 
-    Frame::engineStartup();
-
     pinMode(DRIVE_PULSE, OUTPUT);
     pinMode(DRIVE_DIRECTION, OUTPUT);
     pinMode(DRIVE_ENABLE, OUTPUT);
@@ -136,8 +134,8 @@ void initFrame() {
     pinMode(TURN4_PULSE, OUTPUT);
     pinMode(TURN4_DIRECTION, OUTPUT);
 
-    MotorSettings_t drive_motor_settings = {DRIVE_PULSE, DRIVE_ENABLE, DRIVE_DIRECTION, 30000, 20000};
-    MotorSettings_t lift_motor_settings = {LIFT_PULSE, LIFT_ENABLE, LIFT_DIRECTION, 150000, 20000};
+    MotorSettings_t drive_motor_settings = {DRIVE_PULSE, DRIVE_ENABLE, DRIVE_DIRECTION, 30000, 30000};
+    MotorSettings_t lift_motor_settings = {LIFT_PULSE, LIFT_ENABLE, LIFT_DIRECTION, 130000, 5000};
     MotorSettings_t turn1_motor_settings = {TURN1_PULSE, TURN1_DIRECTION, TURN_ENABLE, 20000, 10000};
     MotorSettings_t turn2_motor_settings = {TURN2_PULSE, TURN2_DIRECTION, TURN_ENABLE, 20000, 10000};
     MotorSettings_t turn3_motor_settings = {TURN3_PULSE, TURN3_DIRECTION, TURN_ENABLE, 20000, 10000};
@@ -156,15 +154,16 @@ void initFrame() {
 
 bool is_initialized = 0;
 void loop() {  
+    // digitalWrite(LED_BUILTIN, HIGH);
 
     /* Makeshift lift initialization. */
-    if (!is_initialized) {
-        frame->moveDown(2250000);
-        delay(20000);
-        frame->moveUp(1000000);
-        delay(16000);
-        is_initialized = 1;
-    }
+    // if (!is_initialized) {
+    //     frame->moveDown(2250000);
+    //     delay(20000);
+    //     frame->moveUp(1000000);
+    //     delay(16000);
+    //     is_initialized = 1;
+    // }
 
     /* OPTION 1: SPI. THIS CODE USES SPI TO TELL THE FRAME WHAT TO DO */
     /* Get command from parent */
@@ -180,15 +179,19 @@ void loop() {
     /* OPTION 3: MANUAL: THIS CODE JUST MANUALLY RUNS THE SYSTEM THROUGH CERTAIN
     TESTS */
 
-    frame->moveForward(10);
-    delay(15000);
-    frame->turnRight(45);
-    delay(15000);
-    frame->moveBackwards(10);
-    delay(15000);
-    frame->turnLeft(45);
-    delay(15000);
+    // frame->moveForward(100000);
+    // delay(10000);
+    // frame->turnLeft(10000);
+    // delay(6000);
+    // frame->turnRight(10000);
+    // delay(6000);
+    // frame->moveBackwards(10);
+    // delay(15000);
+    // frame->turnLeft(45);
+    // delay(15000);
 
+    frame->moveDown(400000);
+    delay(3000);
 
    
 }
