@@ -134,8 +134,8 @@ void initFrame() {
     pinMode(TURN4_PULSE, OUTPUT);
     pinMode(TURN4_DIRECTION, OUTPUT);
 
-    MotorSettings_t drive_motor_settings = {DRIVE_PULSE, DRIVE_ENABLE, DRIVE_DIRECTION, 30000, 30000};
-    MotorSettings_t lift_motor_settings = {LIFT_PULSE, LIFT_ENABLE, LIFT_DIRECTION, 130000, 5000};
+    MotorSettings_t drive_motor_settings = {DRIVE_PULSE, DRIVE_DIRECTION, DRIVE_ENABLE, 15000, 15000};
+    MotorSettings_t lift_motor_settings = {LIFT_PULSE, LIFT_DIRECTION, LIFT_ENABLE, 50000, 2500};
     MotorSettings_t turn1_motor_settings = {TURN1_PULSE, TURN1_DIRECTION, TURN_ENABLE, 20000, 10000};
     MotorSettings_t turn2_motor_settings = {TURN2_PULSE, TURN2_DIRECTION, TURN_ENABLE, 20000, 10000};
     MotorSettings_t turn3_motor_settings = {TURN3_PULSE, TURN3_DIRECTION, TURN_ENABLE, 20000, 10000};
@@ -179,8 +179,10 @@ void loop() {
     /* OPTION 3: MANUAL: THIS CODE JUST MANUALLY RUNS THE SYSTEM THROUGH CERTAIN
     TESTS */
 
-    // frame->moveForward(100000);
-    // delay(10000);
+    frame->moveForward(30);
+    delay(10000);
+    frame->moveBackwards(30);
+    delay(10000);
     // frame->turnLeft(10000);
     // delay(6000);
     // frame->turnRight(10000);
@@ -190,8 +192,10 @@ void loop() {
     // frame->turnLeft(45);
     // delay(15000);
 
-    frame->moveDown(400000);
-    delay(3000);
+    // frame->moveDown(10000000);
+    // delay(3000);
+    // frame->moveUp(10000000);
+    // delay(3000);
 
    
 }

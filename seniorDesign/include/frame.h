@@ -29,7 +29,7 @@
 /* TODO: Find how many steps moves the bot up x number of inches */
 
 struct MotorSettings_t {
-    uint8_t pulse_pin, enable_pin, dir_pin;
+    uint8_t pulse_pin, dir_pin, enable_pin;
     uint32_t max_speed;
     int32_t accel;
 };

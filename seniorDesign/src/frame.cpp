@@ -212,10 +212,10 @@ void Frame::moveDown(uint32_t num_steps) {
  ************************/
 void Frame::turnRight(uint32_t degrees) {
     // float steps_needed = ((float)degrees / 360) * (float)FULL_TURN_ROTATION;
-    turn1_motor->move((int32_t)degrees, false);
-    turn2_motor->move((int32_t)degrees, false);
-    turn3_motor->move((int32_t)degrees, false);
-    turn4_motor->move((int32_t)degrees, false);
+    turn1_motor->move(-int32_t(degrees), false);
+    turn2_motor->move(-int32_t(degrees), false);
+    turn3_motor->move(-int32_t(degrees), false);
+    turn4_motor->move(-int32_t(degrees), false);
 }
 
 /********** turnLeft **********
@@ -275,8 +275,8 @@ void Frame::turnLeft(uint32_t degrees) {
  *      
  ************************/
 void Frame::moveForward(uint32_t num_inches) {
-    // float steps_needed = ((float)num_inches / (float)WHEEL_CIRCUMFERENCE) * (float)FULL_DRIVE_ROTATION;
-    drive_motors->move(num_inches, false);
+    float steps_needed = ((float)num_inches / (float)WHEEL_CIRCUMFERENCE) * (float)FULL_DRIVE_ROTATION;
+    drive_motors->move(steps_needed, false);
 }
 
 /********** moveBackward **********
@@ -302,7 +302,7 @@ void Frame::moveForward(uint32_t num_inches) {
  ************************/
 void Frame::moveBackwards(uint32_t num_inches) {
     float steps_needed = (num_inches / WHEEL_CIRCUMFERENCE) * FULL_DRIVE_ROTATION;
-    drive_motors->move((int32_t)-steps_needed, false);
+    drive_motors->move(-int32_t(steps_needed), false);
 }
 
 /********** stopMoving **********
