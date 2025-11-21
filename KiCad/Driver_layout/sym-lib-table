@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "TB6600HG")(type "KiCad")(uri "${KIPRJMOD}/TB6600/TB6600HG.kicad_sym")(options "")(descr ""))
+)

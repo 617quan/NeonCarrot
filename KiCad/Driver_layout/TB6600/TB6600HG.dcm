@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP TB6600HG
+D Motor / Bewegung / Zndungscontroller und Treiber Stepping Motor Driver IC
+K
+F https://toshiba.semicon-storage.com/info/TB6600HG_datasheet_en_20160610.pdf?did=14683&prodName=TB6600HG
+$ENDCMP
+#
+#End Doc Library
