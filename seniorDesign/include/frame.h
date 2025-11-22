@@ -56,6 +56,8 @@ public:
 
     void calibratePosition();
 
+    void printPosition(int positionNum); //FUNCTION IS TEMPORARY, USED TO TEST INTERFACING WEBSERVER INTO FRAME CLASS - QUAN
+
 private:
 
     /* Call this in the constructor to initialize all motors to correct pins */
@@ -81,6 +83,7 @@ private:
     MotorSettings_t drive_motor_settings, lift_motor_settings, turn1_motor_settings;
     MotorSettings_t turn2_motor_settings, turn3_motor_settings, turn4_motor_settings;
 
+    int position = 0; // used to track position based on webserver input
 };
 
 #endif

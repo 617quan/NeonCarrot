@@ -20,6 +20,7 @@
 #include <string>
 #include "driver/spi_slave.h"
 #include "state_machine.h"
+#include "WebPage.h"
 
 /* Use these functions and typedefs to avoid outdated language */
 #define SPI_CHILD_INITIALIZE spi_slave_initialize
@@ -28,6 +29,7 @@ typedef spi_slave_transaction_t spi_child_transaction_t;
 typedef spi_slave_interface_config_t spi_child_interface_config_t;
 
 Frame *frame = nullptr;
+WebPage webServer("ESP32-Access-Point", "123456789");
 uint8_t recieveMessageFromParent();
 void initFrame();
 void initSPI();
@@ -36,8 +38,8 @@ void parseCommand(uint8_t command);
 
 
 void setup() {
-    // Serial.begin(115200);
-
+    Serial.begin(115200);
+    webServer.begin();
     Frame::engineStartup();
     //Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
     pinMode(LED_BUILTIN, OUTPUT);
@@ -151,9 +153,16 @@ void initFrame() {
         Serial.println("FATAL ERROR: Frame initialized incorrectly");
     }
 }
-
+int state = 0; //used in webserver testing to keep track of states
 bool is_initialized = 0;
 void loop() {  
+    
+    // THIS CODE SEGMENT WAS USED TO TEST WEBSERVER INTERFACING - QUAN
+    // webServer.handleClient();
+    // state = webServer.returnState();
+    // frame->printPosition(state);
+    
+
     // digitalWrite(LED_BUILTIN, HIGH);
 
     /* Makeshift lift initialization. */
@@ -183,6 +192,7 @@ void loop() {
     delay(10000);
     frame->moveBackwards(30);
     delay(10000);
+
     // frame->turnLeft(10000);
     // delay(6000);
     // frame->turnRight(10000);

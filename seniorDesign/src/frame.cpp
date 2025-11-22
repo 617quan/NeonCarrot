@@ -420,3 +420,15 @@ void Frame::calibratePosition() {
     */
 
 }
+
+//FUNCTION IS TEMPORARY, USED TO TEST INTERFACING WEBSERVER INTO FRAME CLASS - QUAN
+void Frame::printPosition(int positionNum) {
+    if (positionNum == 1) position = 1;
+    else if (positionNum == 2) position = 2;
+    else if (positionNum == 3) position = 3;
+    else if (positionNum == 4) position = 4;
+    else if (positionNum == 5) position = 5;
+    else if (positionNum == 6) position = 6;
+    Serial.print("Position Number: " );
+    Serial.println(position);
+};
