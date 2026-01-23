@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "B6B-PH-K-S")(type "KiCad")(uri "${KIPRJMOD}/JST-PH_Connectors/B6B-PH-K-S.kicad_sym")(options "")(descr ""))
+)
