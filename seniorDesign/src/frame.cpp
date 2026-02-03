@@ -1,12 +1,6 @@
 /********** frame.cpp **********
  * Purpose: Defines all methods for the frame class. Instantiates all
  * FastAccelStepper objects to control motors. 
- * - IMPORTANT: All of the drive motors are physically wired to the same pins. 
- * - IMPORTANT: All of the lift motors are wired to the same pins. 
- * - IMPORTANT: All of the turn motors have individual pulse and direction pins 
- * but share an enable pin. Microstep, gearbox ratio, and other importand 
- * variables are defined in the .h file.
- * 
  */ 
 
 #include "frame.h"
@@ -208,12 +202,15 @@ void Frame::moveDown(uint32_t num_steps) {
  *      
  ************************/
 void Frame::turnRight(uint32_t degrees) {
-    float steps_needed_2_4 = (135 / 360) * (float)FULL_TURN_ROTATION;
-    float steps_needed_1_3 = (45 / 360) * (float)FULL_TURN_ROTATION;
-    // turn1_motor->move(-int32_t(steps_needed_1_3), false);
+    float steps_needed_2_4 = (135.0f / 360.0f) * (float)FULL_TURN_ROTATION;
+    float steps_needed_1_3 = (45.0f / 360.0f) * (float)FULL_TURN_ROTATION;
+    
+    turn1_motor->move(-int32_t(steps_needed_1_3), false);
     turn2_motor->move(-int32_t(steps_needed_2_4), false);
-    // turn3_motor->move(-int32_t(steps_needed_1_3), false);
-    // turn4_motor->move(-int32_t(steps_needed_2_4), true);
+    turn3_motor->move(-int32_t(steps_needed_1_3), false);
+    turn4_motor->move(-int32_t(steps_needed_2_4), true);
+
+    
 }
 
 /********** turnLeft **********
@@ -244,11 +241,13 @@ void Frame::turnRight(uint32_t degrees) {
  *      
  ************************/
 void Frame::turnLeft(uint32_t degrees) {
-    // float steps_needed = (degrees / 360) * (float)FULL_TURN_ROTATION;
-    turn1_motor->move((int32_t)degrees, false);
-    turn2_motor->move((int32_t)degrees, false);
-    turn3_motor->move((int32_t)degrees, false);
-    turn4_motor->move((int32_t)degrees, false);
+    float steps_needed_2_4 = (135.0f / 360.0f) * (float)FULL_TURN_ROTATION; //120,000 steps
+    float steps_needed_1_3 = (45.0f / 360.0f) * (float)FULL_TURN_ROTATION;  //40,000 steps
+    
+    turn1_motor->move(int32_t(steps_needed_1_3), false);
+    turn2_motor->move(int32_t(steps_needed_2_4), false);
+    turn3_motor->move(int32_t(steps_needed_1_3), false);
+    turn4_motor->move(int32_t(steps_needed_2_4), true);
 }
 
 /********** moveForward **********

@@ -1,23 +1,29 @@
-README.md
+Neon Carrot Documentation for BEAST Movement
 
 Files
 -----
 
 1. frame.cpp & frame.h
 
-TURNING:
+  TURNING
 
-Notes: Example: If we were to have a microstep setting of 1/8:
- *        Micro step at 8 = 1600 micro steps per step
- *        Pulses per revolution: Motor requires 1600 input pulses to complete 360° rotation
- *        Gear box ratio for drive is 1:30 -> 1600 * 30 = 48000 steps needed for one wheel
- *        Gear box ratio for turn is 1:100 -> 1600 * 100 = 160000 steps needed for one wheel
- 
-Turning functionality works as if the BEAST is rotating on an axel, meaning
- * two wheels need to rotate more from the original position than the other two
- * to complete a successful turn
- * - Wheels 1 and 3 need to turn 45 degrees
- * - Wheels 2 and 4 need to turn 135 degrees 
+  - IMPORTANT: All of the drive motors are physically wired to the same pins. 
+  - IMPORTANT: All of the lift motors are wired to the same pins. 
+  - IMPORTANT: All of the turn motors have individual pulse and direction pins 
+  but share an enable pin. Microstep, gearbox ratio, and other importand 
+  variables are defined in the .h file.
+  
+  Notes: Example: If we were to have a microstep setting of 1/8:
+  - Micro step at 8 = 1600 micro steps per step
+  - Pulses per revolution: Motor requires 1600 input pulses to complete 360° rotation
+  - Gear box ratio for drive is 1:30 -> 1600 * 30 = 48000 steps needed for one wheel
+  - Gear box ratio for turn is 1:100 -> 1600 * 100 = 160000 steps needed for one wheel
+   
+  Turning functionality works as if the BEAST is rotating on an axel, meaning
+  two wheels need to rotate more from the original position than the other two
+  to complete a successful turn
+  - Wheels 1 and 3 need to turn 45 degrees
+  - Wheels 2 and 4 need to turn 135 degrees 
 
 
 2. child_main.cpp
@@ -26,6 +32,8 @@ Turning functionality works as if the BEAST is rotating on an axel, meaning
 
 4. state_machine.cpp
 
+
+5. README.md - this file
 
 OLD SPI code to send char [] messages
 ------------------------------------

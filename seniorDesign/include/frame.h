@@ -4,8 +4,6 @@
  * MotorSettings_t struct, and all of the frame methods. Relies heavily on the
  * FastAccelStepper github repository:
  * https://github.com/gin66/FastAccelStepper/tree/00462dea3e96813f6cbdc04bb2079be33c409ece
- * 
- * 
  */
 
 #ifndef _MOTOR
@@ -18,15 +16,24 @@
 
 #define WHEEL_RADIUS 3
 #define WHEEL_CIRCUMFERENCE (2 * PI * WHEEL_RADIUS)
-#define TURN_GEARBOX_RATIO 100
 #define DRIVE_GEARBOX_RATIO 30
 #define MICROSTEP 1600
-#define STEPS_PER_REV MICROSTEP * 200
+#define STEPS_PER_REV (MICROSTEP * 200)
 
 #define FULL_DRIVE_ROTATION (STEPS_PER_REV * DRIVE_GEARBOX_RATIO)
-#define FULL_TURN_ROTATION (STEPS_PER_REV * TURN_GEARBOX_RATIO)
+#define FULL_TURN_ROTATION (STEPS_PER_REV)
 
-/* TODO: Find how many steps moves the bot up x number of inches */
+#define TURN_1_3_SPEED 45000
+#define Turn_2_4_SPEED (TURN_1_3_SPEED / 3)
+
+#define TURN_1_3_ACCEL 22500
+#define TURN_2_4_ACCEL (TURN_1_3_ACCEL / 3)
+
+#define DRIVE_MAX_SPEED 20000
+#define DRIVE_ACCEL 10000
+
+#define LIFT_MAX_SPEED 50000
+#define LIFT_ACCEL 2500
 
 struct MotorSettings_t {
     uint8_t pulse_pin, dir_pin, enable_pin;
@@ -68,7 +75,7 @@ private:
     std::array<int32_t, 4> getTurnCurrentPositions();
     int32_t getDriveCurrentPosition();
 
-    /* Define the engine used to initialize motors. NOTE: one one engine is
+    /* Define the engine used to initialize motors. NOTE: one engine is
     needed for all motors */
     static FastAccelStepperEngine engine;
 
