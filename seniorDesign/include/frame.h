@@ -1,5 +1,5 @@
 /* frame.h
- * Purpose: Headder file for the frame class. Defines important motor
+ * Purpose: Header file for the frame class. Defines important motor
  * information (wheel circumference, gearbox ratios, and microstep),
  * MotorSettings_t struct, and all of the frame methods. Relies heavily on the
  * FastAccelStepper github repository:
@@ -20,7 +20,7 @@
 #define WHEEL_CIRCUMFERENCE (2 * PI * WHEEL_RADIUS)
 #define TURN_GEARBOX_RATIO 100
 #define DRIVE_GEARBOX_RATIO 30
-#define MICROSTEP 16
+#define MICROSTEP 1600
 #define STEPS_PER_REV MICROSTEP * 200
 
 #define FULL_DRIVE_ROTATION (STEPS_PER_REV * DRIVE_GEARBOX_RATIO)
