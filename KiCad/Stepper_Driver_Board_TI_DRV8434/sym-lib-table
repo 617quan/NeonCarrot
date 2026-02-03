@@ -1,4 +1,4 @@
 (sym_lib_table
   (version 7)
-  (lib (name "DRV8434")(type "KiCad")(uri "${KIPRJMOD}/ul_DRV8434PWPR/KiCADv6/2026-01-10_22-26-26.kicad_sym")(options "")(descr ""))
+  (lib (name "DRV8434")(type "KiCad")(uri "${KIPRJMOD}/DRV8434PWPR/KiCADv6/2026-02-02_22-40-33.kicad_sym")(options "")(descr ""))
 )
