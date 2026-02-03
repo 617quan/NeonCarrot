@@ -1,15 +1,12 @@
 /********** frame.cpp **********
  * Purpose: Defines all methods for the frame class. Instantiates all
- * FastAccelStepper objects to control motors. IMPORTANT: All of the drive
- * motors are physically wired to the same pins. IMPORTANT: All of the lift motors 
- * are wired to the same pins. IMPORTANT: All of the turn motors have individual 
- * pulse and direction pins but share an enable pin. Microstep, gearbox ratio,
- * and other importand variables are defined in the .h file.
- * Notes: Example: If we were to have a microstep setting of 1/8:
- *        Micro step at 8 = 1600 micro steps per step
- *        Pulses per revolution: Motor requires 1600 input pulses to complete 360° rotation
- *        Gear box ratio for drive is 1:30 -> 1600 * 30 = 48000 steps needed for one wheel
- *        Gear box ratio for turn is 1:100 -> 1600 * 100 = 160000 steps needed for one wheel
+ * FastAccelStepper objects to control motors. 
+ * - IMPORTANT: All of the drive motors are physically wired to the same pins. 
+ * - IMPORTANT: All of the lift motors are wired to the same pins. 
+ * - IMPORTANT: All of the turn motors have individual pulse and direction pins 
+ * but share an enable pin. Microstep, gearbox ratio, and other importand 
+ * variables are defined in the .h file.
+ * 
  */ 
 
 #include "frame.h"
@@ -211,11 +208,12 @@ void Frame::moveDown(uint32_t num_steps) {
  *      
  ************************/
 void Frame::turnRight(uint32_t degrees) {
-    // float steps_needed = ((float)degrees / 360) * (float)FULL_TURN_ROTATION;
-    turn1_motor->move(-int32_t(degrees), false);
-    turn2_motor->move(-int32_t(degrees), false);
-    turn3_motor->move(-int32_t(degrees), false);
-    turn4_motor->move(-int32_t(degrees), false);
+    float steps_needed_2_4 = (135 / 360) * (float)FULL_TURN_ROTATION;
+    float steps_needed_1_3 = (45 / 360) * (float)FULL_TURN_ROTATION;
+    // turn1_motor->move(-int32_t(steps_needed_1_3), false);
+    turn2_motor->move(-int32_t(steps_needed_2_4), false);
+    // turn3_motor->move(-int32_t(steps_needed_1_3), false);
+    // turn4_motor->move(-int32_t(steps_needed_2_4), true);
 }
 
 /********** turnLeft **********
