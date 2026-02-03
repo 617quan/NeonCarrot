@@ -4735,7 +4735,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.digikey.com/en/products/detail/jst-sales-america-inc/B6B-PH-K-S/926615"
 			(at 111.76 77.47 0)
 			(effects
 				(font
@@ -4828,7 +4828,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.digikey.com/en/products/detail/jst-sales-america-inc/B6B-PH-K-S/926615"
 			(at 111.76 140.97 0)
 			(effects
 				(font
@@ -4921,7 +4921,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.digikey.com/en/products/detail/jst-sales-america-inc/B6B-PH-K-S/926615"
 			(at 111.76 119.38 0)
 			(effects
 				(font
@@ -5153,7 +5153,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.digikey.com/en/products/detail/jst-sales-america-inc/B6B-PH-K-S/926615"
 			(at 111.76 34.29 0)
 			(effects
 				(font
@@ -5247,7 +5247,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.digikey.com/en/products/detail/jst-sales-america-inc/B6B-PH-K-S/926615"
 			(at 262.89 140.97 0)
 			(effects
 				(font
@@ -5341,7 +5341,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.digikey.com/en/products/detail/jst-sales-america-inc/B6B-PH-K-S/926615"
 			(at 262.89 119.38 0)
 			(effects
 				(font
@@ -5629,7 +5629,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.digikey.com/en/products/detail/jst-sales-america-inc/B6B-PH-K-S/926615"
 			(at 262.89 55.88 0)
 			(effects
 				(font
@@ -5787,7 +5787,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.digikey.com/en/products/detail/jst-sales-america-inc/B6B-PH-K-S/926615"
 			(at 111.76 55.88 0)
 			(effects
 				(font
@@ -6081,7 +6081,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.digikey.com/en/products/detail/jst-sales-america-inc/B6B-PH-K-S/926615"
 			(at 262.89 77.47 0)
 			(effects
 				(font
@@ -6871,7 +6871,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.digikey.com/en/products/detail/jst-sales-america-inc/B6B-PH-K-S/926615"
 			(at 262.89 34.29 0)
 			(effects
 				(font
@@ -7029,7 +7029,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://www.digikey.com/en/products/detail/sullins-connector-solutions/PPTC151LFBN-RC/810153"
 			(at 180.34 86.36 0)
 			(effects
 				(font
@@ -7138,7 +7138,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://www.digikey.com/en/products/detail/sullins-connector-solutions/PPTC151LFBN-RC/810153"
 			(at 156.21 86.36 0)
 			(effects
 				(font
@@ -7249,7 +7249,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.digikey.com/en/products/detail/jst-sales-america-inc/B6B-PH-K-S/926615"
 			(at 262.89 97.79 0)
 			(effects
 				(font
@@ -7413,7 +7413,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.digikey.com/en/products/detail/jst-sales-america-inc/B6B-PH-K-S/926615"
 			(at 111.76 99.06 0)
 			(effects
 				(font
@@ -7569,7 +7569,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "~"
+		(property "Datasheet" "https://www.digikey.com/en/products/detail/sullins-connector-solutions/PPTC151LFBN-RC/810153"
 			(at 191.77 86.36 0)
 			(effects
 				(font
@@ -7743,7 +7743,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.digikey.com/en/products/detail/sullins-connector-solutions/PPTC151LFBN-RC/810153"
 			(at 215.9 86.36 0)
 			(effects
 				(font
