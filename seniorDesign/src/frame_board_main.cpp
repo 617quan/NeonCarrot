@@ -257,7 +257,7 @@ MOVE_COMMAND recieveMessageFromParent() {
             return P2;
         } else if (command == MOVE_TO_P3) {
             frame->turnLeft(90);
-            //frame->moveForward(TODO: FIND THIS OUT);
+            // frame->moveForward(TODO: FIND THIS OUT);
             frame->turnRight(90);
             return P3;
         } else if (command == MOVE_TO_P4) {
@@ -275,7 +275,7 @@ MOVE_COMMAND recieveMessageFromParent() {
         } else if (command == MOVE_TO_P2) {
             return P2;
         } else if (command == MOVE_TO_P3) {
-            //frame->moveBackward(TODO: FIND THIS OUT);
+            // frame->moveBackward(TODO: FIND THIS OUT);
             // frame->rotateLeft(90);
             return P3;
         } else if (command == MOVE_TO_P4) {
@@ -291,18 +291,18 @@ MOVE_COMMAND recieveMessageFromParent() {
 
         if (command == MOVE_TO_P1) {
             frame->turnRight(90);
-            //frame->moveForward(TODO: FIND THIS OUT);
+            // frame->moveForward(TODO: FIND THIS OUT);
             frame->turnLeft(90);
             return P1;
         } else if (command == MOVE_TO_P2) {
-            //frame->rotateRight(90);
-            //frame->moveForward(TODO: FIND THIS OUT);
+            // frame->rotateRight(90);
+            // frame->moveForward(TODO: FIND THIS OUT);
             return P2;
         } else if (command == MOVE_TO_P3) {
             return P3;
         } else if (command == MOVE_TO_P4) {
             // frame->rotateRight(90);
-            //frame->moveForward(TODO: FIND THIS OUT);
+            // frame->moveForward(TODO: FIND THIS OUT);
             // frame->rotateRight(45);
             frame->moveForward(23.622f);
             return P4;
@@ -324,7 +324,7 @@ MOVE_COMMAND recieveMessageFromParent() {
             frame->moveBackwards(23.622f);
             // frame->rotateLeft(135);
             frame->turnLeft(90);
-            //frame->moveForward(TODO: FIND THIS OUT);
+            // frame->moveForward(TODO: FIND THIS OUT);
             frame->turnRight(90);
             return P3;
         } else if (command == MOVE_TO_P4) {
