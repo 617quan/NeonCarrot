@@ -30,10 +30,10 @@ typedef spi_slave_interface_config_t spi_child_interface_config_t;
 
 Frame *frame = nullptr;
 WebPage webServer("ESP32-Access-Point", "123456789");
-uint8_t recieveMessageFromParent();
+MOVE_COMMAND recieveMessageFromParent();
 void initFrame();
 void initSPI();
-void parseCommand(uint8_t command);
+STATE_TYPE parseCommand(MOVE_COMMAND command);
 
 
 
@@ -153,33 +153,20 @@ void initFrame() {
         Serial.println("FATAL ERROR: Frame initialized incorrectly");
     }
 }
-int state = 0; //used in webserver testing to keep track of states
-bool is_initialized = 0;
+STATE_TYPE Curr_state = P1;
+MOVE_COMMAND command;
 void loop() {  
     
     // THIS CODE SEGMENT WAS USED TO TEST WEBSERVER INTERFACING - QUAN
     // webServer.handleClient();
     // state = webServer.returnState();
     // frame->printPosition(state);
-    
 
-    // digitalWrite(LED_BUILTIN, HIGH);
-
-    /* Makeshift lift initialization. */
-    // if (!is_initialized) {
-    //     frame->moveDown(2250000);
-    //     delay(20000);
-    //     frame->moveUp(1000000);
-    //     delay(16000);
-    //     is_initialized = 1;
-    // }
-
-    /* OPTION 1: SPI. THIS CODE USES SPI TO TELL THE FRAME WHAT TO DO */
     /* Get command from parent */
-    // uint8_t command = recieveMessageFromParent();
+    MOVE_COMMAND command = recieveMessageFromParent();
     // Serial.printf("Command to be parsed: %u\n", command);
-    // delay(1000);
-    // parseCommand(command);
+    // delay(1000); HOPE WE DON'T NEED THIS!
+    Curr_state = parseCommand(command);
 
     /* OPTION 2: WEBSERVER. THIS CODE USES THE WEBSERVER TO TELL THE FRAME WHAT
     TO DO */
@@ -188,31 +175,10 @@ void loop() {
     /* OPTION 3: MANUAL: THIS CODE JUST MANUALLY RUNS THE SYSTEM THROUGH CERTAIN
     TESTS */
 
-    // frame->moveForward(30);
-    // delay(10000);
-    // frame->moveBackwards(30);
-    // delay(10000);
-
     frame->turnRight(45);
     delay(5000);
     frame->turnLeft(45);
     delay(5000);
-
-
-    // frame->turnLeft(10000);
-    // delay(6000);
-    // frame->turnRight(10000);
-    // delay(6000);
-    // frame->moveBackwards(10);
-    // delay(15000);
-    // frame->turnLeft(45);
-    // delay(15000);
-
-    // frame->moveDown(10000000);
-    // delay(3000);
-    // frame->moveUp(10000000);
-    // delay(3000);
-
    
 }
 
@@ -234,7 +200,7 @@ void loop() {
   *     - Uses spi_child_transmit() blocking call to wait for parent to send
   * 
   ************************/
-uint8_t recieveMessageFromParent() {
+MOVE_COMMAND recieveMessageFromParent() {
     spi_child_transaction_t t;
     memset(&t, 0, sizeof(t));
     
@@ -257,8 +223,8 @@ uint8_t recieveMessageFromParent() {
         Serial.print("Transaction failed\n");
     }
 
-    uint8_t command = rec_buf[0];
-    Serial.printf("Receiving message from parent, command: %u\n", command);
+    MOVE_COMMAND command = (MOVE_COMMAND)rec_buf[0];
+    Serial.printf("Receiving message from parent, command: %u\n", (uint8_t)command);
     
     return command;
 }
@@ -280,17 +246,92 @@ uint8_t recieveMessageFromParent() {
  *  - Commands defined in state_machine.h
  * 
  ************************/
- void parseCommand(uint8_t command) {
-    /* NOTE: THESE ARE JUST PLACEHOLDERS!!! */
-    if (command == CMD_MOVE_TO_P2) {
-        frame->moveForward(24);
-    } else if (command == CMD_MOVE_TO_P3) {
-        frame->turnRight(45);
-    } else if (command == CMD_MOVE_TO_P4) {
-        frame->moveBackwards(24);
-    } else if (command == CMD_STOP_MOVE) {
-        frame->turnLeft(45);
-    } else {
-        Serial.println("Unknown command received");
+ STATE_TYPE parseCommand(MOVE_COMMAND command) {
+
+    switch (Curr_state) {
+        case (P1): 
+        if (command == MOVE_TO_P1) {
+            return P1;
+        } else if (command == MOVE_TO_P2) {
+            // frame->rotateRight(90);
+            return P2;
+        } else if (command == MOVE_TO_P3) {
+            frame->turnLeft(90);
+            //frame->moveForward(TODO: FIND THIS OUT);
+            frame->turnRight(90);
+            return P3;
+        } else if (command == MOVE_TO_P4) {
+            // frame->rotateRight(135);
+            frame->moveForward(23.622f);
+            return P4;
+        } else {
+            Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
+        }
+        break;
+        case (P2):
+        if (command == MOVE_TO_P1) {
+            // frame->rotateLeft(45);
+            return P1;
+        } else if (command == MOVE_TO_P2) {
+            return P2;
+        } else if (command == MOVE_TO_P3) {
+            //frame->moveBackward(TODO: FIND THIS OUT);
+            // frame->rotateLeft(90);
+            return P3;
+        } else if (command == MOVE_TO_P4) {
+            // frame->rotateRight(45);
+            frame->moveForward(23.622f);
+            return P4;
+        } else {
+            Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
+        }
+
+        break;
+        case (P3):
+
+        if (command == MOVE_TO_P1) {
+            frame->turnRight(90);
+            //frame->moveForward(TODO: FIND THIS OUT);
+            frame->turnLeft(90);
+            return P1;
+        } else if (command == MOVE_TO_P2) {
+            //frame->rotateRight(90);
+            //frame->moveForward(TODO: FIND THIS OUT);
+            return P2;
+        } else if (command == MOVE_TO_P3) {
+            return P3;
+        } else if (command == MOVE_TO_P4) {
+            // frame->rotateRight(90);
+            //frame->moveForward(TODO: FIND THIS OUT);
+            // frame->rotateRight(45);
+            frame->moveForward(23.622f);
+            return P4;
+        } else {
+            Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
+        }
+
+        break;
+        case (P4):
+        if (command == MOVE_TO_P1) {
+            frame->moveBackwards(23.622f);
+            // frame->rotateLeft(135);
+            return P1;
+        } else if (command == MOVE_TO_P2) {
+            frame->moveBackwards(23.622f);
+            // frame->rotateLeft(45);
+            return P2;
+        } else if (command == MOVE_TO_P3) {
+            frame->moveBackwards(23.622f);
+            // frame->rotateLeft(135);
+            frame->turnLeft(90);
+            //frame->moveForward(TODO: FIND THIS OUT);
+            frame->turnRight(90);
+            return P3;
+        } else if (command == MOVE_TO_P4) {
+            return P4;
+        } else {
+            Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
+        }
+        break;
     }
 }

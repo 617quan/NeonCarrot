@@ -56,7 +56,7 @@ public:
     void moveDown(uint32_t num_steps);
     void turnRight(uint32_t degrees);
     void turnLeft(uint32_t degrees);
-    void moveForward(uint32_t num_inches);
+    void moveForward(float num_inches);
     void moveBackwards(uint32_t num_inches);
 
     void stopMoving();

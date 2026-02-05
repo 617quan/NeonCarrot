@@ -210,7 +210,7 @@ void Frame::turnRight(uint32_t degrees) {
     turn3_motor->move(-int32_t(steps_needed_1_3), false);
     turn4_motor->move(-int32_t(steps_needed_2_4), true);
 
-    
+
 }
 
 /********** turnLeft **********
@@ -271,7 +271,7 @@ void Frame::turnLeft(uint32_t degrees) {
  *      of steps to figure out how many steps needed to be driven.
  *      
  ************************/
-void Frame::moveForward(uint32_t num_inches) {
+void Frame::moveForward(float num_inches) {
     float steps_needed = ((float)num_inches / (float)WHEEL_CIRCUMFERENCE) * (float)FULL_DRIVE_ROTATION;
     drive_motors->move(steps_needed, false);
 }

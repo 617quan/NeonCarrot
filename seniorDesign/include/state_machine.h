@@ -4,19 +4,20 @@
 #include <stdint.h>
 #include <Arduino.h>
 
-/* Define states */
-#define STATE_STOP  0
-#define STATE_AT_P1 1
-#define STATE_AT_P2 2
-#define STATE_AT_P3 3
-#define STATE_AT_P4 4
 
-/* Define commands */
-#define CMD_STOP_MOVE  0
-#define CMD_MOVE_TO_P1 1
-#define CMD_MOVE_TO_P2 2
-#define CMD_MOVE_TO_P3 3
-#define CMD_MOVE_TO_P4 4
+typedef enum {
+    P1 = 49, // ascii 1
+    P2 = 50, // ascii 2
+    P3 = 51, // ascii 3
+    P4 = 52  // ascii 4
+} STATE_TYPE;
+
+typedef enum {
+    MOVE_TO_P1 = 63, // ascii ?
+    MOVE_TO_P2 = 64, // ascii A
+    MOVE_TO_P3 = 65, // ascii B
+    MOVE_TO_P4 = 66  // ascii C
+} MOVE_COMMAND;
 
 class StateMachine {
 public:
