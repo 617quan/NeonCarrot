@@ -139,9 +139,9 @@ void initFrame() {
     MotorSettings_t drive_motor_settings = {DRIVE_PULSE, DRIVE_DIRECTION, DRIVE_ENABLE, DRIVE_MAX_SPEED, DRIVE_ACCEL};
     MotorSettings_t lift_motor_settings = {LIFT_PULSE, LIFT_DIRECTION, LIFT_ENABLE, LIFT_MAX_SPEED, LIFT_ACCEL};
     MotorSettings_t turn1_motor_settings = {TURN1_PULSE, TURN1_DIRECTION, TURN_ENABLE, TURN_1_3_SPEED, TURN_1_3_ACCEL};
-    MotorSettings_t turn2_motor_settings = {TURN2_PULSE, TURN2_DIRECTION, TURN_ENABLE, Turn_2_4_SPEED, TURN_2_4_ACCEL};
+    MotorSettings_t turn2_motor_settings = {TURN2_PULSE, TURN2_DIRECTION, TURN_ENABLE, TURN_2_4_SPEED, TURN_2_4_ACCEL};
     MotorSettings_t turn3_motor_settings = {TURN3_PULSE, TURN3_DIRECTION, TURN_ENABLE, TURN_1_3_SPEED, TURN_1_3_ACCEL};
-    MotorSettings_t turn4_motor_settings = {TURN4_PULSE, TURN4_DIRECTION, TURN_ENABLE, Turn_2_4_SPEED, TURN_2_4_ACCEL};
+    MotorSettings_t turn4_motor_settings = {TURN4_PULSE, TURN4_DIRECTION, TURN_ENABLE, TURN_2_4_SPEED, TURN_2_4_ACCEL};
 
     MotorSettings_t turn_motor_settings_arr[4] = {turn1_motor_settings, 
                                                   turn2_motor_settings, 
@@ -163,10 +163,10 @@ void loop() {
     // frame->printPosition(state);
 
     /* Get command from parent */
-    MOVE_COMMAND command = recieveMessageFromParent();
+    // MOVE_COMMAND command = recieveMessageFromParent();
     // Serial.printf("Command to be parsed: %u\n", command);
     // delay(1000); HOPE WE DON'T NEED THIS!
-    Curr_state = parseCommand(command);
+    // Curr_state = parseCommand(command);
 
     /* OPTION 2: WEBSERVER. THIS CODE USES THE WEBSERVER TO TELL THE FRAME WHAT
     TO DO */
@@ -175,10 +175,10 @@ void loop() {
     /* OPTION 3: MANUAL: THIS CODE JUST MANUALLY RUNS THE SYSTEM THROUGH CERTAIN
     TESTS */
 
-    frame->turnRight(45);
-    delay(5000);
     frame->turnLeft(45);
-    delay(5000);
+    delay(10000);
+    frame->turnRight(45);
+    delay(10000);
    
 }
 
@@ -205,9 +205,9 @@ MOVE_COMMAND recieveMessageFromParent() {
     memset(&t, 0, sizeof(t));
     
     /* Receive 1-byte uint8_t */
-    uint8_t rec_buf[128] = {0};
+    uint8_t rec_buf[128] = {0}; // Must be 128
     t.length = 8; // 8 bits = 1 byte for uint8_t
-    t.rx_buffer = rec_buf;
+    t.rx_buffer = rec_buf; 
     t.tx_buffer = nullptr;
 
     esp_err_t t_status = SPI_CHILD_TRANSMIT(VSPI_HOST, &t, portMAX_DELAY);

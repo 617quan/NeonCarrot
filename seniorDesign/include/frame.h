@@ -23,11 +23,11 @@
 #define FULL_DRIVE_ROTATION (STEPS_PER_REV * DRIVE_GEARBOX_RATIO)
 #define FULL_TURN_ROTATION (STEPS_PER_REV)
 
-#define TURN_1_3_SPEED 45000
-#define Turn_2_4_SPEED (TURN_1_3_SPEED / 3)
+#define TURN_2_4_SPEED 45000 / 5
+#define TURN_1_3_SPEED 45000 / 5 //(TURN_2_4_SPEED / 3)
 
-#define TURN_1_3_ACCEL 22500
-#define TURN_2_4_ACCEL (TURN_1_3_ACCEL / 3)
+#define TURN_2_4_ACCEL 22500 / 2
+#define TURN_1_3_ACCEL 22500 / 2 //(TURN_2_4_ACCEL / 3)
 
 #define DRIVE_MAX_SPEED 20000
 #define DRIVE_ACCEL 10000
@@ -54,10 +54,14 @@ public:
     
     void moveUp(uint32_t num_steps);
     void moveDown(uint32_t num_steps);
+
     void turnRight(uint32_t degrees);
     void turnLeft(uint32_t degrees);
+    void rotateRight(uint32_t degrees);
+    void rotateLeft(uint32_t degrees);
+
     void moveForward(float num_inches);
-    void moveBackwards(uint32_t num_inches);
+    void moveBackwards(float num_inches);
 
     void stopMoving();
 

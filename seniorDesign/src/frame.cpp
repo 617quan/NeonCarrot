@@ -152,7 +152,7 @@ void Frame::moveUp(uint32_t num_steps) {
     /* TODO: Incorporate logic to be specific in how many inches the motor
     lifts */
 
-    lift_motors->move(-int32_t(num_steps), false);
+    lift_motors->move(-int32_t(num_steps), true);
 }
 
 /********** moveDown **********
@@ -205,10 +205,12 @@ void Frame::turnRight(uint32_t degrees) {
     float steps_needed_2_4 = (135.0f / 360.0f) * (float)FULL_TURN_ROTATION;
     float steps_needed_1_3 = (45.0f / 360.0f) * (float)FULL_TURN_ROTATION;
     
-    turn1_motor->move(-int32_t(steps_needed_1_3), false);
-    turn2_motor->move(-int32_t(steps_needed_2_4), false);
-    turn3_motor->move(-int32_t(steps_needed_1_3), false);
-    turn4_motor->move(-int32_t(steps_needed_2_4), true);
+    // drive_motors->enableOutputs();
+    // turn1_motor->move(-int32_t(steps_needed_1_3), false);
+    // turn2_motor->move(-int32_t(steps_needed_2_4), false);
+    // turn3_motor->move(-int32_t(steps_needed_1_3), false);
+    // turn4_motor->move(-int32_t(steps_needed_2_4), true);
+    drive_motors->disableOutputs();
 
 
 }
@@ -244,10 +246,24 @@ void Frame::turnLeft(uint32_t degrees) {
     float steps_needed_2_4 = (135.0f / 360.0f) * (float)FULL_TURN_ROTATION; //120,000 steps
     float steps_needed_1_3 = (45.0f / 360.0f) * (float)FULL_TURN_ROTATION;  //40,000 steps
     
-    turn1_motor->move(int32_t(steps_needed_1_3), false);
-    turn2_motor->move(int32_t(steps_needed_2_4), false);
-    turn3_motor->move(int32_t(steps_needed_1_3), false);
-    turn4_motor->move(int32_t(steps_needed_2_4), true);
+    drive_motors->enableOutputs();
+    // turn1_motor->move(int32_t(steps_needed_1_3), false);
+    // turn2_motor->move(int32_t(steps_needed_2_4), false);
+    // turn3_motor->move(int32_t(steps_needed_1_3), false);
+    // turn4_motor->move(int32_t(steps_needed_2_4), true);
+    // drive_motors->disableOutputs();
+}
+
+void Frame::rotateRight(uint32_t degrees) {
+    this->turnRight(45);
+    // this->moveForward();
+    this->turnLeft(45);
+}
+
+void Frame::rotateLeft(uint32_t degrees) {
+    this->turnRight(45);
+    // this->moveBackwards();
+    this->turnLeft(45);
 }
 
 /********** moveForward **********
@@ -273,7 +289,7 @@ void Frame::turnLeft(uint32_t degrees) {
  ************************/
 void Frame::moveForward(float num_inches) {
     float steps_needed = ((float)num_inches / (float)WHEEL_CIRCUMFERENCE) * (float)FULL_DRIVE_ROTATION;
-    drive_motors->move(steps_needed, false);
+    drive_motors->move(steps_needed, true);
 }
 
 /********** moveBackward **********
@@ -297,8 +313,8 @@ void Frame::moveForward(float num_inches) {
  *      of steps to figure out how many steps needed to be driven.
  *      
  ************************/
-void Frame::moveBackwards(uint32_t num_inches) {
-    float steps_needed = (num_inches / WHEEL_CIRCUMFERENCE) * FULL_DRIVE_ROTATION;
+void Frame::moveBackwards(float num_inches) {
+    float steps_needed = (num_inches / (float)WHEEL_CIRCUMFERENCE) * (float)FULL_DRIVE_ROTATION;
     drive_motors->move(-int32_t(steps_needed), false);
 }
 
