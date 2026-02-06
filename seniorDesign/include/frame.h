@@ -32,7 +32,7 @@
 #define DRIVE_MAX_SPEED 20000
 #define DRIVE_ACCEL 10000
 
-#define LIFT_MAX_SPEED 50000
+#define LIFT_MAX_SPEED 40000 // was 50,000 Emmett changed it 
 #define LIFT_ACCEL 2500
 
 struct MotorSettings_t {

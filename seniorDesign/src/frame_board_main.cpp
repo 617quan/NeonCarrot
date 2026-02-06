@@ -175,9 +175,8 @@ void loop() {
     /* OPTION 3: MANUAL: THIS CODE JUST MANUALLY RUNS THE SYSTEM THROUGH CERTAIN
     TESTS */
 
-    frame->turnLeft(45);
-    delay(10000);
-    frame->turnRight(45);
+    
+    frame->moveUp(1000000);
     delay(10000);
    
 }
