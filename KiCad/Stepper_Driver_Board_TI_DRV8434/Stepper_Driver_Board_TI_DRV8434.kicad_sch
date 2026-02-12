@@ -3682,7 +3682,7 @@
 	)
 	(wire
 		(pts
-			(xy 256.54 80.01) (xy 248.92 80.01)
+			(xy 254 80.01) (xy 248.92 80.01)
 		)
 		(stroke
 			(width 0)
@@ -3972,16 +3972,6 @@
 	)
 	(wire
 		(pts
-			(xy 256.54 48.26) (xy 256.54 26.67)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "53855930-d860-4f25-9f4f-0504dea31e29")
-	)
-	(wire
-		(pts
 			(xy 189.23 109.22) (xy 189.23 110.49)
 		)
 		(stroke
@@ -4012,7 +4002,7 @@
 	)
 	(wire
 		(pts
-			(xy 256.54 53.34) (xy 256.54 80.01)
+			(xy 254 48.26) (xy 254 80.01)
 		)
 		(stroke
 			(width 0)
@@ -4049,16 +4039,6 @@
 			(type default)
 		)
 		(uuid "6429244e-e7c0-41c9-a076-829593680fcd")
-	)
-	(wire
-		(pts
-			(xy 256.54 53.34) (xy 275.59 53.34)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "644238fb-230c-49eb-af8d-387627b50802")
 	)
 	(wire
 		(pts
@@ -4332,6 +4312,16 @@
 	)
 	(wire
 		(pts
+			(xy 259.08 53.34) (xy 275.59 53.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a608b04b-7806-4198-b962-0c74717ff0c3")
+	)
+	(wire
+		(pts
 			(xy 212.09 55.88) (xy 212.09 57.15)
 		)
 		(stroke
@@ -4399,16 +4389,6 @@
 			(type default)
 		)
 		(uuid "b67ad33a-bd78-42e1-808a-01e1e5a033c3")
-	)
-	(wire
-		(pts
-			(xy 256.54 48.26) (xy 275.59 48.26)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "b7ca5c43-04a6-4e9a-9f76-578c3a970b78")
 	)
 	(wire
 		(pts
@@ -4572,7 +4552,7 @@
 	)
 	(wire
 		(pts
-			(xy 256.54 26.67) (xy 233.68 26.67)
+			(xy 259.08 26.67) (xy 233.68 26.67)
 		)
 		(stroke
 			(width 0)
@@ -4639,6 +4619,26 @@
 			(type default)
 		)
 		(uuid "effd4122-85ee-4c04-934d-c1127621dc07")
+	)
+	(wire
+		(pts
+			(xy 259.08 26.67) (xy 259.08 53.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f23384a4-806f-4197-8f1f-c248e46fb5e1")
+	)
+	(wire
+		(pts
+			(xy 254 48.26) (xy 275.59 48.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f6e63ce4-5acc-4ba6-b510-ea35e99b1e3e")
 	)
 	(wire
 		(pts
@@ -4721,14 +4721,14 @@
 		(uuid "fec92110-2c9e-4526-b30c-4103977449e4")
 	)
 	(label "ENA_ESP"
-		(at 260.35 48.26 0)
+		(at 260.35 53.34 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left bottom)
 		)
-		(uuid "12b94735-cf6d-4558-a1f4-87781ee179dc")
+		(uuid "05d899bf-ef4b-4861-95c8-79641341e618")
 	)
 	(label "AOUT1"
 		(at 85.09 76.2 0)
@@ -4820,6 +4820,16 @@
 		)
 		(uuid "4c87334d-be94-4ddd-aca2-cd13144918ce")
 	)
+	(label "PUL_ESP"
+		(at 260.35 48.26 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "74c63ec5-131f-4d03-a596-39e79d90eb40")
+	)
 	(label "DIR"
 		(at 161.29 76.2 0)
 		(effects
@@ -4889,16 +4899,6 @@
 			(justify left bottom)
 		)
 		(uuid "c27ad104-66e2-47d1-885a-af23f80b10bb")
-	)
-	(label "PUL_ESP"
-		(at 260.35 53.34 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "def52a75-db13-4289-b0d7-1e42a1fa3d51")
 	)
 	(label "VCP"
 		(at 106.68 58.42 0)
