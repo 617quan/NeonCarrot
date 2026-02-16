@@ -11,29 +11,12 @@
 
 #include <stdint.h>
 #include <Arduino.h>
+#include <string>
 #include "FastAccelStepper.h"
-#include "pinout_defines.h"
-
-#define WHEEL_RADIUS 3
-#define WHEEL_CIRCUMFERENCE (2 * PI * WHEEL_RADIUS)
-#define DRIVE_GEARBOX_RATIO 30
-#define MICROSTEP 1600
-#define STEPS_PER_REV (MICROSTEP * 200)
-
-#define FULL_DRIVE_ROTATION (STEPS_PER_REV * DRIVE_GEARBOX_RATIO)
-#define FULL_TURN_ROTATION (STEPS_PER_REV)
-
-#define TURN_2_4_SPEED 45000 / 5
-#define TURN_1_3_SPEED 45000 / 5 //(TURN_2_4_SPEED / 3)
-
-#define TURN_2_4_ACCEL 22500 / 2
-#define TURN_1_3_ACCEL 22500 / 2 //(TURN_2_4_ACCEL / 3)
-
-#define DRIVE_MAX_SPEED 20000
-#define DRIVE_ACCEL 10000
-
-#define LIFT_MAX_SPEED 40000 // was 50,000 Emmett changed it 
-#define LIFT_ACCEL 2500
+#include "defines.h"
+#include "driver/spi_slave.h"
+#include "state_machine.h"
+#include "WebPage.h"
 
 struct MotorSettings_t {
     uint8_t pulse_pin, dir_pin, enable_pin;
@@ -50,8 +33,10 @@ public:
 
     ~Frame();
 
-    static void engineStartup(); /* Call this at the beginning of setup to get the engine setup */
+    /* Call this at the beginning of setup to get the engine setup */
+    static void engineStartup();
     
+    /* Movement Functions */
     void moveUp(uint32_t num_steps);
     void moveDown(uint32_t num_steps);
 
@@ -62,7 +47,6 @@ public:
 
     void moveForward(float num_inches);
     void moveBackwards(float num_inches);
-
     void stopMoving();
 
     void calibratePosition();
@@ -78,9 +62,10 @@ private:
     int32_t getLiftCurrentPosition();
     std::array<int32_t, 4> getTurnCurrentPositions();
     int32_t getDriveCurrentPosition();
+    float convertInchesToSteps(int32_t num_inches);
+    float convertDegreesToSteps(int32_t num_degrees, int32_t wheels);
 
-    /* Define the engine used to initialize motors. NOTE: one engine is
-    needed for all motors */
+    /* Define the engine used to initialize motors - one engine is needed for all motors */
     static FastAccelStepperEngine engine;
 
     /* Define stepper motor objects. These represent the physical motors on the

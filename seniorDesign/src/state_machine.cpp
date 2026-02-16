@@ -12,108 +12,168 @@
 //  * 
 //  ************************/
 // StateMachine::StateMachine() {
-//     currentState = STATE_STOP;
-//     currentCommand = CMD_MOVE_TO_P1;
+//     currentState = P1;
+//     currentCommand = MOVE_TO_P1;
+
 // }
 
-// /********** sendCommandToStateMachine **********
-//  * 
-//  * Sends a command to the state machine.
-//  * 
-//  * Inputs:
-//  *   uint8_t command - command to send.
-//  * 
-//  * Returns:
-//  *   None.
-//  * 
-//  * Notes:
-//  *   - Commands defined in state_machine.h
-//  * 
-//  ************************/
-// void StateMachine::sendCommandToStateMachine(uint8_t command) {
-//     currentCommand = command;
+// /********** recieveMessageFromParent **********
+//   * Description: 
+//   *     Recieves an uint8_t message from the parent ESP32.
+//   * 
+//   * Inputs: 
+//   *     None.
+//   * 
+//   * Returns:
+//   *     uint8_t - message from parent.
+//   * 
+//   * Notes:
+//   *     - Since there is no heap and we don't know how long of a message will
+//   *       come across we first send across size (in bytes) then make a buffer 
+//   *       to recieve the whole message
+//   *     - Use memset tp set everything in child struct to 0
+//   *     - Uses spi_child_transmit() blocking call to wait for parent to send
+//   * 
+//   ************************/
+// MOVE_COMMAND StateMachine::recieveMessageFromParent() {
+//     spi_child_transaction_t t;
+//     memset(&t, 0, sizeof(t));
+    
+//     /* Receive 1-byte uint8_t */
+//     uint8_t rec_buf[128] = {0}; // Must be 128
+//     t.length = 8; // 8 bits = 1 byte for uint8_t
+//     t.rx_buffer = rec_buf; 
+//     t.tx_buffer = nullptr;
+
+//     esp_err_t t_status = SPI_CHILD_TRANSMIT(VSPI_HOST, &t, portMAX_DELAY);
+//     if (t_status == ESP_OK) {
+//         Serial.print("Nothing wong\n");
+//     } else if (t_status == ESP_ERR_TIMEOUT) {
+//         Serial.print("Took too wong\n");
+//     } else if (t_status == ESP_ERR_INVALID_STATE) {
+//         Serial.print("Invalid state\n");
+//     } else if (t_status == ESP_ERR_INVALID_ARG) {
+//         Serial.print("Invalid argument\n");
+//     } else {
+//         Serial.print("Transaction failed\n");
+//     }
+
+//     MOVE_COMMAND command = (MOVE_COMMAND)rec_buf[0];
+//     Serial.printf("Receiving message from parent, command: %u\n", (uint8_t)command);
+    
+//     return command;
 // }
 
-// /********** updateState **********
+
+
+// /********** parseCommands **********
 //  * 
-//  * Updates the state machine to the next state when the current state
-//  * has been reached.
+//  * Handles commands from parent and calls appropriate wheel functions.
 //  * 
 //  * Inputs:
-//  *   None.
+//  *    uint8_t command - command from parent
 //  * 
 //  * Returns:
-//  *   None.
+//  *    None.
+//  * 
+//  * Expects:
+//  *   - Commands apply to both wheel 3 and wheel 4
 //  * 
 //  * Notes:
-//  *   - Current state progression just goes STOP -> P1 -> P2 -> P3 -> P4 -> STOP
+//  *  - Commands defined in state_machine.h
 //  * 
 //  ************************/
-// void StateMachine::updateState() {
-//     uint8_t state = getState();
-//     uint8_t command = getCommand();
+//  STATE_TYPE StateMachine::parseCommand(MOVE_COMMAND command) {
 
-//     if ((state == STATE_STOP) and (command == CMD_MOVE_TO_P1)) {
-//         Serial.printf("in stop state moving to P1\n");
-//         currentCommand = CMD_MOVE_TO_P1;
-//         currentState   = STATE_AT_P1;
+//     switch (Curr_state) {
+//         case (P1): 
+//         if (command == MOVE_TO_P1) {
+//             return P1;
+//         } else if (command == MOVE_TO_P2) {
+//             // frame->rotateRight(90);
+//             return P2;
+//         } else if (command == MOVE_TO_P3) {
+//             frame->turnLeft(90);
+//             // frame->moveForward(TODO: FIND THIS OUT);
+//             frame->turnRight(90);
+//             return P3;
+//         } else if (command == MOVE_TO_P4) {
+//             // frame->rotateRight(135);
+//             frame->moveForward(23.622f);
+//             return P4;
+//         } else {
+//             Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
+//         }
+//         break;
+//         case (P2):
+//         if (command == MOVE_TO_P1) {
+//             // frame->rotateLeft(45);
+//             return P1;
+//         } else if (command == MOVE_TO_P2) {
+//             return P2;
+//         } else if (command == MOVE_TO_P3) {
+//             // frame->moveBackward(TODO: FIND THIS OUT);
+//             // frame->rotateLeft(90);
+//             return P3;
+//         } else if (command == MOVE_TO_P4) {
+//             // frame->rotateRight(45);
+//             frame->moveForward(23.622f);
+//             return P4;
+//         } else {
+//             Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
+//         }
 
-//     } else if ((state == STATE_AT_P1) and (command == CMD_MOVE_TO_P2)) {
-//         Serial.printf("in state P1 moving to P2\n");
-//         currentCommand = CMD_MOVE_TO_P2;
-//         currentState   = STATE_AT_P2;
+//         break;
+//         case (P3):
 
-//     } else if ((state == STATE_AT_P2) and (command == CMD_MOVE_TO_P3)) {
-//         Serial.printf("in state P2 moving to P3\n");
-//         currentCommand = CMD_MOVE_TO_P3;
-//         currentState   = STATE_AT_P3;
+//         if (command == MOVE_TO_P1) {
+//             frame->turnRight(90);
+//             // frame->moveForward(TODO: FIND THIS OUT);
+//             frame->turnLeft(90);
+//             return P1;
+//         } else if (command == MOVE_TO_P2) {
+//             // frame->rotateRight(90);
+//             // frame->moveForward(TODO: FIND THIS OUT);
+//             return P2;
+//         } else if (command == MOVE_TO_P3) {
+//             return P3;
+//         } else if (command == MOVE_TO_P4) {
+//             // frame->rotateRight(90);
+//             // frame->moveForward(TODO: FIND THIS OUT);
+//             // frame->rotateRight(45);
+//             frame->moveForward(23.622f);
+//             return P4;
+//         } else {
+//             Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
+//         }
 
-//     } else if ((state == STATE_AT_P3) and (command == CMD_MOVE_TO_P4)) {
-//         Serial.printf("in state P3 moving to P4\n");
-//         currentCommand = CMD_MOVE_TO_P4;
-//         currentState   = STATE_AT_P4;
-
-//     } else if (command == CMD_STOP_MOVE) {
-//         stop();
+//         break;
+//         case (P4):
+//         if (command == MOVE_TO_P1) {
+//             frame->moveBackwards(23.622f);
+//             // frame->rotateLeft(135);
+//             return P1;
+//         } else if (command == MOVE_TO_P2) {
+//             frame->moveBackwards(23.622f);
+//             // frame->rotateLeft(45);
+//             return P2;
+//         } else if (command == MOVE_TO_P3) {
+//             frame->moveBackwards(23.622f);
+//             // frame->rotateLeft(135);
+//             frame->turnLeft(90);
+//             // frame->moveForward(TODO: FIND THIS OUT);
+//             frame->turnRight(90);
+//             return P3;
+//         } else if (command == MOVE_TO_P4) {
+//             return P4;
+//         } else {
+//             Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
+//         }
+//         break;
 //     }
 // }
 
-// /********** getState **********
-//  * 
-//  * Returns the current state of the state machine.
-//  * 
-//  * Inputs:
-//  *       None.
-//  * 
-//  * Returns:
-//  *      uint8_t: Current state.
-//  * 
-//  ************************/
-// uint8_t StateMachine::getState() {
-//     return currentState;
-// }
 
-// /********** getCommand **********
-//  * 
-//  * Returns the command.
-//  * 
-//  * Inputs:
-//  *   None.
-//  * 
-//  * Returns:
-//  *      uint8_t: Current command.
-//  * 
-//  ************************/
-// uint8_t StateMachine::getCommand() {
-//     return currentCommand;
-// }
-
-// /********** stop **********
-//  * 
-//  * Stops all movement.
-//  * 
-//  ************************/
-// void StateMachine::stop() {
-//     currentCommand = CMD_STOP_MOVE;
-//     currentState   = STATE_STOP;
+// void StateMachine::emergencyStop() {
+//     frame->stopMoving();
 // }

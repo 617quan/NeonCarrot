@@ -4,7 +4,6 @@
  */ 
 
 #include "frame.h"
-#include "pinout_defines.h"
 
 /* Instantiates the engine object to be used for all stepper motors*/
 FastAccelStepperEngine Frame::engine;
@@ -73,8 +72,6 @@ Frame::Frame(MotorSettings_t drive_motor_settings,
     this->turn3_motor_settings = turn_motor_settings[2];
     this->turn4_motor_settings = turn_motor_settings[3];
 
-    
-    
     /* Initialize pins, max speed, and acceleration for all motors */
     drive_motors = initMotor(drive_motor_settings);
     lift_motors = initMotor(lift_motor_settings);
@@ -85,6 +82,7 @@ Frame::Frame(MotorSettings_t drive_motor_settings,
 
 }
 
+/********** Deconstructor **********/
 Frame::~Frame() {
 /* Nothing new being made, so nothing here */
 }
@@ -202,17 +200,15 @@ void Frame::moveDown(uint32_t num_steps) {
  *      
  ************************/
 void Frame::turnRight(uint32_t degrees) {
-    float steps_needed_2_4 = (135.0f / 360.0f) * (float)FULL_TURN_ROTATION;
-    float steps_needed_1_3 = (45.0f / 360.0f) * (float)FULL_TURN_ROTATION;
+    float steps_needed_2_4 = convertDegreesToSteps(degrees, 24); // 120,000 steps
+    float steps_needed_1_3 = convertDegreesToSteps(degrees, 13); // 40,000 steps
     
-    // drive_motors->enableOutputs();
-    // turn1_motor->move(-int32_t(steps_needed_1_3), false);
-    // turn2_motor->move(-int32_t(steps_needed_2_4), false);
-    // turn3_motor->move(-int32_t(steps_needed_1_3), false);
-    // turn4_motor->move(-int32_t(steps_needed_2_4), true);
+    drive_motors->enableOutputs();
+    turn1_motor->move(-int32_t(steps_needed_1_3), false);
+    turn2_motor->move(-int32_t(steps_needed_2_4), false);
+    turn3_motor->move(-int32_t(steps_needed_1_3), false);
+    turn4_motor->move(-int32_t(steps_needed_2_4), true);
     drive_motors->disableOutputs();
-
-
 }
 
 /********** turnLeft **********
@@ -243,15 +239,15 @@ void Frame::turnRight(uint32_t degrees) {
  *      
  ************************/
 void Frame::turnLeft(uint32_t degrees) {
-    float steps_needed_2_4 = (135.0f / 360.0f) * (float)FULL_TURN_ROTATION; //120,000 steps
-    float steps_needed_1_3 = (45.0f / 360.0f) * (float)FULL_TURN_ROTATION;  //40,000 steps
+    float steps_needed_2_4 = convertDegreesToSteps(degrees, 24); // 120,000 steps
+    float steps_needed_1_3 = convertDegreesToSteps(degrees, 13); // 40,000 steps
     
     drive_motors->enableOutputs();
-    // turn1_motor->move(int32_t(steps_needed_1_3), false);
-    // turn2_motor->move(int32_t(steps_needed_2_4), false);
-    // turn3_motor->move(int32_t(steps_needed_1_3), false);
-    // turn4_motor->move(int32_t(steps_needed_2_4), true);
-    // drive_motors->disableOutputs();
+    turn1_motor->move(int32_t(steps_needed_1_3), false);
+    turn2_motor->move(int32_t(steps_needed_2_4), false);
+    turn3_motor->move(int32_t(steps_needed_1_3), false);
+    turn4_motor->move(int32_t(steps_needed_2_4), true);
+    drive_motors->disableOutputs();
 }
 
 void Frame::rotateRight(uint32_t degrees) {
@@ -288,8 +284,8 @@ void Frame::rotateLeft(uint32_t degrees) {
  *      
  ************************/
 void Frame::moveForward(float num_inches) {
-    float steps_needed = ((float)num_inches / (float)WHEEL_CIRCUMFERENCE) * (float)FULL_DRIVE_ROTATION;
-    drive_motors->move(steps_needed, true);
+    float steps_needed = convertInchesToSteps(num_inches);
+    drive_motors->move(int32_t(steps_needed), true);
 }
 
 /********** moveBackward **********
@@ -314,8 +310,8 @@ void Frame::moveForward(float num_inches) {
  *      
  ************************/
 void Frame::moveBackwards(float num_inches) {
-    float steps_needed = (num_inches / (float)WHEEL_CIRCUMFERENCE) * (float)FULL_DRIVE_ROTATION;
-    drive_motors->move(-int32_t(steps_needed), false);
+    float steps_needed = convertInchesToSteps(num_inches);
+    drive_motors->move(-int32_t(steps_needed), true);
 }
 
 /********** stopMoving **********
@@ -403,6 +399,43 @@ std::array<int32_t, 4> Frame::getTurnCurrentPositions() {
  ************************/
 int32_t Frame::getDriveCurrentPosition() {
     return drive_motors->getCurrentPosition();
+}
+
+/********** convertInchesToSteps **********
+ * 
+ * Converts the desired number of inches for moving forwards to microsteps for
+ * the stepper driver to execute.
+ *
+ * Parameters:
+ *      float num_inches: number of inches to move.
+ * 
+ * Return:
+ *      The number of microsteps as a float.
+ *  
+ ************************/
+float Frame::convertInchesToSteps(float num_inches) {
+    return ((num_inches / (float)WHEEL_CIRCUMFERENCE) * (float)FULL_DRIVE_ROTATION);
+}
+
+/********** convertDegreesToSteps **********
+ * 
+ * Converts the desired number of degrees for turning to microsteps for the 
+ * stepper driver to execute.
+ *
+ * Parameters:
+ *      uint32_t num_degrees: number of degrees to turn.
+ *      int32_t wheels: indicates which two wheels to move.
+ * 
+ * Return:
+ *      The number of microsteps as a float.
+ *  
+ ************************/
+float Frame::convertDegreesToSteps(uint32_t num_degrees, int32_t wheels) {
+    if (wheels == 13) {
+        return (45.0f / 360.0f) * (float)FULL_TURN_ROTATION;  //40,000 steps
+    } else if (wheels == 24) {
+        return (135.0f / 360.0f) * (float)FULL_TURN_ROTATION; //120,000 steps
+    }
 }
 
 /********** calibrateMotors **********
