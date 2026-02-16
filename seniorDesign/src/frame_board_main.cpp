@@ -27,7 +27,6 @@ WebPage webServer("ESP32-Access-Point", "123456789");
 void initFrame();
 void initSPI();
 
-
 void setup() {
     Serial.begin(115200);
     webServer.begin();
@@ -36,8 +35,6 @@ void setup() {
     pinMode(LED_BUILTIN, OUTPUT);
     initFrame();
     initSPI();    
-
-    
 }
 
 /********** initSPI **********
@@ -144,8 +141,54 @@ void initFrame() {
         Serial.println("FATAL ERROR: Frame initialized incorrectly");
     }
 }
-// STATE_TYPE Curr_state = P1;
-// MOVE_COMMAND command;
+
+/********** recieveMessageFromParent **********
+  * Description: 
+  *     Recieves an uint8_t message from the parent ESP32.
+  * 
+  * Inputs: 
+  *     None.
+  * 
+  * Returns:
+  *     uint8_t - message from parent.
+  * 
+  * Notes:
+  *     - Since there is no heap and we don't know how long of a message will
+  *       come across we first send across size (in bytes) then make a buffer 
+  *       to recieve the whole message
+  *     - Use memset tp set everything in child struct to 0
+  *     - Uses spi_child_transmit() blocking call to wait for parent to send
+  * 
+  ************************/
+MOVE_COMMAND recieveMessageFromParent() {
+    spi_child_transaction_t t;
+    memset(&t, 0, sizeof(t));
+    
+    /* Receive 1-byte uint8_t */
+    uint8_t rec_buf[128] = {0}; // Must be 128
+    t.length = 8; // 8 bits = 1 byte for uint8_t
+    t.rx_buffer = rec_buf; 
+    t.tx_buffer = nullptr;
+
+    esp_err_t t_status = SPI_CHILD_TRANSMIT(VSPI_HOST, &t, portMAX_DELAY);
+    if (t_status == ESP_OK) {
+        Serial.print("Nothing wong\n");
+    } else if (t_status == ESP_ERR_TIMEOUT) {
+        Serial.print("Took too wong\n");
+    } else if (t_status == ESP_ERR_INVALID_STATE) {
+        Serial.print("Invalid state\n");
+    } else if (t_status == ESP_ERR_INVALID_ARG) {
+        Serial.print("Invalid argument\n");
+    } else {
+        Serial.print("Transaction failed\n");
+    }
+
+    MOVE_COMMAND command = (MOVE_COMMAND)rec_buf[0];
+    Serial.printf("Receiving message from parent, command: %u\n", (uint8_t)command);
+    
+    return command;
+}
+
 void loop() {  
     
     // THIS CODE SEGMENT WAS USED TO TEST WEBSERVER INTERFACING - QUAN

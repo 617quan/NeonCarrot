@@ -6,11 +6,11 @@
  * https://github.com/gin66/FastAccelStepper/tree/00462dea3e96813f6cbdc04bb2079be33c409ece
  */
 
-#ifndef _MOTOR
-#define _MOTOR
+#ifndef _FRAME_H
+#define _FRAME_H
 
 #include <stdint.h>
-#include <Arduino.h>
+#include "Arduino.h"
 #include <string>
 #include "FastAccelStepper.h"
 #include "defines.h"
@@ -57,13 +57,14 @@ private:
 
     /* Call this in the constructor to initialize all motors to correct pins */
     FastAccelStepper* initMotor(MotorSettings_t lift_motor_settings);
+    void recieveMessageFromParent();
 
     /* Getters for motor position. One function for each type of motor */
     int32_t getLiftCurrentPosition();
     std::array<int32_t, 4> getTurnCurrentPositions();
     int32_t getDriveCurrentPosition();
-    float convertInchesToSteps(int32_t num_inches);
-    float convertDegreesToSteps(int32_t num_degrees, int32_t wheels);
+    float convertInchesToSteps(float num_inches);
+    float convertDegreesToSteps(uint32_t num_degrees, int32_t wheels);
 
     /* Define the engine used to initialize motors - one engine is needed for all motors */
     static FastAccelStepperEngine engine;
