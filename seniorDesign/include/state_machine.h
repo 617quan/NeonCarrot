@@ -24,10 +24,15 @@ class StateMachine {
 public:
 
     StateMachine();
-    STATE_TYPE parseCommand(MOVE_COMMAND command);
+    STATE_TYPE parseCommands(MOVE_COMMAND command);
+    STATE_TYPE getCurrState();
+    MOVE_COMMAND getCurrCommand();
 
 private:
     void emergencyStop();
+
+    STATE_TYPE curr_state;
+    MOVE_COMMAND command;
 };
 
 #endif

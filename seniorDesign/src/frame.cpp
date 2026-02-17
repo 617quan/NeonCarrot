@@ -79,7 +79,6 @@ Frame::Frame(MotorSettings_t drive_motor_settings,
     turn2_motor = initMotor(turn2_motor_settings);
     turn3_motor = initMotor(turn3_motor_settings);
     turn4_motor = initMotor(turn4_motor_settings);
-
 }
 
 /********** Deconstructor **********/
@@ -150,7 +149,9 @@ void Frame::moveUp(uint32_t num_steps) {
     /* TODO: Incorporate logic to be specific in how many inches the motor
     lifts */
 
-    lift_motors->move(-int32_t(num_steps), true);
+    /* Set the target positions when movements start */
+    lift_target_pos = lift_motors->getCurrentPosition() - int32_t(num_steps);
+    lift_motors->move(-int32_t(num_steps), false);
 }
 
 /********** moveDown **********
@@ -170,7 +171,9 @@ void Frame::moveUp(uint32_t num_steps) {
  * 
  ************************/
 void Frame::moveDown(uint32_t num_steps) {
-    lift_motors->move(int32_t(num_steps), true);
+    /* Set the target positions when movements start */
+    lift_target_pos = lift_motors->getCurrentPosition() + int32_t(num_steps);
+    lift_motors->move(int32_t(num_steps), false);
 }
 
 /********** turnRight **********
@@ -203,11 +206,17 @@ void Frame::turnRight(uint32_t degrees) {
     float steps_needed_2_4 = convertDegreesToSteps(degrees, 24); // 120,000 steps
     float steps_needed_1_3 = convertDegreesToSteps(degrees, 13); // 40,000 steps
     
+    /* Set the target positions when movements start */
+    turn_target_pos[0] = turn1_motor->getCurrentPosition() - int32_t(steps_needed_1_3);
+    turn_target_pos[1] = turn2_motor->getCurrentPosition() - int32_t(steps_needed_2_4);
+    turn_target_pos[2] = turn3_motor->getCurrentPosition() - int32_t(steps_needed_1_3);
+    turn_target_pos[3] = turn4_motor->getCurrentPosition() - int32_t(steps_needed_2_4);
+    
     drive_motors->enableOutputs();
     turn1_motor->move(-int32_t(steps_needed_1_3), false);
     turn2_motor->move(-int32_t(steps_needed_2_4), false);
     turn3_motor->move(-int32_t(steps_needed_1_3), false);
-    turn4_motor->move(-int32_t(steps_needed_2_4), true);
+    turn4_motor->move(-int32_t(steps_needed_2_4), false);
     drive_motors->disableOutputs();
 }
 
@@ -242,11 +251,17 @@ void Frame::turnLeft(uint32_t degrees) {
     float steps_needed_2_4 = convertDegreesToSteps(degrees, 24); // 120,000 steps
     float steps_needed_1_3 = convertDegreesToSteps(degrees, 13); // 40,000 steps
     
+     /* Set the target positions when movements start */
+    turn_target_pos[0] = turn1_motor->getCurrentPosition() + int32_t(steps_needed_1_3);
+    turn_target_pos[1] = turn2_motor->getCurrentPosition() + int32_t(steps_needed_2_4);
+    turn_target_pos[2] = turn3_motor->getCurrentPosition() + int32_t(steps_needed_1_3);
+    turn_target_pos[3] = turn4_motor->getCurrentPosition() + int32_t(steps_needed_2_4);
+    
     drive_motors->enableOutputs();
     turn1_motor->move(int32_t(steps_needed_1_3), false);
     turn2_motor->move(int32_t(steps_needed_2_4), false);
     turn3_motor->move(int32_t(steps_needed_1_3), false);
-    turn4_motor->move(int32_t(steps_needed_2_4), true);
+    turn4_motor->move(int32_t(steps_needed_2_4), false);
     drive_motors->disableOutputs();
 }
 
@@ -285,7 +300,9 @@ void Frame::rotateLeft(uint32_t degrees) {
  ************************/
 void Frame::moveForward(float num_inches) {
     float steps_needed = convertInchesToSteps(num_inches);
-    drive_motors->move(int32_t(steps_needed), true);
+     /* Set the target positions when movements start */
+    drive_target_pos = drive_motors->getCurrentPosition() + int32_t(steps_needed);
+    drive_motors->move(int32_t(steps_needed), false);
 }
 
 /********** moveBackward **********
@@ -311,7 +328,9 @@ void Frame::moveForward(float num_inches) {
  ************************/
 void Frame::moveBackwards(float num_inches) {
     float steps_needed = convertInchesToSteps(num_inches);
-    drive_motors->move(-int32_t(steps_needed), true);
+     /* Set the target positions when movements start */
+    drive_target_pos = drive_motors->getCurrentPosition() - int32_t(steps_needed);
+    drive_motors->move(-int32_t(steps_needed), false);
 }
 
 /********** stopMoving **********
@@ -433,9 +452,47 @@ float Frame::convertInchesToSteps(float num_inches) {
 float Frame::convertDegreesToSteps(uint32_t num_degrees, int32_t wheels) {
     if (wheels == 13) {
         return (45.0f / 360.0f) * (float)FULL_TURN_ROTATION;  //40,000 steps
-    } else if (wheels == 24) {
+    } else {
         return (135.0f / 360.0f) * (float)FULL_TURN_ROTATION; //120,000 steps
     }
+}
+
+/********** isMoving **********
+ * 
+ * Determine if the bot is currently moving by checking if the motor has 
+ * reached its target by comparing positions.
+ *
+ * Parameters:
+ *     None.
+ * 
+ * Return:
+ *     True if the bot is moving, false if the bot is not moving.
+ *  
+ ************************/
+bool Frame::isMoving() {
+    // Check if drive motors have reached target
+    if (drive_motors->getCurrentPosition() != drive_target_pos) {
+        return true;
+    }
+    // Check if lift motors have reached target
+    if (lift_motors->getCurrentPosition() != lift_target_pos) {
+        return true;
+    }
+    // Check if turn motors have reached target
+    if (turn1_motor->getCurrentPosition() != turn_target_pos[0]) {
+        return true;
+    }
+    if (turn2_motor->getCurrentPosition() != turn_target_pos[1]) {
+        return true;
+    }
+    if (turn3_motor->getCurrentPosition() != turn_target_pos[2]) {
+        return true;
+    }
+    if (turn4_motor->getCurrentPosition() != turn_target_pos[3]) {
+        return true;
+    }
+    
+    return false;
 }
 
 /********** calibrateMotors **********

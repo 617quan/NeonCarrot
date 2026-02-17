@@ -15,12 +15,14 @@
  */
 
 #include "frame.h"
+#include "state_machine.h"
 
 /* Use these functions and typedefs to avoid outdated language */
 #define SPI_CHILD_INITIALIZE spi_slave_initialize
 #define SPI_CHILD_TRANSMIT spi_slave_transmit
 typedef spi_slave_transaction_t spi_child_transaction_t;
 typedef spi_slave_interface_config_t spi_child_interface_config_t;
+MOVE_COMMAND recieveMessageFromParent();
 
 Frame *frame = nullptr;
 WebPage webServer("ESP32-Access-Point", "123456789");
@@ -88,8 +90,7 @@ void initSPI() {
         while(1) {
             Serial.printf("SPI child init failed: %d\n", ret);
         }
-    } 
-
+    }
 }
 
 /********** initFrame **********
@@ -200,23 +201,35 @@ void loop() {
     // MOVE_COMMAND command = recieveMessageFromParent();
     // Serial.printf("Command to be parsed: %u\n", command);
     // delay(1000); HOPE WE DON'T NEED THIS!
-    // Curr_state = parseCommand(command);
+    // curr_state = parseCommand(command);
 
     /* OPTION 2: WEBSERVER. THIS CODE USES THE WEBSERVER TO TELL THE FRAME WHAT
     TO DO */
-
-
     /* OPTION 3: MANUAL: THIS CODE JUST MANUALLY RUNS THE SYSTEM THROUGH CERTAIN
     TESTS */
     // delay(2000);
-    frame->moveForward(WHEEL_CIRCUMFERENCE);
-    delay(5000);
-    frame->moveBackwards(WHEEL_CIRCUMFERENCE);
-    delay(5000);
 
-
-    
+    // frame->moveForward(WHEEL_CIRCUMFERENCE);
+    // delay(5000);
+    // frame->moveBackwards(WHEEL_CIRCUMFERENCE);
+    // delay(5000);
     // frame->moveDown(1000000);
     // delay(10000);
-   
+
+    /* STATE MACHINE TESTING */
+    StateMachine stateMachine;
+
+    MOVE_COMMAND command = MOVE_TO_P1;
+    STATE_TYPE curr_state = stateMachine.parseCommands(command);
+
+    Serial.printf("Current State: %u | Command Received: %u\n", stateMachine.getCurrState(), stateMachine.getCurrCommand());
+
+    delay(10000);
+    
+    MOVE_COMMAND command2 = MOVE_TO_P2;
+    STATE_TYPE curr_state2 = stateMachine.parseCommands(command2);
+
+    Serial.printf("Current State: %u | Command Received: %u\n", stateMachine.getCurrState(), stateMachine.getCurrCommand());
+    
+    delay(10000);
 }

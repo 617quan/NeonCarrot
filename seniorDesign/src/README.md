@@ -25,6 +25,11 @@ Files
   - Wheels 1 and 3 need to turn 45 degrees
   - Wheels 2 and 4 need to turn 135 degrees 
 
+Emergency Stop Logic:
+    1. Check if motors are still moving using the isMoving() method in the Frame 
+       class before allowing the next command to proceed
+    2. Check for emergency stop at every cycle, allowing it to interrupt
+    3. Wait in a loop (non-blocking) for the current movement to complete
 
 2. child_main.cpp
 

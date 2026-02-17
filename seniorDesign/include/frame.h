@@ -39,16 +39,15 @@ public:
     /* Movement Functions */
     void moveUp(uint32_t num_steps);
     void moveDown(uint32_t num_steps);
-
     void turnRight(uint32_t degrees);
     void turnLeft(uint32_t degrees);
     void rotateRight(uint32_t degrees);
     void rotateLeft(uint32_t degrees);
-
     void moveForward(float num_inches);
     void moveBackwards(float num_inches);
-    void stopMoving();
 
+    void stopMoving();
+    bool isMoving();
     void calibratePosition();
 
     void printPosition(int positionNum); //FUNCTION IS TEMPORARY, USED TO TEST INTERFACING WEBSERVER INTO FRAME CLASS - QUAN
@@ -57,15 +56,16 @@ private:
 
     /* Call this in the constructor to initialize all motors to correct pins */
     FastAccelStepper* initMotor(MotorSettings_t lift_motor_settings);
-    void recieveMessageFromParent();
 
     /* Getters for motor position. One function for each type of motor */
     int32_t getLiftCurrentPosition();
     std::array<int32_t, 4> getTurnCurrentPositions();
     int32_t getDriveCurrentPosition();
+
+    /* Conversion Functions */
     float convertInchesToSteps(float num_inches);
     float convertDegreesToSteps(uint32_t num_degrees, int32_t wheels);
-
+    
     /* Define the engine used to initialize motors - one engine is needed for all motors */
     static FastAccelStepperEngine engine;
 
@@ -81,6 +81,11 @@ private:
     MotorSettings_t turn2_motor_settings, turn3_motor_settings, turn4_motor_settings;
 
     int position = 0; // used to track position based on webserver input
+    
+    /* Target positions for movement tracking */
+    int32_t drive_target_pos = 0;
+    int32_t lift_target_pos = 0;
+    int32_t turn_target_pos[4] = {0, 0, 0, 0};
 };
 
 #endif
