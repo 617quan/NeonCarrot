@@ -29,8 +29,6 @@ public:
     MOVE_COMMAND getCurrCommand();
 
 private:
-    void emergencyStop();
-
     STATE_TYPE curr_state;
     MOVE_COMMAND command;
 };

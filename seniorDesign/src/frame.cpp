@@ -203,20 +203,19 @@ void Frame::moveDown(uint32_t num_steps) {
  *      
  ************************/
 void Frame::turnRight(uint32_t degrees) {
-    float steps_needed_2_4 = convertDegreesToSteps(degrees, 24); // 120,000 steps
-    float steps_needed_1_3 = convertDegreesToSteps(degrees, 13); // 40,000 steps
+    int32_t steps_needed = ((float)degrees / 360.0f) * (float)FULL_TURN_ROTATION;
     
     /* Set the target positions when movements start */
-    turn_target_pos[0] = turn1_motor->getCurrentPosition() - int32_t(steps_needed_1_3);
-    turn_target_pos[1] = turn2_motor->getCurrentPosition() - int32_t(steps_needed_2_4);
-    turn_target_pos[2] = turn3_motor->getCurrentPosition() - int32_t(steps_needed_1_3);
-    turn_target_pos[3] = turn4_motor->getCurrentPosition() - int32_t(steps_needed_2_4);
+    turn_target_pos[0] = turn1_motor->getCurrentPosition() - int32_t(steps_needed);
+    turn_target_pos[1] = turn2_motor->getCurrentPosition() - int32_t(steps_needed);
+    turn_target_pos[2] = turn3_motor->getCurrentPosition() - int32_t(steps_needed);
+    turn_target_pos[3] = turn4_motor->getCurrentPosition() - int32_t(steps_needed);
     
     drive_motors->enableOutputs();
-    turn1_motor->move(-int32_t(steps_needed_1_3), false);
-    turn2_motor->move(-int32_t(steps_needed_2_4), false);
-    turn3_motor->move(-int32_t(steps_needed_1_3), false);
-    turn4_motor->move(-int32_t(steps_needed_2_4), false);
+    turn1_motor->move(-int32_t(steps_needed), false);
+    turn2_motor->move(-int32_t(steps_needed), false);
+    turn3_motor->move(-int32_t(steps_needed), false);
+    turn4_motor->move(-int32_t(steps_needed), false);
     drive_motors->disableOutputs();
 }
 
@@ -248,33 +247,66 @@ void Frame::turnRight(uint32_t degrees) {
  *      
  ************************/
 void Frame::turnLeft(uint32_t degrees) {
-    float steps_needed_2_4 = convertDegreesToSteps(degrees, 24); // 120,000 steps
-    float steps_needed_1_3 = convertDegreesToSteps(degrees, 13); // 40,000 steps
+    float steps_needed = ((float)degrees / 360.0f) * (float)FULL_TURN_ROTATION; // 40,000 steps
     
      /* Set the target positions when movements start */
+    turn_target_pos[0] = turn1_motor->getCurrentPosition() + int32_t(steps_needed);
+    turn_target_pos[1] = turn2_motor->getCurrentPosition() + int32_t(steps_needed);
+    turn_target_pos[2] = turn3_motor->getCurrentPosition() + int32_t(steps_needed);
+    turn_target_pos[3] = turn4_motor->getCurrentPosition() + int32_t(steps_needed);
+    
+    drive_motors->enableOutputs();
+    turn1_motor->move(int32_t(steps_needed), false);
+    turn2_motor->move(int32_t(steps_needed), false);
+    turn3_motor->move(int32_t(steps_needed), false);
+    turn4_motor->move(int32_t(steps_needed), false);
+    drive_motors->disableOutputs();
+}
+
+void Frame::rotateRight(uint32_t degrees) {
+    int32_t steps_needed_1_3 = convertDegreesToSteps(90, 13);
+    int32_t steps_needed_2_4 = convertDegreesToSteps(135, 24);
+    
+    /* Set the target positions when movements start */
+    turn_target_pos[0] = turn1_motor->getCurrentPosition() - int32_t(steps_needed_1_3);
+    turn_target_pos[1] = turn2_motor->getCurrentPosition() - int32_t(steps_needed_2_4);
+    turn_target_pos[2] = turn3_motor->getCurrentPosition() - int32_t(steps_needed_1_3);
+    turn_target_pos[3] = turn4_motor->getCurrentPosition() - int32_t(steps_needed_2_4);
+    
+    drive_motors->enableOutputs();
+    turn1_motor->move(-int32_t(steps_needed_1_3), false);
+    turn2_motor->move(-int32_t(steps_needed_2_4), false);
+    turn3_motor->move(-int32_t(steps_needed_1_3), false);
+    turn4_motor->move(-int32_t(steps_needed_2_4), false);
+    drive_motors->disableOutputs();
+}
+
+void Frame::rotateLeft(uint32_t degrees) {
+    int32_t steps_needed_1_3 = convertDegreesToSteps(45, 13);
+    int32_t steps_needed_2_4 = convertDegreesToSteps(135, 24);
+    
+    /* Set the target positions when movements start */
     turn_target_pos[0] = turn1_motor->getCurrentPosition() + int32_t(steps_needed_1_3);
     turn_target_pos[1] = turn2_motor->getCurrentPosition() + int32_t(steps_needed_2_4);
     turn_target_pos[2] = turn3_motor->getCurrentPosition() + int32_t(steps_needed_1_3);
     turn_target_pos[3] = turn4_motor->getCurrentPosition() + int32_t(steps_needed_2_4);
     
     drive_motors->enableOutputs();
+    turn1_motor->move(-int32_t(steps_needed_1_3), false);
+    turn2_motor->move(-int32_t(steps_needed_2_4), false);
+    turn3_motor->move(-int32_t(steps_needed_1_3), false);
+    turn4_motor->move(-int32_t(steps_needed_2_4), true);
+    drive_motors->disableOutputs();
+
+    moveForward(100);
+    drive_motors->enableOutputs();
     turn1_motor->move(int32_t(steps_needed_1_3), false);
     turn2_motor->move(int32_t(steps_needed_2_4), false);
     turn3_motor->move(int32_t(steps_needed_1_3), false);
-    turn4_motor->move(int32_t(steps_needed_2_4), false);
+    turn4_motor->move(int32_t(steps_needed_2_4), true);
     drive_motors->disableOutputs();
-}
 
-void Frame::rotateRight(uint32_t degrees) {
-    this->turnRight(45);
-    // this->moveForward();
-    this->turnLeft(45);
-}
-
-void Frame::rotateLeft(uint32_t degrees) {
-    this->turnRight(45);
-    // this->moveBackwards();
-    this->turnLeft(45);
+    moveForward(100);
 }
 
 /********** moveForward **********
@@ -302,7 +334,7 @@ void Frame::moveForward(float num_inches) {
     float steps_needed = convertInchesToSteps(num_inches);
      /* Set the target positions when movements start */
     drive_target_pos = drive_motors->getCurrentPosition() + int32_t(steps_needed);
-    drive_motors->move(int32_t(steps_needed), false);
+    drive_motors->move(int32_t(steps_needed), true);
 }
 
 /********** moveBackward **********
@@ -330,7 +362,7 @@ void Frame::moveBackwards(float num_inches) {
     float steps_needed = convertInchesToSteps(num_inches);
      /* Set the target positions when movements start */
     drive_target_pos = drive_motors->getCurrentPosition() - int32_t(steps_needed);
-    drive_motors->move(-int32_t(steps_needed), false);
+    drive_motors->move(-int32_t(steps_needed), true);
 }
 
 /********** stopMoving **********

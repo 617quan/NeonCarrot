@@ -45,7 +45,7 @@ StateMachine::StateMachine() {
     
     /* Check for emergency stop */
     if (command == EMERGENCY_STOP) {
-        emergencyStop();
+        frame->stopMoving();
         /* Stay in current state */
         return curr_state;
     }
@@ -61,15 +61,15 @@ StateMachine::StateMachine() {
         if (command == MOVE_TO_P1) {
             return P1;
         } else if (command == MOVE_TO_P2) {
-            // frame->rotateRight(90);
+            frame->rotateRight(90);
             return P2;
         } else if (command == MOVE_TO_P3) {
-            frame->turnLeft(90);
-            // frame->moveForward(TODO: FIND THIS OUT);
-            frame->turnRight(90);
+            frame->rotateLeft(90);
+            frame->moveForward(23.622f);
+            frame->rotateRight(90);
             return P3;
         } else if (command == MOVE_TO_P4) {
-            // frame->rotateRight(135);
+            frame->rotateRight(135);
             frame->moveForward(23.622f);
             return P4;
         } else {
@@ -78,16 +78,16 @@ StateMachine::StateMachine() {
         break;
         case (P2):
         if (command == MOVE_TO_P1) {
-            // frame->rotateLeft(45);
+            frame->rotateLeft(45);
             return P1;
         } else if (command == MOVE_TO_P2) {
             return P2;
         } else if (command == MOVE_TO_P3) {
-            // frame->moveBackward(TODO: FIND THIS OUT);
-            // frame->rotateLeft(90);
+            frame->moveBackwards(23.622f);
+            frame->rotateLeft(90);
             return P3;
         } else if (command == MOVE_TO_P4) {
-            // frame->rotateRight(45);
+            frame->rotateRight(45);
             frame->moveForward(23.622f);
             return P4;
         } else {
@@ -96,20 +96,20 @@ StateMachine::StateMachine() {
         break;
         case (P3):
         if (command == MOVE_TO_P1) {
-            frame->turnRight(90);
-            // frame->moveForward(TODO: FIND THIS OUT);
-            frame->turnLeft(90);
+            frame->rotateRight(90);
+            frame->moveForward(23.622f);
+            frame->rotateLeft(90);
             return P1;
         } else if (command == MOVE_TO_P2) {
-            // frame->rotateRight(90);
-            // frame->moveForward(TODO: FIND THIS OUT);
+            frame->rotateRight(90);
+            frame->moveForward(23.622f);
             return P2;
         } else if (command == MOVE_TO_P3) {
             return P3;
         } else if (command == MOVE_TO_P4) {
-            // frame->rotateRight(90);
-            // frame->moveForward(TODO: FIND THIS OUT);
-            // frame->rotateRight(45);
+            frame->rotateRight(90);
+            frame->moveForward(23.622f);
+            frame->rotateRight(45);
             frame->moveForward(23.622f);
             return P4;
         } else {
@@ -119,18 +119,17 @@ StateMachine::StateMachine() {
         case (P4):
         if (command == MOVE_TO_P1) {
             frame->moveBackwards(23.622f);
-            // frame->rotateLeft(135);
+            frame->rotateLeft(135);
             return P1;
         } else if (command == MOVE_TO_P2) {
             frame->moveBackwards(23.622f);
-            // frame->rotateLeft(45);
+            frame->rotateLeft(45);
             return P2;
         } else if (command == MOVE_TO_P3) {
             frame->moveBackwards(23.622f);
-            // frame->rotateLeft(135);
-            frame->turnLeft(90);
-            // frame->moveForward(TODO: FIND THIS OUT);
-            frame->turnRight(90);
+            frame->rotateLeft(45);
+            frame->moveBackwards(23.622f);
+            frame->rotateLeft(90);
             return P3;
         } else if (command == MOVE_TO_P4) {
             return P4;
@@ -142,18 +141,6 @@ StateMachine::StateMachine() {
     return curr_state;
 }
 
-/********** emergencyStop **********
- * 
- * Will halt the BEAST when the emergency stop button is pressed.
- * 
- * Inputs: None.
- * 
- * Returns: None.
- * 
- ************************/
-void StateMachine::emergencyStop() {
-    frame->stopMoving();
-}
 
 /********** getCurrState **********
  * 
