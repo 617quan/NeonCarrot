@@ -144,11 +144,12 @@ StateMachine::StateMachine() {
 
 /********** getCurrState **********
  * 
- * 
+ * Returns the current state that the bot is in.
  * 
  * Inputs: None.
  * 
- * Returns: None.
+ * Returns: 
+ *      STATE_TYPE curr_state: the current state; 
  * 
  ************************/
 STATE_TYPE StateMachine::getCurrState() {
@@ -161,7 +162,8 @@ STATE_TYPE StateMachine::getCurrState() {
  * 
  * Inputs: None.
  * 
- * Returns: MOVE_COMMAND - the current command.
+ * Returns: 
+ *      MOVE_COMMAND command: the current command.
  * 
  ************************/
 MOVE_COMMAND StateMachine::getCurrCommand() {

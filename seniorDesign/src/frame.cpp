@@ -249,7 +249,7 @@ void Frame::turnRight(uint32_t degrees) {
 void Frame::turnLeft(uint32_t degrees) {
     float steps_needed = ((float)degrees / 360.0f) * (float)FULL_TURN_ROTATION; // 40,000 steps
     
-     /* Set the target positions when movements start */
+    /* Set the target positions when movements start */
     turn_target_pos[0] = turn1_motor->getCurrentPosition() + int32_t(steps_needed);
     turn_target_pos[1] = turn2_motor->getCurrentPosition() + int32_t(steps_needed);
     turn_target_pos[2] = turn3_motor->getCurrentPosition() + int32_t(steps_needed);
