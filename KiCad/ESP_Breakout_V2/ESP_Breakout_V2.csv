@@ -1,0 +1,4 @@
+"Reference","Value","Datasheet","Footprint","Qty","DNP"
+"J1,J2,J7,J8","Conn_01x15_Socket","https://www.digikey.com/en/products/detail/sullins-connector-solutions/PPTC151LFBN-RC/810153","Connector_PinSocket_2.54mm:PinSocket_1x15_P2.54mm_Vertical","4",""
+"J3,J4,J5,J6","Conn_01x03_Pin","https://www.digikey.com/en/products/detail/w%C3%BCrth-elektronik/61300311121/4846825","Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical","4",""
+"J_Drive1,J_Drive2,J_Drive3,J_Drive4,J_Lift1,J_Lift2,J_Lift3,J_Lift4,J_Turn1,J_Turn2,J_Turn3,J_Turn4","B6B-PH-K-S","https://www.digikey.com/en/products/detail/jst-sales-america-inc/B6B-PH-K-S/926615","Connector_JST:JST_PH_B6B-PH-K_1x06_P2.00mm_Vertical","12",""
