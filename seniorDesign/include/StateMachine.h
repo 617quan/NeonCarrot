@@ -1,7 +1,7 @@
 #ifndef STATE_MACHINE_H
 #define STATE_MACHINE_H
 
-#include "frame.h"
+#include "MotorGroup.h"
 
 typedef enum {
     P1 = 49,    // ascii 1

@@ -15,7 +15,7 @@
 #include "FastAccelStepper.h"
 #include "defines.h"
 #include "driver/spi_slave.h"
-#include "state_machine.h"
+#include "StateMachine.h"
 #include "WebPage.h"
 
 struct MotorSettings_t {
@@ -24,33 +24,20 @@ struct MotorSettings_t {
     int32_t accel;
 };
 
-struct Motors {
-    FastAccelStepper* wheel1_motor, wheel2_motor, wheel3_motor, wheel4_motor;
-    MotorSettings_t settings[4];
-};
-
-class MotorGroup
+class MotorGroup {
 public:
-    MotorGroup();
-
+    MotorGroup(MotorSettings_t settings[4]);
     ~MotorGroup();
 
     /* Call this at the beginning of setup to get the engine setup */
     static void engineStartup();
     
     /* Movement Functions */
-    void moveUp(uint32_t num_steps);
-    void moveDown(uint32_t num_steps);
-    void turnRight(uint32_t degrees);
-    void turnLeft(uint32_t degrees);
-    void rotateRight(uint32_t degrees);
-    void rotateLeft(uint32_t degrees);
-    void moveForward(float num_inches);
-    void moveBackwards(float num_inches);
+    void moveForwards(uint32_t num_steps);  // Forwards  = Up,   Clockwise
+    void moveBackwards(uint32_t num_steps); // Backwards = Down, Counter-Clockwise
 
     void stopMoving();
     bool isMoving();
-    void calibratePosition();
 
     void printPosition(int positionNum); //FUNCTION IS TEMPORARY, USED TO TEST INTERFACING WEBSERVER INTO MotorGroup CLASS - QUAN
 
@@ -60,9 +47,7 @@ private:
     FastAccelStepper* initMotor(MotorSettings_t lift_motor_settings);
 
     /* Getters for motor position. One function for each type of motor */
-    int32_t getLiftCurrentPosition();
-    std::array<int32_t, 4> getTurnCurrentPositions();
-    int32_t getDriveCurrentPosition();
+    std::array<int32_t, 4> getMotorPositions();
 
     /* Conversion Functions */
     float convertInchesToSteps(float num_inches);
@@ -71,12 +56,24 @@ private:
     /* Define the engine used to initialize motors - one engine is needed for all motors */
     static FastAccelStepperEngine engine;
 
+    /* Define stepper motor objects. These represent the physical motors on the
+    MotorGroup. NOTE: All 4 drive motors share the same 3 pins. All 4 lift motors
+    share the same 3 pins. Each turn motor has an individual pulse and direction
+    pin, but they all share the same enable pin. */
+    FastAccelStepper* wheel1_motor = nullptr;
+    FastAccelStepper* wheel2_motor = nullptr;
+    FastAccelStepper* wheel3_motor = nullptr;
+    FastAccelStepper* wheel4_motor = nullptr;
+    MotorSettings_t settings[4];
+
+    char group_type;
+
     int position = 0; // used to track position based on webserver input
     
     /* Target positions for movement tracking */
-    int32_t drive_target_pos = 0;
-    int32_t lift_target_pos = 0;
-    int32_t turn_target_pos[4] = {0, 0, 0, 0};
+    // int32_t drive_target_pos = 0;
+    // int32_t lift_target_pos = 0;
+    // int32_t turn_target_pos[4] = {0, 0, 0, 0};
 };
 
 #endif

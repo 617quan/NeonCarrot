@@ -1,12 +1,12 @@
-/********** frame.cpp **********
- * Purpose: Defines all methods for the frame class. Instantiates all
+/********** MotorGroup.cpp **********
+ * Purpose: Defines all methods for the MotorGroup class. Instantiates all
  * FastAccelStepper objects to control motors. 
  */ 
 
-#include "frame.h"
+#include "MotorGroup.h"
 
 /* Instantiates the engine object to be used for all stepper motors*/
-FastAccelStepperEngine Frame::engine;
+FastAccelStepperEngine MotorGroup::engine;
 
 /********** engineStartup **********
  *
@@ -29,60 +29,56 @@ FastAccelStepperEngine Frame::engine;
  *      None.
  *      
  ************************/
-void Frame::engineStartup() {
+void MotorGroup::engineStartup() {
     engine.init();
 }
 
-/********** Frame Constructor **********
+/********** MotorGroup Constructor **********
  *
- * Takes in information (pulse pin, direction pin, enable pin, max speed,
- * acceleration) for the singular drive motor, singular lift motor, and 4 turn
- * motors and initializes the motors.
+ * Initialize a MotorGroup from an array of four MotorSettings_t structs.
+ * Each entry must include pulse, direction, and enable pins plus speed/accel.
  *
  * Parameters:
- *      MotorSettings_t lift_motor_settings: pinout, max speed, and acceleration
- *      for lift motor
- *      MotorSettings_t drive_motor_settings: pinout, max speed, and 
- *      acceleration for drivemotor
- *      MotorSettings_t turn_motor_settings[]: pinout, max speed, and 
- *      acceleration for each individual turn motor. All enables are the same.
- * 
- * Return:
- *      A Frame object with all motors initialized, and ready to be moved.
+ *      MotorSettings_t settings[4] - configuration for each wheel's stepper
+ *
+ * Returns:
+ *      Constructs a MotorGroup whose FastAccelStepper pointers are initialized
+ *      and ready for motion commands.
  *
  * Expects:
- *      All pinouts are defined and correctly added into MotorSettings_t
- *      structs. No direction pins are shared for motors of the same type.
- *      Expects 4 turn_motor_settings in the turn_motor_settings array.
+ *      - Call MotorGroup::engineStartup() before creating any MotorGroup.
+ *      - Each settings[i] must contain valid, non-conflicting pin numbers.
+ *      - Exactly four motor settings are expected.
  *
  * Notes:
- *      None.
- *      
+ *      If a motor cannot be connected, the constructor prints an error and
+ *      halts execution.
+ *
  ************************/
-Frame::Frame(MotorSettings_t drive_motor_settings, 
-             MotorSettings_t lift_motor_settings, 
-             MotorSettings_t turn_motor_settings[]) {
+MotorGroup::MotorGroup(MotorSettings_t settings[4], char group_type) {
 
-    /* Take the arguments from the constructor and set them equal to the private
-    class members */
-    this->lift_motor_settings = lift_motor_settings;
-    this->drive_motor_settings = drive_motor_settings;
-    this->turn1_motor_settings = turn_motor_settings[0];
-    this->turn2_motor_settings = turn_motor_settings[1];
-    this->turn3_motor_settings = turn_motor_settings[2];
-    this->turn4_motor_settings = turn_motor_settings[3];
+    this->group_type = group_type;
 
-    /* Initialize pins, max speed, and acceleration for all motors */
-    drive_motors = initMotor(drive_motor_settings);
-    lift_motors = initMotor(lift_motor_settings);
-    turn1_motor = initMotor(turn1_motor_settings);
-    turn2_motor = initMotor(turn2_motor_settings);
-    turn3_motor = initMotor(turn3_motor_settings);
-    turn4_motor = initMotor(turn4_motor_settings);
+    // Store the settings in the class member
+    this->settings[0] = settings[0];
+    this->settings[1] = settings[1];
+    if (group_type != 'd') {
+        this->settings[2] = settings[2];
+        this->settings[3] = settings[3];
+    } else {
+        this->settings[2] = {0, 0, 0, 0, 0};
+        this->settings[3] = {0, 0, 0, 0, 0};
+    }
+
+    // Initialize all motors using the settings provided
+    wheel1_motor = initMotor(settings[0]);
+    wheel2_motor = initMotor(settings[1]);
+    wheel3_motor = initMotor(settings[2]);
+    wheel4_motor = initMotor(settings[3]);
 }
 
 /********** Deconstructor **********/
-Frame::~Frame() {
+MotorGroup::~MotorGroup() {
 /* Nothing new being made, so nothing here */
 }
 
@@ -110,7 +106,7 @@ Frame::~Frame() {
  *      Nothing
  *      
  ************************/
-FastAccelStepper* Frame::initMotor(MotorSettings_t motor_settings) {
+FastAccelStepper* MotorGroup::initMotor(MotorSettings_t motor_settings) {
     FastAccelStepper *motor = engine.stepperConnectToPin(motor_settings.pulse_pin);
     if (motor == nullptr) {
         char strBuf[60];
@@ -138,21 +134,21 @@ FastAccelStepper* Frame::initMotor(MotorSettings_t motor_settings) {
  * 
  * Return:
  *      Nothing. Moves the motor up TODO: Figure out how many steps move the
- *      whole frame up a real given distance (say one inch)
+ *      whole MotorGroup up a real given distance (say one inch)
  *
  * Expects:
- *      Unsigned number. This function only moves the frame up, not down.
+ *      Unsigned number. This function only moves the MotorGroup up, not down.
  *
  ************************/
-void Frame::moveUp(uint32_t num_steps) {
+// void MotorGroup::moveUp(uint32_t num_steps) {
 
-    /* TODO: Incorporate logic to be specific in how many inches the motor
-    lifts */
+//     /* TODO: Incorporate logic to be specific in how many inches the motor
+//     lifts */
 
-    /* Set the target positions when movements start */
-    lift_target_pos = lift_motors->getCurrentPosition() - int32_t(num_steps);
-    lift_motors->move(-int32_t(num_steps), false);
-}
+//     /* Set the target positions when movements start */
+//     lift_target_pos = lift_motors->getCurrentPosition() - int32_t(num_steps);
+//     lift_motors->move(-int32_t(num_steps), false);
+// }
 
 /********** moveDown **********
  *
@@ -164,17 +160,17 @@ void Frame::moveUp(uint32_t num_steps) {
  * 
  * Return:
  *      Nothing. Moves the motor down TODO: Figure out how many steps move the
- *      whole frame down a real given distance (say one inch)
+ *      whole MotorGroup down a real given distance (say one inch)
  *
  * Expects:
- *      Unsigned number. This function only moves the frame down, not up.
+ *      Unsigned number. This function only moves the MotorGroup down, not up.
  * 
  ************************/
-void Frame::moveDown(uint32_t num_steps) {
-    /* Set the target positions when movements start */
-    lift_target_pos = lift_motors->getCurrentPosition() + int32_t(num_steps);
-    lift_motors->move(int32_t(num_steps), false);
-}
+// void MotorGroup::moveDown(uint32_t num_steps) {
+//     /* Set the target positions when movements start */
+//     lift_target_pos = lift_motors->getCurrentPosition() + int32_t(num_steps);
+//     lift_motors->move(int32_t(num_steps), false);
+// }
 
 /********** turnRight **********
  *
@@ -190,7 +186,7 @@ void Frame::moveDown(uint32_t num_steps) {
  * Expects:
  *      Unsigned number in between 0 and 360. Can use larger number, but that
  *      would just turn the motor more than a full rotation. In our case, it
- *      would probably hit the frame, which is not good for the integrity of the
+ *      would probably hit the MotorGroup, which is not good for the integrity of the
  *      wheels.
  *
  * Notes:
@@ -202,22 +198,22 @@ void Frame::moveDown(uint32_t num_steps) {
  *      number of steps.
  *      
  ************************/
-void Frame::turnRight(uint32_t degrees) {
-    int32_t steps_needed = ((float)degrees / 360.0f) * (float)FULL_TURN_ROTATION;
+// void MotorGroup::turnRight(uint32_t degrees) {
+//     int32_t steps_needed = ((float)degrees / 360.0f) * (float)FULL_TURN_ROTATION;
     
-    /* Set the target positions when movements start */
-    turn_target_pos[0] = turn1_motor->getCurrentPosition() - int32_t(steps_needed);
-    turn_target_pos[1] = turn2_motor->getCurrentPosition() - int32_t(steps_needed);
-    turn_target_pos[2] = turn3_motor->getCurrentPosition() - int32_t(steps_needed);
-    turn_target_pos[3] = turn4_motor->getCurrentPosition() - int32_t(steps_needed);
+//     /* Set the target positions when movements start */
+//     turn_target_pos[0] = turn1_motor->getCurrentPosition() - int32_t(steps_needed);
+//     turn_target_pos[1] = turn2_motor->getCurrentPosition() - int32_t(steps_needed);
+//     turn_target_pos[2] = turn3_motor->getCurrentPosition() - int32_t(steps_needed);
+//     turn_target_pos[3] = turn4_motor->getCurrentPosition() - int32_t(steps_needed);
     
-    drive_motors->enableOutputs();
-    turn1_motor->move(-int32_t(steps_needed), false);
-    turn2_motor->move(-int32_t(steps_needed), false);
-    turn3_motor->move(-int32_t(steps_needed), false);
-    turn4_motor->move(-int32_t(steps_needed), false);
-    drive_motors->disableOutputs();
-}
+//     drive_motors->enableOutputs();
+//     turn1_motor->move(-int32_t(steps_needed), false);
+//     turn2_motor->move(-int32_t(steps_needed), false);
+//     turn3_motor->move(-int32_t(steps_needed), false);
+//     turn4_motor->move(-int32_t(steps_needed), false);
+//     drive_motors->disableOutputs();
+// }
 
 /********** turnLeft **********
  *
@@ -234,7 +230,7 @@ void Frame::turnRight(uint32_t degrees) {
  * Expects:
  *      Unsigned number in between 0 and 360. Can use larger number, but that
  *      would just turn the motor more than a full rotation. In our case, it
- *      would probably hit the frame, which is not good for the integrity of the
+ *      would probably hit the MotorGroup, which is not good for the integrity of the
  *      wheels.
  *
  * Notes:
@@ -246,68 +242,68 @@ void Frame::turnRight(uint32_t degrees) {
  *      number of steps.
  *      
  ************************/
-void Frame::turnLeft(uint32_t degrees) {
-    float steps_needed = ((float)degrees / 360.0f) * (float)FULL_TURN_ROTATION; // 40,000 steps
+// void MotorGroup::turnLeft(uint32_t degrees) {
+//     float steps_needed = ((float)degrees / 360.0f) * (float)FULL_TURN_ROTATION; // 40,000 steps
     
-     /* Set the target positions when movements start */
-    turn_target_pos[0] = turn1_motor->getCurrentPosition() + int32_t(steps_needed);
-    turn_target_pos[1] = turn2_motor->getCurrentPosition() + int32_t(steps_needed);
-    turn_target_pos[2] = turn3_motor->getCurrentPosition() + int32_t(steps_needed);
-    turn_target_pos[3] = turn4_motor->getCurrentPosition() + int32_t(steps_needed);
+//      /* Set the target positions when movements start */
+//     turn_target_pos[0] = turn1_motor->getCurrentPosition() + int32_t(steps_needed);
+//     turn_target_pos[1] = turn2_motor->getCurrentPosition() + int32_t(steps_needed);
+//     turn_target_pos[2] = turn3_motor->getCurrentPosition() + int32_t(steps_needed);
+//     turn_target_pos[3] = turn4_motor->getCurrentPosition() + int32_t(steps_needed);
     
-    drive_motors->enableOutputs();
-    turn1_motor->move(int32_t(steps_needed), false);
-    turn2_motor->move(int32_t(steps_needed), false);
-    turn3_motor->move(int32_t(steps_needed), false);
-    turn4_motor->move(int32_t(steps_needed), false);
-    drive_motors->disableOutputs();
-}
+//     drive_motors->enableOutputs();
+//     turn1_motor->move(int32_t(steps_needed), false);
+//     turn2_motor->move(int32_t(steps_needed), false);
+//     turn3_motor->move(int32_t(steps_needed), false);
+//     turn4_motor->move(int32_t(steps_needed), false);
+//     drive_motors->disableOutputs();
+// }
 
-void Frame::rotateRight(uint32_t degrees) {
-    int32_t steps_needed_1_3 = convertDegreesToSteps(90, 13);
-    int32_t steps_needed_2_4 = convertDegreesToSteps(135, 24);
+// void MotorGroup::rotateRight(uint32_t degrees) {
+//     int32_t steps_needed_1_3 = convertDegreesToSteps(90, 13);
+//     int32_t steps_needed_2_4 = convertDegreesToSteps(135, 24);
     
-    /* Set the target positions when movements start */
-    turn_target_pos[0] = turn1_motor->getCurrentPosition() - int32_t(steps_needed_1_3);
-    turn_target_pos[1] = turn2_motor->getCurrentPosition() - int32_t(steps_needed_2_4);
-    turn_target_pos[2] = turn3_motor->getCurrentPosition() - int32_t(steps_needed_1_3);
-    turn_target_pos[3] = turn4_motor->getCurrentPosition() - int32_t(steps_needed_2_4);
+//     /* Set the target positions when movements start */
+//     turn_target_pos[0] = turn1_motor->getCurrentPosition() - int32_t(steps_needed_1_3);
+//     turn_target_pos[1] = turn2_motor->getCurrentPosition() - int32_t(steps_needed_2_4);
+//     turn_target_pos[2] = turn3_motor->getCurrentPosition() - int32_t(steps_needed_1_3);
+//     turn_target_pos[3] = turn4_motor->getCurrentPosition() - int32_t(steps_needed_2_4);
     
-    drive_motors->enableOutputs();
-    turn1_motor->move(-int32_t(steps_needed_1_3), false);
-    turn2_motor->move(-int32_t(steps_needed_2_4), false);
-    turn3_motor->move(-int32_t(steps_needed_1_3), false);
-    turn4_motor->move(-int32_t(steps_needed_2_4), false);
-    drive_motors->disableOutputs();
-}
+//     drive_motors->enableOutputs();
+//     turn1_motor->move(-int32_t(steps_needed_1_3), false);
+//     turn2_motor->move(-int32_t(steps_needed_2_4), false);
+//     turn3_motor->move(-int32_t(steps_needed_1_3), false);
+//     turn4_motor->move(-int32_t(steps_needed_2_4), false);
+//     drive_motors->disableOutputs();
+// }
 
-void Frame::rotateLeft(uint32_t degrees) {
-    int32_t steps_needed_1_3 = convertDegreesToSteps(45, 13);
-    int32_t steps_needed_2_4 = convertDegreesToSteps(135, 24);
+// void MotorGroup::rotateLeft(uint32_t degrees) {
+//     int32_t steps_needed_1_3 = convertDegreesToSteps(45, 13);
+//     int32_t steps_needed_2_4 = convertDegreesToSteps(135, 24);
     
-    /* Set the target positions when movements start */
-    turn_target_pos[0] = turn1_motor->getCurrentPosition() + int32_t(steps_needed_1_3);
-    turn_target_pos[1] = turn2_motor->getCurrentPosition() + int32_t(steps_needed_2_4);
-    turn_target_pos[2] = turn3_motor->getCurrentPosition() + int32_t(steps_needed_1_3);
-    turn_target_pos[3] = turn4_motor->getCurrentPosition() + int32_t(steps_needed_2_4);
+//     /* Set the target positions when movements start */
+//     turn_target_pos[0] = turn1_motor->getCurrentPosition() + int32_t(steps_needed_1_3);
+//     turn_target_pos[1] = turn2_motor->getCurrentPosition() + int32_t(steps_needed_2_4);
+//     turn_target_pos[2] = turn3_motor->getCurrentPosition() + int32_t(steps_needed_1_3);
+//     turn_target_pos[3] = turn4_motor->getCurrentPosition() + int32_t(steps_needed_2_4);
     
-    drive_motors->enableOutputs();
-    turn1_motor->move(-int32_t(steps_needed_1_3), false);
-    turn2_motor->move(-int32_t(steps_needed_2_4), false);
-    turn3_motor->move(-int32_t(steps_needed_1_3), false);
-    turn4_motor->move(-int32_t(steps_needed_2_4), true);
-    drive_motors->disableOutputs();
+//     drive_motors->enableOutputs();
+//     turn1_motor->move(-int32_t(steps_needed_1_3), false);
+//     turn2_motor->move(-int32_t(steps_needed_2_4), false);
+//     turn3_motor->move(-int32_t(steps_needed_1_3), false);
+//     turn4_motor->move(-int32_t(steps_needed_2_4), true);
+//     drive_motors->disableOutputs();
 
-    moveForward(100);
-    drive_motors->enableOutputs();
-    turn1_motor->move(int32_t(steps_needed_1_3), false);
-    turn2_motor->move(int32_t(steps_needed_2_4), false);
-    turn3_motor->move(int32_t(steps_needed_1_3), false);
-    turn4_motor->move(int32_t(steps_needed_2_4), true);
-    drive_motors->disableOutputs();
+//     moveForward(100);
+//     drive_motors->enableOutputs();
+//     turn1_motor->move(int32_t(steps_needed_1_3), false);
+//     turn2_motor->move(int32_t(steps_needed_2_4), false);
+//     turn3_motor->move(int32_t(steps_needed_1_3), false);
+//     turn4_motor->move(int32_t(steps_needed_2_4), true);
+//     drive_motors->disableOutputs();
 
-    moveForward(100);
-}
+//     moveForward(100);
+// }
 
 /********** moveForward **********
  *
@@ -315,10 +311,10 @@ void Frame::rotateLeft(uint32_t degrees) {
  * calls are non blocking.
  *
  * Parameters:
- *      uint32_t num_inches: number of inches we want to move the frame.
+ *      uint32_t num_inches: number of inches we want to move the MotorGroup.
  * 
  * Return:
- *      Nothing. Moves the whole frame forward the given number of inches.
+ *      Nothing. Moves the whole MotorGroup forward the given number of inches.
  *
  * Expects:
  *      No negative arguments.
@@ -330,11 +326,24 @@ void Frame::rotateLeft(uint32_t degrees) {
  *      of steps to figure out how many steps needed to be driven.
  *      
  ************************/
-void Frame::moveForward(float num_inches) {
-    float steps_needed = convertInchesToSteps(num_inches);
-     /* Set the target positions when movements start */
-    drive_target_pos = drive_motors->getCurrentPosition() + int32_t(steps_needed);
-    drive_motors->move(int32_t(steps_needed), true);
+void MotorGroup::moveForward(uint32_t distance) {
+    // float steps_needed = convertInchesToSteps(num_inches);
+    //  /* Set the target positions when movements start */
+    // drive_target_pos = drive_motors->getCurrentPosition() + int32_t(steps_needed);
+    // drive_motors->move(int32_t(steps_needed), true);
+
+    if (group_type == 'd') {
+        int32_t steps_needed = convertInchesToSteps(distance);
+        wheel1_motor->move(int32_t(steps_needed), false);
+        wheel2_motor->move(int32_t(steps_needed), false);
+        wheel3_motor->move(int32_t(-steps_needed), false);
+        wheel4_motor->move(int32_t(-steps_needed), false);
+    } else if (group_type == 't') {
+        int32_t steps_needed_1_3 = convertDegreesToSteps(45, 13);
+        int32_t steps_needed_2_4 = convertDegreesToSteps(135, 24);
+    } else if (group_type == 'l') {
+        lift_motors->move(-int32_t(num_steps), false);
+    }
 }
 
 /********** moveBackward **********
@@ -343,10 +352,10 @@ void Frame::moveForward(float num_inches) {
  * calls are non blocking.
  *
  * Parameters:
- *      uint32_t num_inches: number of inches we want to move the frame.
+ *      uint32_t num_inches: number of inches we want to move the MotorGroup.
  * 
  * Return:
- *      Nothing. Moves the whole frame bachward the given number of inches.
+ *      Nothing. Moves the whole MotorGroup bachward the given number of inches.
  *
  * Expects:
  *      No negative arguments.
@@ -358,7 +367,7 @@ void Frame::moveForward(float num_inches) {
  *      of steps to figure out how many steps needed to be driven.
  *      
  ************************/
-void Frame::moveBackwards(float num_inches) {
+void MotorGroup::moveBackwards(uint32_t num_steps) {
     float steps_needed = convertInchesToSteps(num_inches);
      /* Set the target positions when movements start */
     drive_target_pos = drive_motors->getCurrentPosition() - int32_t(steps_needed);
@@ -379,8 +388,8 @@ void Frame::moveBackwards(float num_inches) {
  *      Nothing.
  *      
  ************************/
-void Frame::stopMoving() {
-        drive_motors->stopMove();
+void MotorGroup::stopMoving() {
+    group_type->stopMove();
 }
 
 /********** getLiftCurrentPosition **********
@@ -401,7 +410,7 @@ void Frame::stopMoving() {
  *      Uses the libraries position tracking function
  *      
  ************************/
-int32_t Frame::getLiftCurrentPosition() {
+int32_t MotorGroup::getLiftCurrentPosition() {
     return lift_motors->getCurrentPosition();
 }
 
@@ -423,7 +432,7 @@ int32_t Frame::getLiftCurrentPosition() {
  *      Uses the libraries position tracking function
  *      
  ************************/
-std::array<int32_t, 4> Frame::getTurnCurrentPositions() {
+std::array<int32_t, 4> MotorGroup::getTurnCurrentPositions() {
     return {turn1_motor->getCurrentPosition(), 
     turn2_motor->getCurrentPosition(), 
     turn3_motor->getCurrentPosition(), 
@@ -448,7 +457,7 @@ std::array<int32_t, 4> Frame::getTurnCurrentPositions() {
  *      Uses the libraries position tracking function
  *      
  ************************/
-int32_t Frame::getDriveCurrentPosition() {
+int32_t MotorGroup::getDriveCurrentPosition() {
     return drive_motors->getCurrentPosition();
 }
 
@@ -464,7 +473,7 @@ int32_t Frame::getDriveCurrentPosition() {
  *      The number of microsteps as a float.
  *  
  ************************/
-float Frame::convertInchesToSteps(float num_inches) {
+float MotorGroup::convertInchesToSteps(float num_inches) {
     return ((num_inches / (float)WHEEL_CIRCUMFERENCE) * (float)FULL_DRIVE_ROTATION);
 }
 
@@ -481,7 +490,7 @@ float Frame::convertInchesToSteps(float num_inches) {
  *      The number of microsteps as a float.
  *  
  ************************/
-float Frame::convertDegreesToSteps(uint32_t num_degrees, int32_t wheels) {
+float MotorGroup::convertDegreesToSteps(uint32_t num_degrees, int32_t wheels) {
     if (wheels == 13) {
         return (45.0f / 360.0f) * (float)FULL_TURN_ROTATION;  //40,000 steps
     } else {
@@ -501,7 +510,7 @@ float Frame::convertDegreesToSteps(uint32_t num_degrees, int32_t wheels) {
  *     True if the bot is moving, false if the bot is not moving.
  *  
  ************************/
-bool Frame::isMoving() {
+bool MotorGroup::isMoving() {
     // Check if drive motors have reached target
     if (drive_motors->getCurrentPosition() != drive_target_pos) {
         return true;
@@ -527,37 +536,8 @@ bool Frame::isMoving() {
     return false;
 }
 
-/********** calibrateMotors **********
- *
- * TODO: WE NEED TO WRITE THIS FUNCTION.
- *
- * Parameters:
- *      None
- * 
- * Return:
- *      An integer representing the position of the lift motors
- *
- * Expects:
- *      The position has been initialized and is being tracked by the library.
- *
- * Notes:
- *      Uses the libraries position tracking function
- *      
- ************************/
-void Frame::calibratePosition() {
-    int32_t liftCurrPos = getLiftCurrentPosition();
-    int32_t turnCurrPos = getLiftCurrentPosition();
-    int32_t driveCurrPos = getLiftCurrentPosition();
-
-    /* if (liftCurrPos isn't what we want it to be) {
-        fix that shit
-    } 
-    */
-
-}
-
-//FUNCTION IS TEMPORARY, USED TO TEST INTERFACING WEBSERVER INTO FRAME CLASS - QUAN
-void Frame::printPosition(int positionNum) {
+//FUNCTION IS TEMPORARY, USED TO TEST INTERFACING WEBSERVER INTO MotorGroup CLASS - QUAN
+void MotorGroup::printPosition(int positionNum) {
     if (positionNum == 1) position = 1;
     else if (positionNum == 2) position = 2;
     else if (positionNum == 3) position = 3;

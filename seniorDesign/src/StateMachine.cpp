@@ -4,9 +4,9 @@
  * 
  */
 
-#include "state_machine.h"
+#include "StateMachine.h"
 
-extern Frame *frame;
+extern MotorGroup *motor_group;
 
 /********** StateMachine **********
  * 
@@ -45,13 +45,13 @@ StateMachine::StateMachine() {
     
     /* Check for emergency stop */
     if (command == EMERGENCY_STOP) {
-        frame->stopMoving();
+        motor_group->stopMoving();
         /* Stay in current state */
         return curr_state;
     }
     
     /* Wait for current movement to complete before issuing next command */
-    if (frame->isMoving()) {
+    if (motor_group->isMoving()) {
         /* Stay in current state until movement completes */
         return curr_state;
     }
@@ -61,16 +61,16 @@ StateMachine::StateMachine() {
         if (command == MOVE_TO_P1) {
             return P1;
         } else if (command == MOVE_TO_P2) {
-            frame->rotateRight(90);
+            motor_group->rotateRight(90);
             return P2;
         } else if (command == MOVE_TO_P3) {
-            frame->rotateLeft(90);
-            frame->moveForward(23.622f);
-            frame->rotateRight(90);
+            motor_group->rotateLeft(90);
+            motor_group->moveForward(23.622f);
+            motor_group->rotateRight(90);
             return P3;
         } else if (command == MOVE_TO_P4) {
-            frame->rotateRight(135);
-            frame->moveForward(23.622f);
+            motor_group->rotateRight(135);
+            motor_group->moveForward(23.622f);
             return P4;
         } else {
             Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
@@ -78,17 +78,17 @@ StateMachine::StateMachine() {
         break;
         case (P2):
         if (command == MOVE_TO_P1) {
-            frame->rotateLeft(45);
+            motor_group->rotateLeft(45);
             return P1;
         } else if (command == MOVE_TO_P2) {
             return P2;
         } else if (command == MOVE_TO_P3) {
-            frame->moveBackwards(23.622f);
-            frame->rotateLeft(90);
+            motor_group->moveBackwards(23.622f);
+            motor_group->rotateLeft(90);
             return P3;
         } else if (command == MOVE_TO_P4) {
-            frame->rotateRight(45);
-            frame->moveForward(23.622f);
+            motor_group->rotateRight(45);
+            motor_group->moveForward(23.622f);
             return P4;
         } else {
             Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
@@ -96,21 +96,21 @@ StateMachine::StateMachine() {
         break;
         case (P3):
         if (command == MOVE_TO_P1) {
-            frame->rotateRight(90);
-            frame->moveForward(23.622f);
-            frame->rotateLeft(90);
+            motor_group->rotateRight(90);
+            motor_group->moveForward(23.622f);
+            motor_group->rotateLeft(90);
             return P1;
         } else if (command == MOVE_TO_P2) {
-            frame->rotateRight(90);
-            frame->moveForward(23.622f);
+            motor_group->rotateRight(90);
+            motor_group->moveForward(23.622f);
             return P2;
         } else if (command == MOVE_TO_P3) {
             return P3;
         } else if (command == MOVE_TO_P4) {
-            frame->rotateRight(90);
-            frame->moveForward(23.622f);
-            frame->rotateRight(45);
-            frame->moveForward(23.622f);
+            motor_group->rotateRight(90);
+            motor_group->moveForward(23.622f);
+            motor_group->rotateRight(45);
+            motor_group->moveForward(23.622f);
             return P4;
         } else {
             Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
@@ -118,18 +118,18 @@ StateMachine::StateMachine() {
         break;
         case (P4):
         if (command == MOVE_TO_P1) {
-            frame->moveBackwards(23.622f);
-            frame->rotateLeft(135);
+            motor_group->moveBackwards(23.622f);
+            motor_group->rotateLeft(135);
             return P1;
         } else if (command == MOVE_TO_P2) {
-            frame->moveBackwards(23.622f);
-            frame->rotateLeft(45);
+            motor_group->moveBackwards(23.622f);
+            motor_group->rotateLeft(45);
             return P2;
         } else if (command == MOVE_TO_P3) {
-            frame->moveBackwards(23.622f);
-            frame->rotateLeft(45);
-            frame->moveBackwards(23.622f);
-            frame->rotateLeft(90);
+            motor_group->moveBackwards(23.622f);
+            motor_group->rotateLeft(45);
+            motor_group->moveBackwards(23.622f);
+            motor_group->rotateLeft(90);
             return P3;
         } else if (command == MOVE_TO_P4) {
             return P4;
