@@ -4,12 +4,26 @@
  * 4 Pins for Limit Switches
 */
 
-#include "ESP1Main.h"
+#include "MotorGroup.h"
+#include "StateMachine.h"
+#include "WebPage.h"
+#include "defines.h"
 
-void ESP1Main::setup() {
+#define SPI_CHILD_INITIALIZE spi_slave_initialize
+#define SPI_CHILD_TRANSMIT spi_slave_transmit
+typedef spi_slave_transaction_t spi_child_transaction_t;
+typedef spi_slave_interface_config_t spi_child_interface_config_t;
+
+void initMotorGroup();
+void initSPI();
+MOVE_COMMAND recieveMessageFromParent();
+    
+
+void setup() {
     Serial.begin(115200);
-    webServer.begin();
-    Frame::engineStartup();
+    // webServer.begin();
+    // WebPage webServer("ESP32-Access-Point", "123456789");
+    MotorGroup::engineStartup();
     pinMode(LED_BUILTIN, OUTPUT);
     initMotorGroup();
     initSPI();    
@@ -33,7 +47,7 @@ void ESP1Main::setup() {
  *      channel for this protocol.
  *   
  ************************/
-void ESP1Main::initSPI() {
+void initSPI() {
 
     /* SPI Child Init - SPI bus configuration */
     spi_bus_config_t buscfg = {
@@ -72,23 +86,48 @@ void ESP1Main::initSPI() {
  *      None. Initializes the frame.
  * 
  ************************/
-void ESP1Main::initMotorGroup() {
+void initMotorGroup() {
 
-    pinMode(DRIVE_PULSE, OUTPUT);
-    pinMode(DRIVE_DIRECTION, OUTPUT);
     pinMode(DRIVE_ENABLE, OUTPUT);
-
-    pinMode(LIFT_PULSE, OUTPUT);
-    pinMode(LIFT_DIRECTION, OUTPUT);
+    pinMode(FRONT_DRIVE_DIRECTION, OUTPUT);
+    pinMode(FRONT_DRIVE_PULSE, OUTPUT);
+    pinMode(BACK_DRIVE_DIRECTION, OUTPUT);
+    pinMode(BACK_DRIVE_PULSE, OUTPUT);
     pinMode(LIFT_ENABLE, OUTPUT);
+    pinMode(LIFT_DIRECTION, OUTPUT);
+    pinMode(LIFT1_PULSE, OUTPUT);
+    pinMode(LIFT2_PULSE, OUTPUT);
+    pinMode(LIFT3_PULSE, OUTPUT);
+    pinMode(LIFT4_PULSE, OUTPUT);
 
-    MotorSettings_t drive_motor_settings = {DRIVE_PULSE, DRIVE_DIRECTION, DRIVE_ENABLE, DRIVE_MAX_SPEED, DRIVE_ACCEL};
-    MotorSettings_t lift_motor_settings = {LIFT_PULSE, LIFT_DIRECTION, LIFT_ENABLE, LIFT_MAX_SPEED, LIFT_ACCEL};
-    
-    motor_group = new MotorGroup(drive_motor_settings, lift_motor_settings, turn_motor_settings_arr);
-    if (motor_group == nullptr) {
-        Serial.println("FATAL ERROR: Motor Group initialized incorrectly");
+    MotorSettings_t front_drive_settings = {FRONT_DRIVE_PULSE, FRONT_DRIVE_DIRECTION, DRIVE_ENABLE, DRIVE_MAX_SPEED, DRIVE_ACCEL};
+    MotorSettings_t back_drive_settings = {BACK_DRIVE_PULSE, BACK_DRIVE_DIRECTION, DRIVE_ENABLE, DRIVE_MAX_SPEED, DRIVE_ACCEL};
+    MotorSettings_t lift1_settings = {LIFT1_PULSE, LIFT_DIRECTION, LIFT_ENABLE, LIFT_MAX_SPEED, LIFT_ACCEL};
+    MotorSettings_t lift2_settings = {LIFT2_PULSE, 0, LIFT_ENABLE, LIFT_MAX_SPEED, LIFT_ACCEL};
+    MotorSettings_t lift3_settings = {LIFT3_PULSE, 0, LIFT_ENABLE, LIFT_MAX_SPEED, LIFT_ACCEL};
+    MotorSettings_t lift4_settings = {LIFT4_PULSE, 0, LIFT_ENABLE, LIFT_MAX_SPEED, LIFT_ACCEL};
+
+    MotorSettings_t drive_settings[4] = {front_drive_settings, 
+                                         back_drive_settings,
+                                         {0, 0, 0, 0, 0},
+                                         {0, 0, 0, 0, 0}
+                                        };
+
+    MotorSettings_t lift_settings[4] = {lift1_settings, 
+                                        lift2_settings,
+                                        lift3_settings, 
+                                        lift4_settings
+                                        };
+
+    MotorGroup *drive_motors = new MotorGroup(drive_settings, 'd');
+    if (drive_motors == nullptr) {
+        Serial.println("FATAL ERROR: drive motors initialized incorrectly");
     }
+    MotorGroup *lift_motors = new MotorGroup(lift_settings, 'l');
+    if (lift_motors == nullptr) {
+        Serial.println("FATAL ERROR: lift motors initialized incorrectly");
+    }
+    
 }
 
 /********** recieveMessageFromParent **********
@@ -109,7 +148,7 @@ void ESP1Main::initMotorGroup() {
  *     - Uses spi_child_transmit() blocking call to wait for parent to send
  * 
  ************************/
-MOVE_COMMAND ESP1Main::recieveMessageFromParent() {
+MOVE_COMMAND recieveMessageFromParent() {
     spi_child_transaction_t t;
     memset(&t, 0, sizeof(t));
     
@@ -146,10 +185,9 @@ MOVE_COMMAND ESP1Main::recieveMessageFromParent() {
  *      None.
  * 
  ************************/
-void ESP1Main::loop() {  
+void loop() {  
     
     delay(1000);
-    frame->rotateLeft(90);
     delay(5000);
 
 }

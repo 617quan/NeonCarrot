@@ -42,103 +42,106 @@ StateMachine::StateMachine() {
  * 
  ************************/
  STATE_TYPE StateMachine::parseCommands(MOVE_COMMAND command) {
-    
-    /* Check for emergency stop */
-    if (command == EMERGENCY_STOP) {
-        motor_group->stopMoving();
-        /* Stay in current state */
-        return curr_state;
-    }
-    
-    /* Wait for current movement to complete before issuing next command */
-    if (motor_group->isMoving()) {
-        /* Stay in current state until movement completes */
-        return curr_state;
-    }
 
-    switch (curr_state) {
-        case (P1): 
-        if (command == MOVE_TO_P1) {
-            return P1;
-        } else if (command == MOVE_TO_P2) {
-            motor_group->rotateRight(90);
-            return P2;
-        } else if (command == MOVE_TO_P3) {
-            motor_group->rotateLeft(90);
-            motor_group->moveForward(23.622f);
-            motor_group->rotateRight(90);
-            return P3;
-        } else if (command == MOVE_TO_P4) {
-            motor_group->rotateRight(135);
-            motor_group->moveForward(23.622f);
-            return P4;
-        } else {
-            Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
-        }
-        break;
-        case (P2):
-        if (command == MOVE_TO_P1) {
-            motor_group->rotateLeft(45);
-            return P1;
-        } else if (command == MOVE_TO_P2) {
-            return P2;
-        } else if (command == MOVE_TO_P3) {
-            motor_group->moveBackwards(23.622f);
-            motor_group->rotateLeft(90);
-            return P3;
-        } else if (command == MOVE_TO_P4) {
-            motor_group->rotateRight(45);
-            motor_group->moveForward(23.622f);
-            return P4;
-        } else {
-            Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
-        }
-        break;
-        case (P3):
-        if (command == MOVE_TO_P1) {
-            motor_group->rotateRight(90);
-            motor_group->moveForward(23.622f);
-            motor_group->rotateLeft(90);
-            return P1;
-        } else if (command == MOVE_TO_P2) {
-            motor_group->rotateRight(90);
-            motor_group->moveForward(23.622f);
-            return P2;
-        } else if (command == MOVE_TO_P3) {
-            return P3;
-        } else if (command == MOVE_TO_P4) {
-            motor_group->rotateRight(90);
-            motor_group->moveForward(23.622f);
-            motor_group->rotateRight(45);
-            motor_group->moveForward(23.622f);
-            return P4;
-        } else {
-            Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
-        }
-        break;
-        case (P4):
-        if (command == MOVE_TO_P1) {
-            motor_group->moveBackwards(23.622f);
-            motor_group->rotateLeft(135);
-            return P1;
-        } else if (command == MOVE_TO_P2) {
-            motor_group->moveBackwards(23.622f);
-            motor_group->rotateLeft(45);
-            return P2;
-        } else if (command == MOVE_TO_P3) {
-            motor_group->moveBackwards(23.622f);
-            motor_group->rotateLeft(45);
-            motor_group->moveBackwards(23.622f);
-            motor_group->rotateLeft(90);
-            return P3;
-        } else if (command == MOVE_TO_P4) {
-            return P4;
-        } else {
-            Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
-        }
-        break;
-    }
-    return curr_state;
+    return P1;
+    
+    // /* Check for emergency stop */
+    // if (command == EMERGENCY_STOP) {
+    //     motor_group->stopMoving();
+    //     /* Stay in current state */
+    //     return curr_state;
+    // }
+    
+    // /* Wait for current movement to complete before issuing next command */
+    // if (motor_group->isMoving()) {
+    //     /* Stay in current state until movement completes */
+    //     return curr_state;
+    // }
+
+    // switch (curr_state) {
+
+    //     case (P1): 
+    //     if (command == MOVE_TO_P1) {
+    //         return P1;
+    //     } else if (command == MOVE_TO_P2) {
+    //         motor_group->rotateRight(90);
+    //         return P2;
+    //     } else if (command == MOVE_TO_P3) {
+    //         motor_group->rotateLeft(90);
+    //         motor_group->moveForward(23.622f);
+    //         motor_group->rotateRight(90);
+    //         return P3;
+    //     } else if (command == MOVE_TO_P4) {
+    //         motor_group->rotateRight(135);
+    //         motor_group->moveForward(23.622f);
+    //         return P4;
+    //     } else {
+    //         Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
+    //     }
+    //     break;
+    //     case (P2):
+    //     if (command == MOVE_TO_P1) {
+    //         motor_group->rotateLeft(45);
+    //         return P1;
+    //     } else if (command == MOVE_TO_P2) {
+    //         return P2;
+    //     } else if (command == MOVE_TO_P3) {
+    //         motor_group->moveBackwards(23.622f);
+    //         motor_group->rotateLeft(90);
+    //         return P3;
+    //     } else if (command == MOVE_TO_P4) {
+    //         motor_group->rotateRight(45);
+    //         motor_group->moveForward(23.622f);
+    //         return P4;
+    //     } else {
+    //         Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
+    //     }
+    //     break;
+    //     case (P3):
+    //     if (command == MOVE_TO_P1) {
+    //         motor_group->rotateRight(90);
+    //         motor_group->moveForward(23.622f);
+    //         motor_group->rotateLeft(90);
+    //         return P1;
+    //     } else if (command == MOVE_TO_P2) {
+    //         motor_group->rotateRight(90);
+    //         motor_group->moveForward(23.622f);
+    //         return P2;
+    //     } else if (command == MOVE_TO_P3) {
+    //         return P3;
+    //     } else if (command == MOVE_TO_P4) {
+    //         motor_group->rotateRight(90);
+    //         motor_group->moveForward(23.622f);
+    //         motor_group->rotateRight(45);
+    //         motor_group->moveForward(23.622f);
+    //         return P4;
+    //     } else {
+    //         Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
+    //     }
+    //     break;
+    //     case (P4):
+    //     if (command == MOVE_TO_P1) {
+    //         motor_group->moveBackwards(23.622f);
+    //         motor_group->rotateLeft(135);
+    //         return P1;
+    //     } else if (command == MOVE_TO_P2) {
+    //         motor_group->moveBackwards(23.622f);
+    //         motor_group->rotateLeft(45);
+    //         return P2;
+    //     } else if (command == MOVE_TO_P3) {
+    //         motor_group->moveBackwards(23.622f);
+    //         motor_group->rotateLeft(45);
+    //         motor_group->moveBackwards(23.622f);
+    //         motor_group->rotateLeft(90);
+    //         return P3;
+    //     } else if (command == MOVE_TO_P4) {
+    //         return P4;
+    //     } else {
+    //         Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
+    //     }
+    //     break;
+    // }
+    // return curr_state;
 }
 
 

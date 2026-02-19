@@ -26,15 +26,15 @@ struct MotorSettings_t {
 
 class MotorGroup {
 public:
-    MotorGroup(MotorSettings_t settings[4]);
+    MotorGroup(MotorSettings_t settings[4], char group_type);
     ~MotorGroup();
 
     /* Call this at the beginning of setup to get the engine setup */
     static void engineStartup();
     
     /* Movement Functions */
-    void moveForwards(uint32_t num_steps);  // Forwards  = Up,   Clockwise
-    void moveBackwards(uint32_t num_steps); // Backwards = Down, Counter-Clockwise
+    void moveForwards(float distance);  // Forwards  = Up,   Clockwise
+    void moveBackwards(float distance); // Backwards = Down, Counter-Clockwise
 
     void stopMoving();
     bool isMoving();
@@ -50,8 +50,7 @@ private:
     std::array<int32_t, 4> getMotorPositions();
 
     /* Conversion Functions */
-    float convertInchesToSteps(float num_inches);
-    float convertDegreesToSteps(uint32_t num_degrees, int32_t wheels);
+    int32_t convertInchesToSteps(float num_inches);
     
     /* Define the engine used to initialize motors - one engine is needed for all motors */
     static FastAccelStepperEngine engine;

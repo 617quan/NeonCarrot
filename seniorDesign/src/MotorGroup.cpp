@@ -62,19 +62,21 @@ MotorGroup::MotorGroup(MotorSettings_t settings[4], char group_type) {
     // Store the settings in the class member
     this->settings[0] = settings[0];
     this->settings[1] = settings[1];
+    wheel1_motor = initMotor(settings[0]);
+    wheel2_motor = initMotor(settings[1]);
+    
     if (group_type != 'd') {
         this->settings[2] = settings[2];
         this->settings[3] = settings[3];
+        wheel3_motor = initMotor(settings[2]);
+        wheel4_motor = initMotor(settings[3]);
     } else {
         this->settings[2] = {0, 0, 0, 0, 0};
         this->settings[3] = {0, 0, 0, 0, 0};
     }
 
     // Initialize all motors using the settings provided
-    wheel1_motor = initMotor(settings[0]);
-    wheel2_motor = initMotor(settings[1]);
-    wheel3_motor = initMotor(settings[2]);
-    wheel4_motor = initMotor(settings[3]);
+    
 }
 
 /********** Deconstructor **********/
@@ -116,7 +118,7 @@ FastAccelStepper* MotorGroup::initMotor(MotorSettings_t motor_settings) {
         }
         return nullptr;
     }
-    motor->setDirectionPin(motor_settings.dir_pin, true, 0);
+    if (motor_settings.dir_pin != 0) motor->setDirectionPin(motor_settings.dir_pin, true, 0);
     motor->setEnablePin(motor_settings.enable_pin, true);
     motor->setSpeedInHz(motor_settings.max_speed);
     motor->setAcceleration(motor_settings.accel);
@@ -326,23 +328,21 @@ FastAccelStepper* MotorGroup::initMotor(MotorSettings_t motor_settings) {
  *      of steps to figure out how many steps needed to be driven.
  *      
  ************************/
-void MotorGroup::moveForward(uint32_t distance) {
-    // float steps_needed = convertInchesToSteps(num_inches);
-    //  /* Set the target positions when movements start */
-    // drive_target_pos = drive_motors->getCurrentPosition() + int32_t(steps_needed);
-    // drive_motors->move(int32_t(steps_needed), true);
-
+void MotorGroup::moveForwards(float distance) {
     if (group_type == 'd') {
         int32_t steps_needed = convertInchesToSteps(distance);
-        wheel1_motor->move(int32_t(steps_needed), false);
-        wheel2_motor->move(int32_t(steps_needed), false);
-        wheel3_motor->move(int32_t(-steps_needed), false);
-        wheel4_motor->move(int32_t(-steps_needed), false);
+        wheel1_motor->move(steps_needed, false);
+        wheel2_motor->move(-steps_needed, false); 
     } else if (group_type == 't') {
-        int32_t steps_needed_1_3 = convertDegreesToSteps(45, 13);
-        int32_t steps_needed_2_4 = convertDegreesToSteps(135, 24);
+        wheel1_motor->move(TURN_1_3_NUM_STEPS, false);
+        wheel2_motor->move(TURN_2_4_NUM_STEPS, false);
+        wheel3_motor->move(TURN_1_3_NUM_STEPS, false);
+        wheel4_motor->move(TURN_2_4_NUM_STEPS, false);
     } else if (group_type == 'l') {
-        lift_motors->move(-int32_t(num_steps), false);
+        wheel1_motor->move(distance, false);
+        wheel2_motor->move(distance, false);
+        wheel3_motor->move(distance, false);
+        wheel4_motor->move(distance, false);
     }
 }
 
@@ -367,11 +367,22 @@ void MotorGroup::moveForward(uint32_t distance) {
  *      of steps to figure out how many steps needed to be driven.
  *      
  ************************/
-void MotorGroup::moveBackwards(uint32_t num_steps) {
-    float steps_needed = convertInchesToSteps(num_inches);
-     /* Set the target positions when movements start */
-    drive_target_pos = drive_motors->getCurrentPosition() - int32_t(steps_needed);
-    drive_motors->move(-int32_t(steps_needed), true);
+void MotorGroup::moveBackwards(float distance) {
+    if (group_type == 'd') {
+        int32_t steps_needed = convertInchesToSteps(distance);
+        wheel1_motor->move(-steps_needed, false);
+        wheel2_motor->move(steps_needed, false);
+    } else if (group_type == 't') {
+        wheel1_motor->move(-TURN_1_3_NUM_STEPS, false);
+        wheel2_motor->move(-TURN_2_4_NUM_STEPS, false);
+        wheel3_motor->move(-TURN_1_3_NUM_STEPS, false);
+        wheel4_motor->move(-TURN_2_4_NUM_STEPS, false);
+    } else if (group_type == 'l') {
+        wheel1_motor->move(-distance, false);
+        wheel2_motor->move(-distance, false);
+        wheel3_motor->move(-distance, false);
+        wheel4_motor->move(-distance, false);
+    }
 }
 
 /********** stopMoving **********
@@ -389,76 +400,10 @@ void MotorGroup::moveBackwards(uint32_t num_steps) {
  *      
  ************************/
 void MotorGroup::stopMoving() {
-    group_type->stopMove();
-}
-
-/********** getLiftCurrentPosition **********
- *
- * Gets the current position of all of the lift motors based on the software's
- * tracking capabilities
- *
- * Parameters:
- *      None
- * 
- * Return:
- *      An integer representing the position of the lift motors
- *
- * Expects:
- *      The position has been initialized and is being tracked by the library.
- *
- * Notes:
- *      Uses the libraries position tracking function
- *      
- ************************/
-int32_t MotorGroup::getLiftCurrentPosition() {
-    return lift_motors->getCurrentPosition();
-}
-
-/********** getTurnCurrentPosition **********
- *
- * Gets the current position of all of the turn motors based on the software's
- * tracking capabilities
- *
- * Parameters:
- *      None
- * 
- * Return:
- *      An array of integers representing the angle of all of the turn motors
- *
- * Expects:
- *      The position has been initialized and is being tracked by the library.
- *
- * Notes:
- *      Uses the libraries position tracking function
- *      
- ************************/
-std::array<int32_t, 4> MotorGroup::getTurnCurrentPositions() {
-    return {turn1_motor->getCurrentPosition(), 
-    turn2_motor->getCurrentPosition(), 
-    turn3_motor->getCurrentPosition(), 
-    turn4_motor->getCurrentPosition()};
-}
-
-/********** getDriveCurrentPosition **********
- *
- * Gets the current position of all of the drive motors based on the software's
- * tracking capabilities
- *
- * Parameters:
- *      None
- * 
- * Return:
- *      An integer representing the position of the drive motors
- *
- * Expects:
- *      The position has been initialized and is being tracked by the library.
- *
- * Notes:
- *      Uses the libraries position tracking function
- *      
- ************************/
-int32_t MotorGroup::getDriveCurrentPosition() {
-    return drive_motors->getCurrentPosition();
+    wheel1_motor->stopMove();
+    wheel2_motor->stopMove();
+    wheel3_motor->stopMove();
+    wheel4_motor->stopMove();
 }
 
 /********** convertInchesToSteps **********
@@ -473,29 +418,8 @@ int32_t MotorGroup::getDriveCurrentPosition() {
  *      The number of microsteps as a float.
  *  
  ************************/
-float MotorGroup::convertInchesToSteps(float num_inches) {
-    return ((num_inches / (float)WHEEL_CIRCUMFERENCE) * (float)FULL_DRIVE_ROTATION);
-}
-
-/********** convertDegreesToSteps **********
- * 
- * Converts the desired number of degrees for turning to microsteps for the 
- * stepper driver to execute.
- *
- * Parameters:
- *      uint32_t num_degrees: number of degrees to turn.
- *      int32_t wheels: indicates which two wheels to move.
- * 
- * Return:
- *      The number of microsteps as a float.
- *  
- ************************/
-float MotorGroup::convertDegreesToSteps(uint32_t num_degrees, int32_t wheels) {
-    if (wheels == 13) {
-        return (45.0f / 360.0f) * (float)FULL_TURN_ROTATION;  //40,000 steps
-    } else {
-        return (135.0f / 360.0f) * (float)FULL_TURN_ROTATION; //120,000 steps
-    }
+int32_t MotorGroup::convertInchesToSteps(float num_inches) {
+    return (int32_t)((num_inches / (float)WHEEL_CIRCUMFERENCE) * (float)FULL_DRIVE_ROTATION);
 }
 
 /********** isMoving **********
@@ -511,28 +435,29 @@ float MotorGroup::convertDegreesToSteps(uint32_t num_degrees, int32_t wheels) {
  *  
  ************************/
 bool MotorGroup::isMoving() {
-    // Check if drive motors have reached target
-    if (drive_motors->getCurrentPosition() != drive_target_pos) {
-        return true;
-    }
-    // Check if lift motors have reached target
-    if (lift_motors->getCurrentPosition() != lift_target_pos) {
-        return true;
-    }
-    // Check if turn motors have reached target
-    if (turn1_motor->getCurrentPosition() != turn_target_pos[0]) {
-        return true;
-    }
-    if (turn2_motor->getCurrentPosition() != turn_target_pos[1]) {
-        return true;
-    }
-    if (turn3_motor->getCurrentPosition() != turn_target_pos[2]) {
-        return true;
-    }
-    if (turn4_motor->getCurrentPosition() != turn_target_pos[3]) {
-        return true;
-    }
+    // // Check if drive motors have reached target
+    // if (drive_motors->getCurrentPosition() != drive_target_pos) {
+    //     return true;
+    // }
+    // // Check if lift motors have reached target
+    // if (lift_motors->getCurrentPosition() != lift_target_pos) {
+    //     return true;
+    // }
+    // // Check if turn motors have reached target
+    // if (turn1_motor->getCurrentPosition() != turn_target_pos[0]) {
+    //     return true;
+    // }
+    // if (turn2_motor->getCurrentPosition() != turn_target_pos[1]) {
+    //     return true;
+    // }
+    // if (turn3_motor->getCurrentPosition() != turn_target_pos[2]) {
+    //     return true;
+    // }
+    // if (turn4_motor->getCurrentPosition() != turn_target_pos[3]) {
+    //     return true;
+    // }
     
+    // return false;
     return false;
 }
 

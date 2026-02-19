@@ -6,28 +6,63 @@
 #ifndef _DEFINES
 #define _DEFINES
 
-/* Pinout Defines */
-#define DRIVE_PULSE 13
-#define DRIVE_DIRECTION 12
-#define DRIVE_ENABLE 14
+/* ESP1 PINOUT */
+#define DRIVE_ENABLE 13
 
-#define LIFT_PULSE 27
-#define LIFT_DIRECTION 26
+#define FRONT_DRIVE_DIRECTION 12
+#define FRONT_DRIVE_PULSE 14
+
+#define BACK_DRIVE_DIRECTION 27
+#define BACK_DRIVE_PULSE 26
+
 #define LIFT_ENABLE 25
+#define LIFT_DIRECTION 17
 
-#define TURN_ENABLE 17
+#define LIFT1_PULSE 33
+#define LIFT2_PULSE 32
+#define LIFT3_PULSE 15
+#define LIFT4_PULSE 2
 
-#define TURN1_PULSE 33
-#define TURN1_DIRECTION 32
+/* ESP2 PINOUT */
 
-#define TURN2_PULSE 15
-#define TURN2_DIRECTION 2
+#define TURN_ENABLE 13
 
-#define TURN3_PULSE 4
-#define TURN3_DIRECTION 16
+#define TURN1_PULSE 12
+#define TURN1_DIRECTION 14
 
-#define TURN4_PULSE 22
-#define TURN4_DIRECTION 21
+#define TURN2_PULSE 27
+#define TURN2_DIRECTION 26
+
+#define TURN3_PULSE 25
+#define TURN3_DIRECTION 17
+
+#define TURN4_PULSE 33
+#define TURN4_DIRECTION 32
+
+
+
+/* Pinout Defines OLD */
+// #define DRIVE_PULSE 13
+// #define DRIVE_DIRECTION 12
+// #define DRIVE_ENABLE 14
+
+// #define LIFT_PULSE 27
+// #define LIFT_DIRECTION 26
+// #define LIFT_ENABLE 25
+
+// #define TURN_ENABLE 17
+
+// #define TURN1_PULSE 33
+// #define TURN1_DIRECTION 32
+
+// #define TURN2_PULSE 15
+// #define TURN2_DIRECTION 2
+
+// #define TURN3_PULSE 4
+// #define TURN3_DIRECTION 16
+
+// #define TURN4_PULSE 22
+// #define TURN4_DIRECTION 21
 
 /* SPI Pin Defines - just use VSPI for now */
 #define SPI_CLK 18
@@ -45,6 +80,9 @@
 
 #define FULL_DRIVE_ROTATION (STEPS_PER_DRIVE_REV)
 #define FULL_TURN_ROTATION (STEPS_PER_TURN_REV)
+
+#define TURN_1_3_NUM_STEPS ((45.0f / 360.0f) * (float)FULL_TURN_ROTATION) // 40,000
+#define TURN_2_4_NUM_STEPS ((135.0f / 360.0f) * (float)FULL_TURN_ROTATION) // 120,000
 
 #define TURN_2_4_SPEED 45000
 #define TURN_1_3_SPEED (TURN_2_4_SPEED / 3)
