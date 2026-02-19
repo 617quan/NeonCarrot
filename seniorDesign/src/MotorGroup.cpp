@@ -71,8 +71,8 @@ MotorGroup::MotorGroup(MotorSettings_t settings[4], char group_type) {
         wheel3_motor = initMotor(settings[2]);
         wheel4_motor = initMotor(settings[3]);
     } else {
-        this->settings[2] = {0, 0, 0, 0, 0};
-        this->settings[3] = {0, 0, 0, 0, 0};
+        this->settings[2] = {};
+        this->settings[3] = {};
     }
 
     // Initialize all motors using the settings provided
@@ -328,11 +328,16 @@ FastAccelStepper* MotorGroup::initMotor(MotorSettings_t motor_settings) {
  *      of steps to figure out how many steps needed to be driven.
  *      
  ************************/
-void MotorGroup::moveForwards(float distance) {
+void MotorGroup::moveForwards(float distance, bool is_turning) {
     if (group_type == 'd') {
         int32_t steps_needed = convertInchesToSteps(distance);
-        wheel1_motor->move(steps_needed, false);
-        wheel2_motor->move(-steps_needed, false); 
+        if (is_turning) {
+            wheel1_motor->move(steps_needed, false);
+            wheel2_motor->move(steps_needed, false); 
+        } else {
+            wheel1_motor->move(steps_needed, false);
+            wheel2_motor->move(-steps_needed, false); 
+        }
     } else if (group_type == 't') {
         wheel1_motor->move(TURN_1_3_NUM_STEPS, false);
         wheel2_motor->move(TURN_2_4_NUM_STEPS, false);
@@ -367,11 +372,16 @@ void MotorGroup::moveForwards(float distance) {
  *      of steps to figure out how many steps needed to be driven.
  *      
  ************************/
-void MotorGroup::moveBackwards(float distance) {
+void MotorGroup::moveBackwards(float distance, bool is_turning) {
     if (group_type == 'd') {
         int32_t steps_needed = convertInchesToSteps(distance);
-        wheel1_motor->move(-steps_needed, false);
-        wheel2_motor->move(steps_needed, false);
+        if (is_turning) {
+            wheel1_motor->move(-steps_needed, false);
+            wheel2_motor->move(-steps_needed, false); 
+        } else {
+            wheel1_motor->move(-steps_needed, false);
+            wheel2_motor->move(steps_needed, false); 
+        }
     } else if (group_type == 't') {
         wheel1_motor->move(-TURN_1_3_NUM_STEPS, false);
         wheel2_motor->move(-TURN_2_4_NUM_STEPS, false);

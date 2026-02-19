@@ -3,14 +3,25 @@
 //  * 4 Pins for Limit Switches
 // */
 
-// #include "ESP2Main.h"
+// #include "MotorGroup.h"
+// #include "StateMachine.h"
+// #include "WebPage.h"
+// #include "defines.h"
 
-// void ESP2Main::setup() {
+// #define SPI_CHILD_INITIALIZE spi_slave_initialize
+// #define SPI_CHILD_TRANSMIT spi_slave_transmit
+// typedef spi_slave_transaction_t spi_child_transaction_t;
+// typedef spi_slave_interface_config_t spi_child_interface_config_t;
+
+// void initMotorGroup();
+// void initSPI();
+// MOVE_COMMAND recieveMessageFromParent();
+
+// void setup() {
 //     Serial.begin(115200);
-//     webServer.begin();
-//     Frame::engineStartup();
+//     MotorGroup::engineStartup();
 //     pinMode(LED_BUILTIN, OUTPUT);
-//     initFrame();
+//     initMotorGroup();
 //     initSPI();    
 // }
 
@@ -32,7 +43,7 @@
 //  *      channel for this protocol.
 //  *   
 //  ************************/
-// void ESP2Main::initSPI() {
+// void initSPI() {
 
 //     /* SPI Child Init - SPI bus configuration */
 //     spi_bus_config_t buscfg = {
@@ -71,37 +82,36 @@
 //  *      None. Initializes the frame
 //  * 
 //  ************************/
-// void ESP2Main::initMotorGroup() {
+// void initMotorGroup() {
 
 
 //     pinMode(TURN_ENABLE, OUTPUT);
 
-//     pinMode(TURN1_PULSE, OUTPUT);
 //     pinMode(TURN1_DIRECTION, OUTPUT);
+//     pinMode(TURN1_PULSE, OUTPUT);
 
-//     pinMode(TURN2_PULSE, OUTPUT);
 //     pinMode(TURN2_DIRECTION, OUTPUT);
+//     pinMode(TURN2_PULSE, OUTPUT);
 
-//     pinMode(TURN3_PULSE, OUTPUT);
 //     pinMode(TURN3_DIRECTION, OUTPUT);
+//     pinMode(TURN3_PULSE, OUTPUT);
 
-//     pinMode(TURN4_PULSE, OUTPUT);
 //     pinMode(TURN4_DIRECTION, OUTPUT);
+//     pinMode(TURN4_PULSE, OUTPUT);
 
-//     MotorSettings_t turn1_motor_settings = {TURN1_PULSE, TURN1_DIRECTION, TURN_ENABLE, TURN_1_3_SPEED, TURN_1_3_ACCEL};
-//     MotorSettings_t turn2_motor_settings = {TURN2_PULSE, TURN1_DIRECTION, TURN_ENABLE, TURN_2_4_SPEED, TURN_2_4_ACCEL};
-//     MotorSettings_t turn3_motor_settings = {TURN3_PULSE, TURN1_DIRECTION, TURN_ENABLE, TURN_1_3_SPEED, TURN_1_3_ACCEL};
-//     MotorSettings_t turn4_motor_settings = {TURN4_PULSE, TURN1_DIRECTION, TURN_ENABLE, TURN_2_4_SPEED, TURN_2_4_ACCEL};
+//     MotorSettings_t turn1_settings = {TURN1_PULSE, TURN1_DIRECTION, TURN_ENABLE, TURN_1_3_MAX_SPEED, TURN_1_3_ACCEL};
+//     MotorSettings_t turn2_settings = {TURN2_PULSE, TURN2_DIRECTION, TURN_ENABLE, TURN_2_4_MAX_SPEED, TURN_2_4_ACCEL};
+//     MotorSettings_t turn3_settings = {TURN3_PULSE, TURN3_DIRECTION, TURN_ENABLE, TURN_1_3_MAX_SPEED, TURN_1_3_ACCEL};
+//     MotorSettings_t turn4_settings = {TURN4_PULSE, TURN4_DIRECTION, TURN_ENABLE, TURN_2_4_MAX_SPEED, TURN_2_4_ACCEL};
 
-//     MotorSettings_t turn_motor_settings_arr[4] = {turn1_motor_settings, 
-//                                                   turn2_motor_settings, 
-//                                                   turn3_motor_settings, 
-//                                                   turn4_motor_settings};
-    
-//     motor_group = new MotorGroup(drive_motor_settings, lift_motor_settings, turn_motor_settings_arr);
-//     if (motor_group == nullptr) {
-//         Serial.println("FATAL ERROR: Motor group initialized incorrectly");
+//     MotorSettings_t turn_settings[4] = {turn1_settings, turn2_settings, turn3_settings, turn4_settings};
+
+//     MotorGroup *turn_motors = new MotorGroup(turn_settings, 't');
+
+//     if (turn_motors == nullptr) {
+//         Serial.println("FATAL ERROR: turn motors initialized incorrectly");
 //     }
+
 // }
 
 // /********** recieveMessageFromParent **********
@@ -122,7 +132,7 @@
 //  *     - Uses spi_child_transmit() blocking call to wait for parent to send
 //  * 
 //  ************************/
-// MOVE_COMMAND ESP2Main::recieveMessageFromParent() {
+// MOVE_COMMAND recieveMessageFromParent() {
 //     spi_child_transaction_t t;
 //     memset(&t, 0, sizeof(t));
     
@@ -159,10 +169,9 @@
 //  *      None.
 //  * 
 //  ************************/
-// void ESP2Main::loop() {  
+// void loop() {  
     
 //     delay(1000);
-//     frame->rotateLeft(90);
 //     delay(5000);
 
 // }

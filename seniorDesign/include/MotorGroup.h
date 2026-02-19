@@ -33,8 +33,8 @@ public:
     static void engineStartup();
     
     /* Movement Functions */
-    void moveForwards(float distance);  // Forwards  = Up,   Clockwise
-    void moveBackwards(float distance); // Backwards = Down, Counter-Clockwise
+    void moveForwards(float distance, bool is_turning);  // Forwards  = Up,   Clockwise
+    void moveBackwards(float distance, bool is_turning); // Backwards = Down, Counter-Clockwise
 
     void stopMoving();
     bool isMoving();
