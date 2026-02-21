@@ -18,6 +18,8 @@
 // void initSPI();
 // MOVE_COMMAND recieveMessageFromParent();
     
+// MotorGroup *drive_motors = nullptr;
+// MotorGroup *lift_motors = nullptr;
 
 // void setup() {
 //     Serial.begin(115200);
@@ -117,11 +119,11 @@
 //                                         lift4_settings
 //                                         };
 
-//     MotorGroup *drive_motors = new MotorGroup(drive_settings, 'd');
+//     drive_motors = new MotorGroup(drive_settings, 'd');
 //     if (drive_motors == nullptr) {
 //         Serial.println("FATAL ERROR: drive motors initialized incorrectly");
 //     }
-//     MotorGroup *lift_motors = new MotorGroup(lift_settings, 'l');
+//     lift_motors = new MotorGroup(lift_settings, 'l');
 //     if (lift_motors == nullptr) {
 //         Serial.println("FATAL ERROR: lift motors initialized incorrectly");
 //     }
@@ -186,6 +188,7 @@
 // void loop() {  
     
 //     delay(1000);
+//     // drive_motors->moveForwards((float)WHEEL_CIRCUMFERENCE, false);
 //     delay(5000);
 
 // }

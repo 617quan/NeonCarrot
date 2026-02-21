@@ -333,16 +333,17 @@ void MotorGroup::moveForwards(float distance, bool is_turning) {
         int32_t steps_needed = convertInchesToSteps(distance);
         if (is_turning) {
             wheel1_motor->move(steps_needed, false);
-            wheel2_motor->move(steps_needed, false); 
+            wheel2_motor->move(-steps_needed, false); 
         } else {
             wheel1_motor->move(steps_needed, false);
-            wheel2_motor->move(-steps_needed, false); 
+            wheel2_motor->move(steps_needed, false); 
         }
     } else if (group_type == 't') {
-        wheel1_motor->move(TURN_1_3_NUM_STEPS, false);
-        wheel2_motor->move(TURN_2_4_NUM_STEPS, false);
-        wheel3_motor->move(TURN_1_3_NUM_STEPS, false);
-        wheel4_motor->move(TURN_2_4_NUM_STEPS, false);
+        wheel1_motor->move(-TURN_1_3_NUM_STEPS, false);
+        wheel2_motor->move(-TURN_2_4_NUM_STEPS, false);
+        wheel3_motor->move(-TURN_1_3_NUM_STEPS, false);
+        wheel4_motor->move(-TURN_2_4_NUM_STEPS, false);
+        delay(computeMoveTimeMs(TURN_1_3_NUM_STEPS, TURN_1_3_MAX_SPEED, TURN_1_3_ACCEL) + 100);
     } else if (group_type == 'l') {
         wheel1_motor->move(distance, false);
         wheel2_motor->move(distance, false);
@@ -377,16 +378,17 @@ void MotorGroup::moveBackwards(float distance, bool is_turning) {
         int32_t steps_needed = convertInchesToSteps(distance);
         if (is_turning) {
             wheel1_motor->move(-steps_needed, false);
-            wheel2_motor->move(-steps_needed, false); 
+            wheel2_motor->move(steps_needed, false); 
         } else {
             wheel1_motor->move(-steps_needed, false);
-            wheel2_motor->move(steps_needed, false); 
+            wheel2_motor->move(-steps_needed, false); 
         }
     } else if (group_type == 't') {
-        wheel1_motor->move(-TURN_1_3_NUM_STEPS, false);
-        wheel2_motor->move(-TURN_2_4_NUM_STEPS, false);
-        wheel3_motor->move(-TURN_1_3_NUM_STEPS, false);
-        wheel4_motor->move(-TURN_2_4_NUM_STEPS, false);
+        wheel1_motor->move(TURN_1_3_NUM_STEPS, false);
+        wheel2_motor->move(TURN_2_4_NUM_STEPS, false);
+        wheel3_motor->move(TURN_1_3_NUM_STEPS, false);
+        wheel4_motor->move(TURN_2_4_NUM_STEPS, false);
+        delay(computeMoveTimeMs(TURN_1_3_NUM_STEPS, TURN_1_3_MAX_SPEED, TURN_1_3_ACCEL) + 100);
     } else if (group_type == 'l') {
         wheel1_motor->move(-distance, false);
         wheel2_motor->move(-distance, false);
@@ -469,6 +471,41 @@ bool MotorGroup::isMoving() {
     
     // return false;
     return false;
+}
+
+
+uint32_t MotorGroup::computeMoveTimeMs(int32_t steps,
+                           float max_speed,
+                           float accel)
+{
+    float N = fabsf((float)steps);
+    float v = max_speed;
+    float a = accel;
+
+    if (N <= 0.0f || v <= 0.0f || a <= 0.0f)
+        return 0;
+
+    // Distance needed to reach max speed
+    float d_min = (v * v) / a;
+
+    float total_time_sec = 0.0f;
+
+    if (N >= d_min) {
+        // Trapezoidal profile
+        float t_accel = v / a;
+        float d_cruise = N - d_min;
+        float t_cruise = d_cruise / v;
+
+        total_time_sec = 2.0f * t_accel + t_cruise;
+    } else {
+        // Triangular profile
+        float v_peak = sqrtf(N * a);
+        float t_accel = v_peak / a;
+
+        total_time_sec = 2.0f * t_accel;
+    }
+
+    return (uint32_t)(total_time_sec * 1000.0f);
 }
 
 //FUNCTION IS TEMPORARY, USED TO TEST INTERFACING WEBSERVER INTO MotorGroup CLASS - QUAN

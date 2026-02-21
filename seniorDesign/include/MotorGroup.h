@@ -10,6 +10,7 @@
 #define _MotorGroup_H
 
 #include <stdint.h>
+#include <cmath>
 #include "Arduino.h"
 #include <string>
 #include "FastAccelStepper.h"
@@ -51,6 +52,8 @@ private:
 
     /* Conversion Functions */
     int32_t convertInchesToSteps(float num_inches);
+
+    uint32_t computeMoveTimeMs(int32_t steps, float max_speed, float accel);
     
     /* Define the engine used to initialize motors - one engine is needed for all motors */
     static FastAccelStepperEngine engine;
