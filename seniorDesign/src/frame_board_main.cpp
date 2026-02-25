@@ -14,28 +14,20 @@
  *  - acceleration time.
  */
 
-#include <Arduino.h>
-#include "pinout_defines.h"
 #include "frame.h"
-#include <string>
-#include "driver/spi_slave.h"
 #include "state_machine.h"
-#include "WebPage.h"
 
 /* Use these functions and typedefs to avoid outdated language */
 #define SPI_CHILD_INITIALIZE spi_slave_initialize
 #define SPI_CHILD_TRANSMIT spi_slave_transmit
 typedef spi_slave_transaction_t spi_child_transaction_t;
 typedef spi_slave_interface_config_t spi_child_interface_config_t;
+MOVE_COMMAND recieveMessageFromParent();
 
 Frame *frame = nullptr;
 WebPage webServer("ESP32-Access-Point", "123456789");
-MOVE_COMMAND recieveMessageFromParent();
 void initFrame();
 void initSPI();
-STATE_TYPE parseCommand(MOVE_COMMAND command);
-
-
 
 void setup() {
     Serial.begin(115200);
@@ -45,8 +37,6 @@ void setup() {
     pinMode(LED_BUILTIN, OUTPUT);
     initFrame();
     initSPI();    
-
-    
 }
 
 /********** initSPI **********
@@ -100,8 +90,7 @@ void initSPI() {
         while(1) {
             Serial.printf("SPI child init failed: %d\n", ret);
         }
-    } 
-
+    }
 }
 
 /********** initFrame **********
@@ -139,9 +128,9 @@ void initFrame() {
     MotorSettings_t drive_motor_settings = {DRIVE_PULSE, DRIVE_DIRECTION, DRIVE_ENABLE, DRIVE_MAX_SPEED, DRIVE_ACCEL};
     MotorSettings_t lift_motor_settings = {LIFT_PULSE, LIFT_DIRECTION, LIFT_ENABLE, LIFT_MAX_SPEED, LIFT_ACCEL};
     MotorSettings_t turn1_motor_settings = {TURN1_PULSE, TURN1_DIRECTION, TURN_ENABLE, TURN_1_3_SPEED, TURN_1_3_ACCEL};
-    MotorSettings_t turn2_motor_settings = {TURN2_PULSE, TURN2_DIRECTION, TURN_ENABLE, TURN_2_4_SPEED, TURN_2_4_ACCEL};
-    MotorSettings_t turn3_motor_settings = {TURN3_PULSE, TURN3_DIRECTION, TURN_ENABLE, TURN_1_3_SPEED, TURN_1_3_ACCEL};
-    MotorSettings_t turn4_motor_settings = {TURN4_PULSE, TURN4_DIRECTION, TURN_ENABLE, TURN_2_4_SPEED, TURN_2_4_ACCEL};
+    MotorSettings_t turn2_motor_settings = {TURN2_PULSE, TURN1_DIRECTION, TURN_ENABLE, TURN_2_4_SPEED, TURN_2_4_ACCEL};
+    MotorSettings_t turn3_motor_settings = {TURN3_PULSE, TURN1_DIRECTION, TURN_ENABLE, TURN_1_3_SPEED, TURN_1_3_ACCEL};
+    MotorSettings_t turn4_motor_settings = {TURN4_PULSE, TURN1_DIRECTION, TURN_ENABLE, TURN_2_4_SPEED, TURN_2_4_ACCEL};
 
     MotorSettings_t turn_motor_settings_arr[4] = {turn1_motor_settings, 
                                                   turn2_motor_settings, 
@@ -152,33 +141,6 @@ void initFrame() {
     if (frame == nullptr) {
         Serial.println("FATAL ERROR: Frame initialized incorrectly");
     }
-}
-STATE_TYPE Curr_state = P1;
-MOVE_COMMAND command;
-void loop() {  
-    
-    // THIS CODE SEGMENT WAS USED TO TEST WEBSERVER INTERFACING - QUAN
-    // webServer.handleClient();
-    // state = webServer.returnState();
-    // frame->printPosition(state);
-
-    /* Get command from parent */
-    // MOVE_COMMAND command = recieveMessageFromParent();
-    // Serial.printf("Command to be parsed: %u\n", command);
-    // delay(1000); HOPE WE DON'T NEED THIS!
-    // Curr_state = parseCommand(command);
-
-    /* OPTION 2: WEBSERVER. THIS CODE USES THE WEBSERVER TO TELL THE FRAME WHAT
-    TO DO */
-
-
-    /* OPTION 3: MANUAL: THIS CODE JUST MANUALLY RUNS THE SYSTEM THROUGH CERTAIN
-    TESTS */
-
-    
-    frame->moveUp(1000000);
-    delay(10000);
-   
 }
 
 /********** recieveMessageFromParent **********
@@ -228,109 +190,42 @@ MOVE_COMMAND recieveMessageFromParent() {
     return command;
 }
 
-/********** parseCommands **********
- * 
- * Handles commands from parent and calls appropriate wheel functions.
- * 
- * Inputs:
- *    uint8_t command - command from parent
- * 
- * Returns:
- *    None.
- * 
- * Expects:
- *   - Commands apply to both wheel 3 and wheel 4
- * 
- * Notes:
- *  - Commands defined in state_machine.h
- * 
- ************************/
- STATE_TYPE parseCommand(MOVE_COMMAND command) {
+void loop() {  
+    
+    // THIS CODE SEGMENT WAS USED TO TEST WEBSERVER INTERFACING - QUAN
+    // webServer.handleClient();
+    // state = webServer.returnState();
+    // frame->printPosition(state);
 
-    switch (Curr_state) {
-        case (P1): 
-        if (command == MOVE_TO_P1) {
-            return P1;
-        } else if (command == MOVE_TO_P2) {
-            // frame->rotateRight(90);
-            return P2;
-        } else if (command == MOVE_TO_P3) {
-            frame->turnLeft(90);
-            // frame->moveForward(TODO: FIND THIS OUT);
-            frame->turnRight(90);
-            return P3;
-        } else if (command == MOVE_TO_P4) {
-            // frame->rotateRight(135);
-            frame->moveForward(23.622f);
-            return P4;
-        } else {
-            Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
-        }
-        break;
-        case (P2):
-        if (command == MOVE_TO_P1) {
-            // frame->rotateLeft(45);
-            return P1;
-        } else if (command == MOVE_TO_P2) {
-            return P2;
-        } else if (command == MOVE_TO_P3) {
-            // frame->moveBackward(TODO: FIND THIS OUT);
-            // frame->rotateLeft(90);
-            return P3;
-        } else if (command == MOVE_TO_P4) {
-            // frame->rotateRight(45);
-            frame->moveForward(23.622f);
-            return P4;
-        } else {
-            Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
-        }
+    /* Get command from parent */
+    // MOVE_COMMAND command = recieveMessageFromParent();
+    // Serial.printf("Command to be parsed: %u\n", command);
+    // delay(1000); HOPE WE DON'T NEED THIS!
+    // curr_state = parseCommand(command);
 
-        break;
-        case (P3):
+    /* OPTION 2: WEBSERVER. THIS CODE USES THE WEBSERVER TO TELL THE FRAME WHAT
+    TO DO */
+    /* OPTION 3: MANUAL: THIS CODE JUST MANUALLY RUNS THE SYSTEM THROUGH CERTAIN
+    TESTS */
+    delay(1000);
+    frame->rotateLeft(90);
+    delay(5000);
+    
 
-        if (command == MOVE_TO_P1) {
-            frame->turnRight(90);
-            // frame->moveForward(TODO: FIND THIS OUT);
-            frame->turnLeft(90);
-            return P1;
-        } else if (command == MOVE_TO_P2) {
-            // frame->rotateRight(90);
-            // frame->moveForward(TODO: FIND THIS OUT);
-            return P2;
-        } else if (command == MOVE_TO_P3) {
-            return P3;
-        } else if (command == MOVE_TO_P4) {
-            // frame->rotateRight(90);
-            // frame->moveForward(TODO: FIND THIS OUT);
-            // frame->rotateRight(45);
-            frame->moveForward(23.622f);
-            return P4;
-        } else {
-            Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
-        }
+    /* STATE MACHINE TESTING */
+    // StateMachine stateMachine;
 
-        break;
-        case (P4):
-        if (command == MOVE_TO_P1) {
-            frame->moveBackwards(23.622f);
-            // frame->rotateLeft(135);
-            return P1;
-        } else if (command == MOVE_TO_P2) {
-            frame->moveBackwards(23.622f);
-            // frame->rotateLeft(45);
-            return P2;
-        } else if (command == MOVE_TO_P3) {
-            frame->moveBackwards(23.622f);
-            // frame->rotateLeft(135);
-            frame->turnLeft(90);
-            // frame->moveForward(TODO: FIND THIS OUT);
-            frame->turnRight(90);
-            return P3;
-        } else if (command == MOVE_TO_P4) {
-            return P4;
-        } else {
-            Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
-        }
-        break;
-    }
+    // MOVE_COMMAND command = MOVE_TO_P1;
+    // STATE_TYPE curr_state = stateMachine.parseCommands(command);
+
+    // Serial.printf("Current State: %u | Command Received: %u\n", stateMachine.getCurrState(), stateMachine.getCurrCommand());
+
+    // delay(10000);
+    
+    // MOVE_COMMAND command2 = MOVE_TO_P2;
+    // STATE_TYPE curr_state2 = stateMachine.parseCommands(command2);
+
+    // Serial.printf("Current State: %u | Command Received: %u\n", stateMachine.getCurrState(), stateMachine.getCurrCommand());
+    
+    // delay(10000);
 }

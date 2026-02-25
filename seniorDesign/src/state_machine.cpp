@@ -1,119 +1,171 @@
-// /********** state_machine.cpp **********
-//  * 
-//  * Program movement of the BEAST.
-//  * 
-//  */
+/********** state_machine.cpp **********
+ * 
+ * Program movement of the BEAST.
+ * 
+ */
 
-// #include "state_machine.h"
+#include "state_machine.h"
 
-// /********** StateMachine **********
-//  * 
-//  * Initializes the state machine to the stop state.
-//  * 
-//  ************************/
-// StateMachine::StateMachine() {
-//     currentState = STATE_STOP;
-//     currentCommand = CMD_MOVE_TO_P1;
-// }
+extern Frame *frame;
 
-// /********** sendCommandToStateMachine **********
-//  * 
-//  * Sends a command to the state machine.
-//  * 
-//  * Inputs:
-//  *   uint8_t command - command to send.
-//  * 
-//  * Returns:
-//  *   None.
-//  * 
-//  * Notes:
-//  *   - Commands defined in state_machine.h
-//  * 
-//  ************************/
-// void StateMachine::sendCommandToStateMachine(uint8_t command) {
-//     currentCommand = command;
-// }
+/********** StateMachine **********
+ * 
+ * Initializes the state machine to the stop state.
+ * 
+ ************************/
+StateMachine::StateMachine() {
+    curr_state = P1;
+    command = EMERGENCY_STOP;
+}
 
-// /********** updateState **********
-//  * 
-//  * Updates the state machine to the next state when the current state
-//  * has been reached.
-//  * 
-//  * Inputs:
-//  *   None.
-//  * 
-//  * Returns:
-//  *   None.
-//  * 
-//  * Notes:
-//  *   - Current state progression just goes STOP -> P1 -> P2 -> P3 -> P4 -> STOP
-//  * 
-//  ************************/
-// void StateMachine::updateState() {
-//     uint8_t state = getState();
-//     uint8_t command = getCommand();
+/********** parseCommands **********
+ * 
+ * Handles commands from parent and calls appropriate wheel functions. 
+ * 
+ * Inputs:
+ *    MOVE_COMMAND command - command from parent
+ * 
+ * Returns:
+ *    None.
+ * 
+ * Expects:
+ *   - Commands apply to both wheel 3 and wheel 4
+ * 
+ * Notes:
+ *  - Commands defined in state_machine.h
+ *  - If the emergency stop command is sent at any time then the emergencyStop() 
+ *    function is called immediately
+ * - While motors are moving, sMoving() returns true, so new commands aren't 
+ *   issued
+ * - When motors reach target position, isMoving() returns false, so the next 
+ *   command can be issued
+ * 
+ ************************/
+ STATE_TYPE StateMachine::parseCommands(MOVE_COMMAND command) {
+    
+    /* Check for emergency stop */
+    if (command == EMERGENCY_STOP) {
+        frame->stopMoving();
+        /* Stay in current state */
+        return curr_state;
+    }
+    
+    /* Wait for current movement to complete before issuing next command */
+    if (frame->isMoving()) {
+        /* Stay in current state until movement completes */
+        return curr_state;
+    }
 
-//     if ((state == STATE_STOP) and (command == CMD_MOVE_TO_P1)) {
-//         Serial.printf("in stop state moving to P1\n");
-//         currentCommand = CMD_MOVE_TO_P1;
-//         currentState   = STATE_AT_P1;
+    switch (curr_state) {
+        case (P1): 
+        if (command == MOVE_TO_P1) {
+            return P1;
+        } else if (command == MOVE_TO_P2) {
+            frame->rotateRight(90);
+            return P2;
+        } else if (command == MOVE_TO_P3) {
+            frame->rotateLeft(90);
+            frame->moveForward(23.622f);
+            frame->rotateRight(90);
+            return P3;
+        } else if (command == MOVE_TO_P4) {
+            frame->rotateRight(135);
+            frame->moveForward(23.622f);
+            return P4;
+        } else {
+            Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
+        }
+        break;
+        case (P2):
+        if (command == MOVE_TO_P1) {
+            frame->rotateLeft(45);
+            return P1;
+        } else if (command == MOVE_TO_P2) {
+            return P2;
+        } else if (command == MOVE_TO_P3) {
+            frame->moveBackwards(23.622f);
+            frame->rotateLeft(90);
+            return P3;
+        } else if (command == MOVE_TO_P4) {
+            frame->rotateRight(45);
+            frame->moveForward(23.622f);
+            return P4;
+        } else {
+            Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
+        }
+        break;
+        case (P3):
+        if (command == MOVE_TO_P1) {
+            frame->rotateRight(90);
+            frame->moveForward(23.622f);
+            frame->rotateLeft(90);
+            return P1;
+        } else if (command == MOVE_TO_P2) {
+            frame->rotateRight(90);
+            frame->moveForward(23.622f);
+            return P2;
+        } else if (command == MOVE_TO_P3) {
+            return P3;
+        } else if (command == MOVE_TO_P4) {
+            frame->rotateRight(90);
+            frame->moveForward(23.622f);
+            frame->rotateRight(45);
+            frame->moveForward(23.622f);
+            return P4;
+        } else {
+            Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
+        }
+        break;
+        case (P4):
+        if (command == MOVE_TO_P1) {
+            frame->moveBackwards(23.622f);
+            frame->rotateLeft(135);
+            return P1;
+        } else if (command == MOVE_TO_P2) {
+            frame->moveBackwards(23.622f);
+            frame->rotateLeft(45);
+            return P2;
+        } else if (command == MOVE_TO_P3) {
+            frame->moveBackwards(23.622f);
+            frame->rotateLeft(45);
+            frame->moveBackwards(23.622f);
+            frame->rotateLeft(90);
+            return P3;
+        } else if (command == MOVE_TO_P4) {
+            return P4;
+        } else {
+            Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
+        }
+        break;
+    }
+    return curr_state;
+}
 
-//     } else if ((state == STATE_AT_P1) and (command == CMD_MOVE_TO_P2)) {
-//         Serial.printf("in state P1 moving to P2\n");
-//         currentCommand = CMD_MOVE_TO_P2;
-//         currentState   = STATE_AT_P2;
 
-//     } else if ((state == STATE_AT_P2) and (command == CMD_MOVE_TO_P3)) {
-//         Serial.printf("in state P2 moving to P3\n");
-//         currentCommand = CMD_MOVE_TO_P3;
-//         currentState   = STATE_AT_P3;
+/********** getCurrState **********
+ * 
+ * Returns the current state that the bot is in.
+ * 
+ * Inputs: None.
+ * 
+ * Returns: 
+ *      STATE_TYPE curr_state: the current state; 
+ * 
+ ************************/
+STATE_TYPE StateMachine::getCurrState() {
+    return curr_state;
+}
 
-//     } else if ((state == STATE_AT_P3) and (command == CMD_MOVE_TO_P4)) {
-//         Serial.printf("in state P3 moving to P4\n");
-//         currentCommand = CMD_MOVE_TO_P4;
-//         currentState   = STATE_AT_P4;
-
-//     } else if (command == CMD_STOP_MOVE) {
-//         stop();
-//     }
-// }
-
-// /********** getState **********
-//  * 
-//  * Returns the current state of the state machine.
-//  * 
-//  * Inputs:
-//  *       None.
-//  * 
-//  * Returns:
-//  *      uint8_t: Current state.
-//  * 
-//  ************************/
-// uint8_t StateMachine::getState() {
-//     return currentState;
-// }
-
-// /********** getCommand **********
-//  * 
-//  * Returns the command.
-//  * 
-//  * Inputs:
-//  *   None.
-//  * 
-//  * Returns:
-//  *      uint8_t: Current command.
-//  * 
-//  ************************/
-// uint8_t StateMachine::getCommand() {
-//     return currentCommand;
-// }
-
-// /********** stop **********
-//  * 
-//  * Stops all movement.
-//  * 
-//  ************************/
-// void StateMachine::stop() {
-//     currentCommand = CMD_STOP_MOVE;
-//     currentState   = STATE_STOP;
-// }
+/********** getCurrCommand **********
+ * 
+ * Returns the current command in the state machine.
+ * 
+ * Inputs: None.
+ * 
+ * Returns: 
+ *      MOVE_COMMAND command: the current command.
+ * 
+ ************************/
+MOVE_COMMAND StateMachine::getCurrCommand() {
+    return command;
+}
