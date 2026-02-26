@@ -333,10 +333,12 @@ void MotorGroup::moveForwards(float distance, bool is_turning) {
         int32_t steps_needed = convertInchesToSteps(distance);
         if (is_turning) {
             wheel1_motor->move(steps_needed, false);
-            wheel2_motor->move(-steps_needed, false); 
+            wheel2_motor->move(-steps_needed, false);
+            delay(computeMoveTimeMs(steps_needed, DRIVE_MAX_SPEED, DRIVE_ACCEL) + 100);
         } else {
             wheel1_motor->move(steps_needed, false);
             wheel2_motor->move(steps_needed, false); 
+            delay(computeMoveTimeMs(steps_needed, DRIVE_MAX_SPEED, DRIVE_ACCEL) + 100);
         }
     } else if (group_type == 't') {
         wheel1_motor->move(-TURN_1_3_NUM_STEPS, false);
@@ -345,10 +347,12 @@ void MotorGroup::moveForwards(float distance, bool is_turning) {
         wheel4_motor->move(-TURN_2_4_NUM_STEPS, false);
         delay(computeMoveTimeMs(TURN_1_3_NUM_STEPS, TURN_1_3_MAX_SPEED, TURN_1_3_ACCEL) + 100);
     } else if (group_type == 'l') {
-        wheel1_motor->move(distance, false);
-        wheel2_motor->move(distance, false);
-        wheel3_motor->move(distance, false);
-        wheel4_motor->move(distance, false);
+        int32_t steps_needed = (int)(distance * 100) * 28846;
+        wheel1_motor->move(-steps_needed, false);
+        wheel2_motor->move(steps_needed, false);
+        wheel3_motor->move(steps_needed, false);
+        wheel4_motor->move(steps_needed, false);
+        delay(computeMoveTimeMs(steps_needed, LIFT_MAX_SPEED, LIFT_ACCEL) + 100);
     }
 }
 
@@ -379,9 +383,11 @@ void MotorGroup::moveBackwards(float distance, bool is_turning) {
         if (is_turning) {
             wheel1_motor->move(-steps_needed, false);
             wheel2_motor->move(steps_needed, false); 
+            delay(computeMoveTimeMs(steps_needed, DRIVE_MAX_SPEED, DRIVE_ACCEL) + 100);
         } else {
             wheel1_motor->move(-steps_needed, false);
             wheel2_motor->move(-steps_needed, false); 
+            delay(computeMoveTimeMs(steps_needed, DRIVE_MAX_SPEED, DRIVE_ACCEL) + 100);
         }
     } else if (group_type == 't') {
         wheel1_motor->move(TURN_1_3_NUM_STEPS, false);
@@ -390,10 +396,36 @@ void MotorGroup::moveBackwards(float distance, bool is_turning) {
         wheel4_motor->move(TURN_2_4_NUM_STEPS, false);
         delay(computeMoveTimeMs(TURN_1_3_NUM_STEPS, TURN_1_3_MAX_SPEED, TURN_1_3_ACCEL) + 100);
     } else if (group_type == 'l') {
-        wheel1_motor->move(-distance, false);
-        wheel2_motor->move(-distance, false);
-        wheel3_motor->move(-distance, false);
-        wheel4_motor->move(-distance, false);
+        int32_t steps_needed = (int)(distance * 100) * 28846;
+        wheel1_motor->move(steps_needed, false);
+        wheel2_motor->move(steps_needed, false);
+        wheel3_motor->move(steps_needed, false);
+        wheel4_motor->move(steps_needed, false);
+        delay(computeMoveTimeMs(steps_needed, LIFT_MAX_SPEED, LIFT_ACCEL) + 100);
+    }
+}
+
+void MotorGroup::manualEnable() {
+    if (group_type == 'd') {
+        wheel1_motor->enableOutputs();
+        wheel2_motor->enableOutputs();
+    } else {
+        wheel1_motor->enableOutputs();
+        wheel2_motor->enableOutputs();
+        wheel3_motor->enableOutputs();
+        wheel4_motor->enableOutputs();
+    }
+}
+
+void MotorGroup::manualDisable() {
+    if (group_type == 'd') {
+        wheel1_motor->disableOutputs();
+        wheel2_motor->disableOutputs();
+    } else {
+        wheel1_motor->disableOutputs();
+        wheel2_motor->disableOutputs();
+        wheel3_motor->disableOutputs();
+        wheel4_motor->disableOutputs();
     }
 }
 

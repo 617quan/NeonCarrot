@@ -16,7 +16,7 @@
 #define BACK_DRIVE_PULSE 26
 
 #define LIFT_ENABLE 25
-#define LIFT_DIRECTION 17
+#define LIFT_DIRECTION 23
 
 #define LIFT1_PULSE 33
 #define LIFT2_PULSE 32
@@ -34,7 +34,7 @@
 #define TURN2_DIRECTION 26
 
 #define TURN3_PULSE 25
-#define TURN3_DIRECTION 17
+#define TURN3_DIRECTION 23
 
 #define TURN4_PULSE 33
 #define TURN4_DIRECTION 32
@@ -70,10 +70,13 @@
 #define VSPI_COPI 23 // controller out peripheral in
 #define VSPI_CS 5 
 
+#define TXD2 17
+#define RXD2 16
+
 /* Frame Defines */
 #define WHEEL_DIAMETER 5.9035
 #define WHEEL_CIRCUMFERENCE (PI * WHEEL_DIAMETER)
-#define DRIVE_GEARBOX_RATIO 62
+#define DRIVE_GEARBOX_RATIO 30
 #define TURN_GEARBOX_RATIO 100
 #define MICROSTEP 8
 #define STEPS_PER_DRIVE_REV (MICROSTEP * 200 * DRIVE_GEARBOX_RATIO)
@@ -91,10 +94,13 @@
 #define TURN_2_4_ACCEL 22500
 #define TURN_1_3_ACCEL (TURN_2_4_ACCEL / 3)
 
-#define DRIVE_MAX_SPEED 20000
+#define DRIVE_MAX_SPEED 15000
 #define DRIVE_ACCEL 10000
 
 #define LIFT_MAX_SPEED 30000 // was 50,000 Emmett changed it 
 #define LIFT_ACCEL 1500
+
+/* 150,000 = .52 inches means 2885 steps = .01 inches*/
+
 
 #endif

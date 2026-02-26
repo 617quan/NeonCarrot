@@ -37,6 +37,9 @@ public:
     void moveForwards(float distance, bool is_turning);  // Forwards  = Up,   Clockwise
     void moveBackwards(float distance, bool is_turning); // Backwards = Down, Counter-Clockwise
 
+    void manualEnable();
+    void manualDisable();
+
     void stopMoving();
     bool isMoving();
 
