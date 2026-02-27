@@ -11,10 +11,14 @@
 WebPage webServer("ESP32-Access-Point", "123456789");
 StateMachine state_machine;
 
+HardwareSerial ESP1(1);
+HardwareSerial ESP2(2);
+
 void setup() {
     Serial.begin(115200);
-    Serial1.begin(115200, SERIAL_8N1, RX1, TX1);
-    Serial2.begin(115200, SERIAL_8N1, RX2, TX2);
+    ESP1.begin(115200, SERIAL_8N1, RXD1, TXD2);
+    ESP2.begin(115200, SERIAL_8N1, RXD2, TXD2);
+    webServer.begin();
     
     pinMode(LED_BUILTIN, OUTPUT);
     // initSPI();    
@@ -29,21 +33,11 @@ void setup() {
  * 
  ************************/
 void loop() {  
-
+    
     webServer.handleClient(state_machine.getCurrState());
-
-    // webServer.handleClient();
-    // static int lastState = -1;
-    // int currentState = webServer.returnState();
-
-    // if (currentState != lastState) {
-    //     lastState = currentState;
-
-    // }
-
-
-
-
-
+    if (webServer.hasNewCommand()) {
+        MOVE_COMMAND new_command = webServer.getCommand();
+        state_machine.parseCommands(new_command);
+    }
 
 }

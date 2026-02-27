@@ -9,12 +9,10 @@
 /* STATE MACHINE TYPES */
 
 typedef enum {
-    P1 = 49,    // ascii 1
-    P2 = 50,    // ascii 2
-    P3 = 51,    // ascii 3
-    P4 = 52,    // ascii 4
-    MOVING = 53 // ascii 5 - state to represent any time the bot is actively
-                // moving so that we can check if emergency stop is pressed
+    P1 = 0,
+    P2 = 1,
+    P3 = 2,
+    P4 = 3
 } STATE_TYPE;
 
 typedef enum {
@@ -24,6 +22,20 @@ typedef enum {
     MOVE_TO_P4 = 66,    // ascii C
     IDLE = 67 // ascii D
 } MOVE_COMMAND;
+
+typedef enum {
+    WHEELS_UP,
+    WHEELS_DOWN,
+    MOVE_FORWARDS_24_IN,
+    MOVE_BACKWARDS_24_IN,
+    INITIATE_TURN_MOTORS,
+    RETURN_TURN_MOTORS,
+    TURN_RIGHT_90_DEGREES,
+    TURN_LEFT_90_DEGREES,
+    TURN_RIGHT_135_DEGREES,
+    TURN_LEFT_135_DEGREES,
+    FINISH_MOVEMENT
+} MOTOR_COMMAND;
 
 /* ESP1 PINOUT */
 #define DRIVE_ENABLE 13
@@ -64,8 +76,10 @@ typedef enum {
 #define VSPI_COPI 23 // controller out peripheral in
 #define VSPI_CS 5 
 
-/* UART Pin Defines. RX and TX 2 used on motor boards, both used on mother board
- TX1 and RX1 already defined in Arduino.h */
+/* UART Pin Defines. RXD2 and TXD2 are the specified pins on the board, while
+RXD1 and TXD1 are both remapped for UART channel 1 */
+#define TXD1 5
+#define RXD1 18
 #define TXD2 17
 #define RXD2 16
 

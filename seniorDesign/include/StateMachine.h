@@ -14,6 +14,9 @@ public:
 private:
     STATE_TYPE curr_state;
     MOVE_COMMAND command;
+
+    MOVE_COMMAND movement_memory[16][15];
+
 };
 
 #endif

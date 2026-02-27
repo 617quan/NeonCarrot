@@ -5,6 +5,10 @@
  */
 
 #include "StateMachine.h"
+#include "Arduino.h"
+
+extern HardwareSerial ESP1;
+extern HardwareSerial ESP2;
 
 /********** StateMachine **********
  * 
@@ -12,6 +16,20 @@
  * 
  ************************/
 StateMachine::StateMachine() {
+
+    movement_memory[16][15] = {
+    {FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
+    {INITIATE_TURN_MOTORS, WHEELS_DOWN, TURN_RIGHT_90_DEGREES, WHEELS_UP, RETURN_TURN_MOTORS, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
+    {INITIATE_TURN_MOTORS, WHEELS_DOWN, TURN_RIGHT_90_DEGREES, WHEELS_UP, RETURN_TURN_MOTORS, WHEELS_DOWN, MOVE_BACKWARDS_24_IN, WHEELS_UP, INITIATE_TURN_MOTORS, WHEELS_DOWN, TURN_LEFT_90_DEGREES, WHEELS_UP, RETURN_TURN_MOTORS, FINISH_MOVEMENT, FINISH_MOVEMENT},
+    {INITIATE_TURN_MOTORS, WHEELS_DOWN, TURN_RIGHT_135_DEGREES, WHEELS_UP, RETURN_TURN_MOTORS, WHEELS_DOWN, MOVE_FORWARDS_24_IN, WHEELS_UP, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
+    {INITIATE_TURN_MOTORS, WHEELS_DOWN, TURN_LEFT_90_DEGREES, WHEELS_UP, RETURN_TURN_MOTORS, WHEELS_DOWN, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
+    {FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
+    {WHEELS_DOWN, MOVE_BACKWARDS_24_IN, WHEELS_UP, INITIATE_TURN_MOTORS, WHEELS_DOWN, TURN_LEFT_90_DEGREES, WHEELS_UP, RETURN_TURN_MOTORS, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
+    /* THIS IS HELL */
+    };
+
+
+
     curr_state = P1;
     command = IDLE;
 }
@@ -43,103 +61,65 @@ StateMachine::StateMachine() {
 
     return P1;
     
-    // /* Check for emergency stop */
-    // if (command == EMERGENCY_STOP) {
-    //     motor_group->stopMoving();
-    //     /* Stay in current state */
-    //     return curr_state;
-    // }
-    
-    // /* Wait for current movement to complete before issuing next command */
-    // if (motor_group->isMoving()) {
-    //     /* Stay in current state until movement completes */
-    //     return curr_state;
-    // }
 
-    // switch (curr_state) {
 
-    //     case (P1): 
-    //     if (command == MOVE_TO_P1) {
-    //         return P1;
-    //     } else if (command == MOVE_TO_P2) {
-    //         motor_group->rotateRight(90);
-    //         return P2;
-    //     } else if (command == MOVE_TO_P3) {
-    //         motor_group->rotateLeft(90);
-    //         motor_group->moveForward(23.622f);
-    //         motor_group->rotateRight(90);
-    //         return P3;
-    //     } else if (command == MOVE_TO_P4) {
-    //         motor_group->rotateRight(135);
-    //         motor_group->moveForward(23.622f);
-    //         return P4;
-    //     } else {
-    //         Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
-    //     }
-    //     break;
-    //     case (P2):
-    //     if (command == MOVE_TO_P1) {
-    //         motor_group->rotateLeft(45);
-    //         return P1;
-    //     } else if (command == MOVE_TO_P2) {
-    //         return P2;
-    //     } else if (command == MOVE_TO_P3) {
-    //         motor_group->moveBackwards(23.622f);
-    //         motor_group->rotateLeft(90);
-    //         return P3;
-    //     } else if (command == MOVE_TO_P4) {
-    //         motor_group->rotateRight(45);
-    //         motor_group->moveForward(23.622f);
-    //         return P4;
-    //     } else {
-    //         Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
-    //     }
-    //     break;
-    //     case (P3):
-    //     if (command == MOVE_TO_P1) {
-    //         motor_group->rotateRight(90);
-    //         motor_group->moveForward(23.622f);
-    //         motor_group->rotateLeft(90);
-    //         return P1;
-    //     } else if (command == MOVE_TO_P2) {
-    //         motor_group->rotateRight(90);
-    //         motor_group->moveForward(23.622f);
-    //         return P2;
-    //     } else if (command == MOVE_TO_P3) {
-    //         return P3;
-    //     } else if (command == MOVE_TO_P4) {
-    //         motor_group->rotateRight(90);
-    //         motor_group->moveForward(23.622f);
-    //         motor_group->rotateRight(45);
-    //         motor_group->moveForward(23.622f);
-    //         return P4;
-    //     } else {
-    //         Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
-    //     }
-    //     break;
-    //     case (P4):
-    //     if (command == MOVE_TO_P1) {
-    //         motor_group->moveBackwards(23.622f);
-    //         motor_group->rotateLeft(135);
-    //         return P1;
-    //     } else if (command == MOVE_TO_P2) {
-    //         motor_group->moveBackwards(23.622f);
-    //         motor_group->rotateLeft(45);
-    //         return P2;
-    //     } else if (command == MOVE_TO_P3) {
-    //         motor_group->moveBackwards(23.622f);
-    //         motor_group->rotateLeft(45);
-    //         motor_group->moveBackwards(23.622f);
-    //         motor_group->rotateLeft(90);
-    //         return P3;
-    //     } else if (command == MOVE_TO_P4) {
-    //         return P4;
-    //     } else {
-    //         Serial.println("MOVEMENT_COMMAND_NOT_SPECIFIED");
-    //     }
-    //     break;
-    // }
-    // return curr_state;
+    switch (curr_state) {
+
+        case (P1): 
+            if (command == MOVE_TO_P1) {
+                return P1;
+            } else if (command == MOVE_TO_P2) {
+                ESP2.write(INITIATE_TURN_MOTORS);
+                ESP1.write(LIFT_FRAME);
+                ESP1.write(TURN_RIGHT_90_DEGREES);
+                ESP1.write(LOWER_FRAME);
+                ESP2.write(RETURN_TURN_MOTORS);
+                return P2;
+            } else if (command == MOVE_TO_P3) {
+                return P3;
+            } else if (command == MOVE_TO_P4) {
+                return P4;
+            } else {
+            }
+        break;
+        case (P2):
+            if (command == MOVE_TO_P1) {
+                return P1;
+            } else if (command == MOVE_TO_P2) {
+                return P2;
+            } else if (command == MOVE_TO_P3) {
+                return P3;
+            } else if (command == MOVE_TO_P4) {
+                return P4;
+            } else {
+            }
+        break;
+        case (P3):
+            if (command == MOVE_TO_P1) {
+                return P1;
+            } else if (command == MOVE_TO_P2) {
+                return P2;
+            } else if (command == MOVE_TO_P3) {
+                return P3;
+            } else if (command == MOVE_TO_P4) {
+                return P4;
+            } else {
+            }
+        break;
+        case (P4):
+            if (command == MOVE_TO_P1) {
+                return P1;
+            } else if (command == MOVE_TO_P2) {
+                return P2;
+            } else if (command == MOVE_TO_P3) {
+                return P3;
+            } else if (command == MOVE_TO_P4) {
+                return P4;
+            } else {
+            }
+        break;
+    }
+    return curr_state;
 }
 
 
