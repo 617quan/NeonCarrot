@@ -2,4 +2,5 @@
   (version 7)
   (lib (name "B6B-PH-K-S")(type "KiCad")(uri "${KIPRJMOD}/JST-PH_Connectors/B6B-PH-K-S.kicad_sym")(options "")(descr ""))
   (lib (name "ESP32-DEVKIT-V1")(type "KiCad")(uri "${KIPRJMOD}/ESP32-DEVKIT-V1/ESP32-DEVKIT-V1.kicad_sym")(options "")(descr ""))
+  (lib (name "ESP32_DevKitV1_Headers_Local")(type "KiCad")(uri "${KIPRJMOD}/ESP32-DEVKIT-V1/ESP32_DevKitV1_Headers.kicad_sym")(options "")(descr ""))
 )
