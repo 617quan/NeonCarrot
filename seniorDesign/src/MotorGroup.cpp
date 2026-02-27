@@ -126,206 +126,42 @@ FastAccelStepper* MotorGroup::initMotor(MotorSettings_t motor_settings) {
     return motor;
 }
 
-/********** moveUp **********
- *
- * Moves all of the lift motors up num_steps amount of steps. All moves are
- * non blocking.
- *
- * Parameters:
- *      uint32_t num_steps: Move the motor up this many steps. 
- * 
- * Return:
- *      Nothing. Moves the motor up TODO: Figure out how many steps move the
- *      whole MotorGroup up a real given distance (say one inch)
- *
- * Expects:
- *      Unsigned number. This function only moves the MotorGroup up, not down.
- *
- ************************/
-// void MotorGroup::moveUp(uint32_t num_steps) {
+void MotorGroup::moveForwards() {
+    if (group_type == 't') {
+        wheel1_motor->move(-TURN_1_3_NUM_STEPS, false);
+        wheel2_motor->move(-TURN_2_4_NUM_STEPS, false);
+        wheel3_motor->move(-TURN_1_3_NUM_STEPS, false);
+        wheel4_motor->move(-TURN_2_4_NUM_STEPS, false);
+        delay(computeMoveTimeMs(TURN_1_3_NUM_STEPS, TURN_1_3_MAX_SPEED, TURN_1_3_ACCEL) + 100);
+    }
+}
 
-//     /* TODO: Incorporate logic to be specific in how many inches the motor
-//     lifts */
-
-//     /* Set the target positions when movements start */
-//     lift_target_pos = lift_motors->getCurrentPosition() - int32_t(num_steps);
-//     lift_motors->move(-int32_t(num_steps), false);
-// }
-
-/********** moveDown **********
- *
- * Moves all of the lift motors down num_steps amount of steps. All moves are
- * non blocking.
- *
- * Parameters:
- *      uint32_t num_steps: Move the motor down this many steps. 
- * 
- * Return:
- *      Nothing. Moves the motor down TODO: Figure out how many steps move the
- *      whole MotorGroup down a real given distance (say one inch)
- *
- * Expects:
- *      Unsigned number. This function only moves the MotorGroup down, not up.
- * 
- ************************/
-// void MotorGroup::moveDown(uint32_t num_steps) {
-//     /* Set the target positions when movements start */
-//     lift_target_pos = lift_motors->getCurrentPosition() + int32_t(num_steps);
-//     lift_motors->move(int32_t(num_steps), false);
-// }
-
-/********** turnRight **********
- *
- * Turn the motor right degrees number of degrees. All move function calls are
- * non blocking.
- *
- * Parameters:
- *      uint32_t degrees: number of degrees to turn the motor to the right
- * 
- * Return:
- *      Nothing. Turns all of the turn motors the specified number of degrees.
- *
- * Expects:
- *      Unsigned number in between 0 and 360. Can use larger number, but that
- *      would just turn the motor more than a full rotation. In our case, it
- *      would probably hit the MotorGroup, which is not good for the integrity of the
- *      wheels.
- *
- * Notes:
- *      Here's the math: 
- *      All math is floating point so degrees / 360 does not set steps_needed =
- *      0. Multiply the desired number of degrees by 360 to get what portion of
- *      a full rotation the motor needs to take. Then, multiply by the number of
- *      steps required for a full rotation (FULL_TURN_ROTATION) to get the exact
- *      number of steps.
- *      
- ************************/
-// void MotorGroup::turnRight(uint32_t degrees) {
-//     int32_t steps_needed = ((float)degrees / 360.0f) * (float)FULL_TURN_ROTATION;
-    
-//     /* Set the target positions when movements start */
-//     turn_target_pos[0] = turn1_motor->getCurrentPosition() - int32_t(steps_needed);
-//     turn_target_pos[1] = turn2_motor->getCurrentPosition() - int32_t(steps_needed);
-//     turn_target_pos[2] = turn3_motor->getCurrentPosition() - int32_t(steps_needed);
-//     turn_target_pos[3] = turn4_motor->getCurrentPosition() - int32_t(steps_needed);
-    
-//     drive_motors->enableOutputs();
-//     turn1_motor->move(-int32_t(steps_needed), false);
-//     turn2_motor->move(-int32_t(steps_needed), false);
-//     turn3_motor->move(-int32_t(steps_needed), false);
-//     turn4_motor->move(-int32_t(steps_needed), false);
-//     drive_motors->disableOutputs();
-// }
-
-/********** turnLeft **********
- *
- * Turn the motor left degrees number of degrees. All move function calls are
- * non blocking.
- *
- * Parameters:
- *      uint32_t degrees: number of degrees to turn the motor to the left
- * 
- * Return:
- *      Nothing. Turns all the motors the number of degrees specified in the 
- *      argument
- *
- * Expects:
- *      Unsigned number in between 0 and 360. Can use larger number, but that
- *      would just turn the motor more than a full rotation. In our case, it
- *      would probably hit the MotorGroup, which is not good for the integrity of the
- *      wheels.
- *
- * Notes:
- *      Here's the math: 
- *      All math is floating point so degrees / 360 does not set steps_needed =
- *      0. Multiply the desired number of degrees by 360 to get what portion of
- *      a full rotation the motor needs to take. Then, multiply by the number of
- *      steps required for a full rotation (FULL_TURN_ROTATION) to get the exact
- *      number of steps.
- *      
- ************************/
-// void MotorGroup::turnLeft(uint32_t degrees) {
-//     float steps_needed = ((float)degrees / 360.0f) * (float)FULL_TURN_ROTATION; // 40,000 steps
-    
-//      /* Set the target positions when movements start */
-//     turn_target_pos[0] = turn1_motor->getCurrentPosition() + int32_t(steps_needed);
-//     turn_target_pos[1] = turn2_motor->getCurrentPosition() + int32_t(steps_needed);
-//     turn_target_pos[2] = turn3_motor->getCurrentPosition() + int32_t(steps_needed);
-//     turn_target_pos[3] = turn4_motor->getCurrentPosition() + int32_t(steps_needed);
-    
-//     drive_motors->enableOutputs();
-//     turn1_motor->move(int32_t(steps_needed), false);
-//     turn2_motor->move(int32_t(steps_needed), false);
-//     turn3_motor->move(int32_t(steps_needed), false);
-//     turn4_motor->move(int32_t(steps_needed), false);
-//     drive_motors->disableOutputs();
-// }
-
-// void MotorGroup::rotateRight(uint32_t degrees) {
-//     int32_t steps_needed_1_3 = convertDegreesToSteps(90, 13);
-//     int32_t steps_needed_2_4 = convertDegreesToSteps(135, 24);
-    
-//     /* Set the target positions when movements start */
-//     turn_target_pos[0] = turn1_motor->getCurrentPosition() - int32_t(steps_needed_1_3);
-//     turn_target_pos[1] = turn2_motor->getCurrentPosition() - int32_t(steps_needed_2_4);
-//     turn_target_pos[2] = turn3_motor->getCurrentPosition() - int32_t(steps_needed_1_3);
-//     turn_target_pos[3] = turn4_motor->getCurrentPosition() - int32_t(steps_needed_2_4);
-    
-//     drive_motors->enableOutputs();
-//     turn1_motor->move(-int32_t(steps_needed_1_3), false);
-//     turn2_motor->move(-int32_t(steps_needed_2_4), false);
-//     turn3_motor->move(-int32_t(steps_needed_1_3), false);
-//     turn4_motor->move(-int32_t(steps_needed_2_4), false);
-//     drive_motors->disableOutputs();
-// }
-
-// void MotorGroup::rotateLeft(uint32_t degrees) {
-//     int32_t steps_needed_1_3 = convertDegreesToSteps(45, 13);
-//     int32_t steps_needed_2_4 = convertDegreesToSteps(135, 24);
-    
-//     /* Set the target positions when movements start */
-//     turn_target_pos[0] = turn1_motor->getCurrentPosition() + int32_t(steps_needed_1_3);
-//     turn_target_pos[1] = turn2_motor->getCurrentPosition() + int32_t(steps_needed_2_4);
-//     turn_target_pos[2] = turn3_motor->getCurrentPosition() + int32_t(steps_needed_1_3);
-//     turn_target_pos[3] = turn4_motor->getCurrentPosition() + int32_t(steps_needed_2_4);
-    
-//     drive_motors->enableOutputs();
-//     turn1_motor->move(-int32_t(steps_needed_1_3), false);
-//     turn2_motor->move(-int32_t(steps_needed_2_4), false);
-//     turn3_motor->move(-int32_t(steps_needed_1_3), false);
-//     turn4_motor->move(-int32_t(steps_needed_2_4), true);
-//     drive_motors->disableOutputs();
-
-//     moveForward(100);
-//     drive_motors->enableOutputs();
-//     turn1_motor->move(int32_t(steps_needed_1_3), false);
-//     turn2_motor->move(int32_t(steps_needed_2_4), false);
-//     turn3_motor->move(int32_t(steps_needed_1_3), false);
-//     turn4_motor->move(int32_t(steps_needed_2_4), true);
-//     drive_motors->disableOutputs();
-
-//     moveForward(100);
-// }
+void MotorGroup::moveForwards(float distance) {
+    if (group_type == 'l') {
+        int32_t steps_needed = (int)(distance * 100) * STEPS_PER_LIFT_HUNDREDTH_INCH;
+        wheel1_motor->move(-steps_needed, false);
+        wheel2_motor->move(steps_needed, false);
+        wheel3_motor->move(steps_needed, false);
+        wheel4_motor->move(steps_needed, false);
+        delay(computeMoveTimeMs(steps_needed, LIFT_MAX_SPEED, LIFT_ACCEL) + 100);
+    }
+}
 
 /********** moveForward **********
  *
- * Move all of the drive motors forward num_inches inches. All move function 
- * calls are non blocking.
+ * 
  *
  * Parameters:
- *      uint32_t num_inches: number of inches we want to move the MotorGroup.
+ *      
  * 
  * Return:
- *      Nothing. Moves the whole MotorGroup forward the given number of inches.
+ *      
  *
  * Expects:
- *      No negative arguments.
+ *      
  *
  * Notes:
- *      Here's the math: 
- *      divide num_inches by the circumference of the wheel to find what portion
- *      of a full rotation the motor needs to move. Then, multiply by the number
- *      of steps to figure out how many steps needed to be driven.
+ *      
  *      
  ************************/
 void MotorGroup::moveForwards(float distance, bool is_turning) {
@@ -340,15 +176,23 @@ void MotorGroup::moveForwards(float distance, bool is_turning) {
             wheel2_motor->move(steps_needed, false); 
             delay(computeMoveTimeMs(steps_needed, DRIVE_MAX_SPEED, DRIVE_ACCEL) + 100);
         }
-    } else if (group_type == 't') {
-        wheel1_motor->move(-TURN_1_3_NUM_STEPS, false);
-        wheel2_motor->move(-TURN_2_4_NUM_STEPS, false);
-        wheel3_motor->move(-TURN_1_3_NUM_STEPS, false);
-        wheel4_motor->move(-TURN_2_4_NUM_STEPS, false);
+    }
+}
+
+void MotorGroup::moveBackwards() {
+    if (group_type == 't') {
+        wheel1_motor->move(TURN_1_3_NUM_STEPS, false);
+        wheel2_motor->move(TURN_2_4_NUM_STEPS, false);
+        wheel3_motor->move(TURN_1_3_NUM_STEPS, false);
+        wheel4_motor->move(TURN_2_4_NUM_STEPS, false);
         delay(computeMoveTimeMs(TURN_1_3_NUM_STEPS, TURN_1_3_MAX_SPEED, TURN_1_3_ACCEL) + 100);
-    } else if (group_type == 'l') {
-        int32_t steps_needed = (int)(distance * 100) * 28846;
-        wheel1_motor->move(-steps_needed, false);
+    }
+}
+
+void MotorGroup::moveBackwards(float distance) {
+    if (group_type == 'l') {
+        int32_t steps_needed = (int)(distance * 100) * STEPS_PER_LIFT_HUNDREDTH_INCH;
+        wheel1_motor->move(steps_needed, false);
         wheel2_motor->move(steps_needed, false);
         wheel3_motor->move(steps_needed, false);
         wheel4_motor->move(steps_needed, false);
@@ -389,19 +233,6 @@ void MotorGroup::moveBackwards(float distance, bool is_turning) {
             wheel2_motor->move(-steps_needed, false); 
             delay(computeMoveTimeMs(steps_needed, DRIVE_MAX_SPEED, DRIVE_ACCEL) + 100);
         }
-    } else if (group_type == 't') {
-        wheel1_motor->move(TURN_1_3_NUM_STEPS, false);
-        wheel2_motor->move(TURN_2_4_NUM_STEPS, false);
-        wheel3_motor->move(TURN_1_3_NUM_STEPS, false);
-        wheel4_motor->move(TURN_2_4_NUM_STEPS, false);
-        delay(computeMoveTimeMs(TURN_1_3_NUM_STEPS, TURN_1_3_MAX_SPEED, TURN_1_3_ACCEL) + 100);
-    } else if (group_type == 'l') {
-        int32_t steps_needed = (int)(distance * 100) * 28846;
-        wheel1_motor->move(steps_needed, false);
-        wheel2_motor->move(steps_needed, false);
-        wheel3_motor->move(steps_needed, false);
-        wheel4_motor->move(steps_needed, false);
-        delay(computeMoveTimeMs(steps_needed, LIFT_MAX_SPEED, LIFT_ACCEL) + 100);
     }
 }
 

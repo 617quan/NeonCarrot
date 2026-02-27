@@ -34,6 +34,20 @@ public:
     static void engineStartup();
     
     /* Movement Functions */
+
+    /* ONLY WORKS WITH TURN MOTORS. THEY ALWAYS TURN THE SAME AMOUNT, SO NO ARGS
+    NEEDED */
+    void moveForwards();
+    void moveBackwards();
+
+    /* ONLY WORKS WITH LIFT MOTORS. JUST GIVE A DISTANCE, AND THEY GO UP OR DOWN
+    */
+    void moveForwards(float distance);
+    void moveBackwards(float distance);
+
+    /* ONLY WORKS WITH DRIVE MOTORS. DISTANCE AND TURN NEEDED DUE TO BACK WHEELS
+    MOUNTED IN A DIFFERENT ORIENTATION THAN FRONT. DIFFERENT DIRECTIONS NEEDED
+    FOR BOTH SETS WHEN TURNING VS WHEN GOING STRAIGHT. */
     void moveForwards(float distance, bool is_turning);  // Forwards  = Up,   Clockwise
     void moveBackwards(float distance, bool is_turning); // Backwards = Down, Counter-Clockwise
 
@@ -61,17 +75,16 @@ private:
     /* Define the engine used to initialize motors - one engine is needed for all motors */
     static FastAccelStepperEngine engine;
 
-    /* Define stepper motor objects. These represent the physical motors on the
-    MotorGroup. NOTE: All 4 drive motors share the same 3 pins. All 4 lift motors
-    share the same 3 pins. Each turn motor has an individual pulse and direction
-    pin, but they all share the same enable pin. */
+    /* Define stepper motor objects. Both turn and lift motors will have all of
+    these initialized in the constructor. For the drive motors, only two of
+    these will be initialized as front wheels share the same pulse pin */
     FastAccelStepper* wheel1_motor = nullptr;
     FastAccelStepper* wheel2_motor = nullptr;
     FastAccelStepper* wheel3_motor = nullptr;
     FastAccelStepper* wheel4_motor = nullptr;
     MotorSettings_t settings[4];
 
-    char group_type;
+    char group_type; /* VERY IMPORTANT. 't' FOR TURN, 'd' FOR DRIVE, 'l' FOR LIFT */
 
     int position = 0; // used to track position based on webserver input
     

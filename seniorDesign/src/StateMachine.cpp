@@ -15,7 +15,7 @@ extern MotorGroup *motor_group;
  ************************/
 StateMachine::StateMachine() {
     curr_state = P1;
-    command = EMERGENCY_STOP;
+    command = IDLE;
 }
 
 /********** parseCommands **********

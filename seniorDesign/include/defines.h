@@ -6,6 +6,25 @@
 #ifndef _DEFINES
 #define _DEFINES
 
+/* STATE MACHINE TYPES */
+
+typedef enum {
+    P1 = 49,    // ascii 1
+    P2 = 50,    // ascii 2
+    P3 = 51,    // ascii 3
+    P4 = 52,    // ascii 4
+    MOVING = 53 // ascii 5 - state to represent any time the bot is actively
+                // moving so that we can check if emergency stop is pressed
+} STATE_TYPE;
+
+typedef enum {
+    MOVE_TO_P1 = 63,    // ascii ?
+    MOVE_TO_P2 = 64,    // ascii A
+    MOVE_TO_P3 = 65,    // ascii B
+    MOVE_TO_P4 = 66,    // ascii C
+    IDLE = 67 // ascii D
+} MOVE_COMMAND;
+
 /* ESP1 PINOUT */
 #define DRIVE_ENABLE 13
 
@@ -39,55 +58,35 @@
 #define TURN4_PULSE 33
 #define TURN4_DIRECTION 32
 
-
-
-/* Pinout Defines OLD */
-// #define DRIVE_PULSE 13
-// #define DRIVE_DIRECTION 12
-// #define DRIVE_ENABLE 14
-
-// #define LIFT_PULSE 27
-// #define LIFT_DIRECTION 26
-// #define LIFT_ENABLE 25
-
-// #define TURN_ENABLE 17
-
-// #define TURN1_PULSE 33
-// #define TURN1_DIRECTION 32
-
-// #define TURN2_PULSE 15
-// #define TURN2_DIRECTION 2
-
-// #define TURN3_PULSE 4
-// #define TURN3_DIRECTION 16
-
-// #define TURN4_PULSE 22
-// #define TURN4_DIRECTION 21
-
-/* SPI Pin Defines - just use VSPI for now */
+/* SPI Pin Defines. Not used anymore */
 #define SPI_CLK 18
 #define VSPI_CIPO 19 // controller in peripheral out
 #define VSPI_COPI 23 // controller out peripheral in
 #define VSPI_CS 5 
 
+/* UART Pin Defines. RX and TX 2 used on motor boards, both used on mother board
+*/
+#define TX1 10
+#define RX1 9
 #define TXD2 17
 #define RXD2 16
 
-/* Frame Defines */
+/* DEFINES FOR CONVERTING REAL LIFE DISTANCES TO STEPS FOR THE MOTORS */
 #define WHEEL_DIAMETER 5.9035
 #define WHEEL_CIRCUMFERENCE (PI * WHEEL_DIAMETER)
 #define DRIVE_GEARBOX_RATIO 30
 #define TURN_GEARBOX_RATIO 100
 #define MICROSTEP 8
-#define STEPS_PER_DRIVE_REV (MICROSTEP * 200 * DRIVE_GEARBOX_RATIO)
-#define STEPS_PER_TURN_REV (MICROSTEP * 200 * TURN_GEARBOX_RATIO)
+#define FULL_DRIVE_ROTATION (MICROSTEP * 200 * DRIVE_GEARBOX_RATIO)
+#define FULL_TURN_ROTATION (MICROSTEP * 200 * TURN_GEARBOX_RATIO)
+#define STEPS_PER_LIFT_HUNDREDTH_INCH 28846 /* NOTE: EXPERIMENTALLY FOUND */
 
-#define FULL_DRIVE_ROTATION (STEPS_PER_DRIVE_REV)
-#define FULL_TURN_ROTATION (STEPS_PER_TURN_REV)
-
+/* THESE ARE THE ONLY AMOUNTS THE TURN MOTORS WILL EVER NEED TO TURN */
 #define TURN_1_3_NUM_STEPS ((45.0f / 360.0f) * (float)FULL_TURN_ROTATION) // 40,000
 #define TURN_2_4_NUM_STEPS ((135.0f / 360.0f) * (float)FULL_TURN_ROTATION) // 120,000
 
+/* SPEED AND ACCELERATION DEFINES FOR ALL MOTOR TYPES. NOTE: INCREASING THESE
+VALUES MAY CAUSE MOTORS TO STALL */
 #define TURN_2_4_MAX_SPEED 22500
 #define TURN_1_3_MAX_SPEED (TURN_2_4_MAX_SPEED / 3)
 
@@ -97,10 +96,7 @@
 #define DRIVE_MAX_SPEED 15000
 #define DRIVE_ACCEL 10000
 
-#define LIFT_MAX_SPEED 30000 // was 50,000 Emmett changed it 
+#define LIFT_MAX_SPEED 30000 
 #define LIFT_ACCEL 1500
-
-/* 150,000 = .52 inches means 2885 steps = .01 inches*/
-
 
 #endif
