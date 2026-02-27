@@ -1,7 +1,11 @@
 #include "WebPage.h"
 
 WebPage::WebPage(const char* ssid, const char* password)
-  : _ssid(ssid), _password(password), _server(80), _state("Reset") {}
+  : _ssid(ssid),
+    _password(password),
+    _server(80),
+    _command(IDLE),
+    _newCommand(false) {}
 
 WebPage::~WebPage() {}
 
@@ -16,12 +20,13 @@ void WebPage::begin() {
   _server.begin();
 }
 
-void WebPage::handleClient() {
+void WebPage::handleClient(STATE_TYPE curr_state) {
   WiFiClient client = _server.available();
   if (!client) return;
 
   String header = "";
   String currentLine = "";
+
   while (client.connected()) {
     if (client.available()) {
       char c = client.read();
@@ -29,44 +34,74 @@ void WebPage::handleClient() {
 
       if (c == '\n') {
         if (currentLine.length() == 0) {
+
           handleRequest(header);
 
           client.println("HTTP/1.1 200 OK");
           client.println("Content-type:text/html");
           client.println("Connection: close");
           client.println();
-          client.println(buildWebPage());
+          client.println(buildWebPage(curr_state));
           client.println();
           break;
-        } else currentLine = "";
-      } else if (c != '\r') currentLine += c;
+
+        } else {
+          currentLine = "";
+        }
+      } else if (c != '\r') {
+        currentLine += c;
+      }
     }
   }
+
   client.stop();
 }
 
 void WebPage::handleRequest(String request) {
-  if (request.indexOf("GET /Position1") >= 0) _state = "Position1";
-  else if (request.indexOf("GET /Position2") >= 0) _state = "Position2";
-  else if (request.indexOf("GET /Position3") >= 0) _state = "Position3";
-  else if (request.indexOf("GET /Position4") >= 0) _state = "Position4";
-  else if (request.indexOf("GET /Reset") >= 0) _state = "Reset";
-  else if (request.indexOf("GET /Redo") >= 0) _state = "Redo";
 
-  Serial.println("State changed to: " + _state);
+  MOVE_COMMAND newCommand = IDLE;
+
+  if (request.indexOf("GET /Position1") >= 0)
+    newCommand = MOVE_TO_P1;
+
+  else if (request.indexOf("GET /Position2") >= 0)
+    newCommand = MOVE_TO_P2;
+
+  else if (request.indexOf("GET /Position3") >= 0)
+    newCommand = MOVE_TO_P3;
+
+  else if (request.indexOf("GET /Position4") >= 0)
+    newCommand = MOVE_TO_P4;
+
+  // Only trigger if the command actually changed
+  if (newCommand != _command) {
+    _command = newCommand;
+    _newCommand = true;
+
+    Serial.printf("New MOVE_COMMAND received: %u\n",
+                  (uint8_t)_command);
+  }
 }
 
-int WebPage::returnState() {
-  if (_state == "Position1") return 1;
-  if (_state == "Position2") return 2;
-  if (_state == "Position3") return 3;
-  if (_state == "Position4") return 4;
-  if (_state == "Redo")      return 5;
-  if (_state == "Reset")     return 6;
-  return 1000;
+bool WebPage::hasNewCommand() {
+  return _newCommand;
 }
 
-String WebPage::buildWebPage() {
+MOVE_COMMAND WebPage::getCommand() {
+  _newCommand = false;
+  return _command;
+}
+
+String WebPage::buildWebPage(STATE_TYPE curr_state) {
+  String stateString;
+  switch (curr_state) {
+  case P1:      stateString = "Position1"; break;
+  case P2:      stateString = "Position2"; break;
+  case P3:      stateString = "Position3"; break;
+  case P4:      stateString = "Position4"; break;
+  case MOVING:  stateString = "Moving"; break;
+  default:      stateString = "Unknown"; break;
+}
   String page = R"rawliteral(
 <!DOCTYPE html>
 <html lang="en">
@@ -134,7 +169,7 @@ h1 {
 </head>
 <body>
 <h1>ESP32 Position Control</h1>
-<p>Current State: <span id="state">)rawliteral" + _state + R"rawliteral(</span></p>
+<p>Current State: <span id="state">)rawliteral" + stateString + R"rawliteral(</span></p>
 
 <div class="room">
   <div class="corner pos1"></div>

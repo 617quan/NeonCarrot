@@ -65,9 +65,7 @@ typedef enum {
 #define VSPI_CS 5 
 
 /* UART Pin Defines. RX and TX 2 used on motor boards, both used on mother board
-*/
-#define TX1 10
-#define RX1 9
+ TX1 and RX1 already defined in Arduino.h */
 #define TXD2 17
 #define RXD2 16
 

@@ -3,23 +3,28 @@
 
 #include <Arduino.h>
 #include <WiFi.h>
+#include "defines.h"
 
 class WebPage {
   public:
     WebPage(const char* ssid, const char* password);
     ~WebPage();
 
-    void begin();            // Start AP and web server
-    void handleClient();     // Serve incoming HTTP requests
-    int returnState();  // Return interval based on state
+    void begin();               // Start AP and web server
+    void handleClient(STATE_TYPE curr_state); // Serve incoming HTTP requests
+
+    bool hasNewCommand();       // True if user issued new command
+    MOVE_COMMAND getCommand();  // Returns command and clears flag
 
   private:
     const char* _ssid;
     const char* _password;
     WiFiServer _server;
-    String _state;           // Current "position" state
-    
-    String buildWebPage();             // Generate HTML page
+
+    MOVE_COMMAND _command;   // Current command
+    bool _newCommand;        // Event flag
+
+    String buildWebPage(STATE_TYPE curr_state);           // Generate HTML page
     void handleRequest(String request); // Parse GET requests
 };
 

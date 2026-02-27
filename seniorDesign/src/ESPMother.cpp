@@ -15,7 +15,7 @@ void setup() {
     Serial.begin(115200);
     Serial1.begin(115200, SERIAL_8N1, RX1, TX1);
     Serial2.begin(115200, SERIAL_8N1, RX2, TX2);
-    webServer.begin();
+    
     pinMode(LED_BUILTIN, OUTPUT);
     // initSPI();    
 }
@@ -30,14 +30,16 @@ void setup() {
  ************************/
 void loop() {  
 
-    webServer.handleClient();
-    static int lastState = -1;
-    int currentState = webServer.returnState();
+    webServer.handleClient(state_machine.getCurrState());
 
-    if (currentState != lastState) {
-        lastState = currentState;
+    // webServer.handleClient();
+    // static int lastState = -1;
+    // int currentState = webServer.returnState();
 
-    }
+    // if (currentState != lastState) {
+    //     lastState = currentState;
+
+    // }
 
 
 

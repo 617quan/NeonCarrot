@@ -6,8 +6,6 @@
 
 #include "StateMachine.h"
 
-extern MotorGroup *motor_group;
-
 /********** StateMachine **********
  * 
  * Initializes the state machine to the stop state.
