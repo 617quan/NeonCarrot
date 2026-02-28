@@ -3430,6 +3430,26 @@
 			(embedded_fonts no)
 		)
 	)
+	(text "Could think about lowering this. \nRight now at max forward drop and assuming full 3.3V, \nIf=7mA. At room temp threshold is 5mA max\n"
+		(exclude_from_sim no)
+		(at 260.604 110.998 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "68676f5d-a98b-4002-8680-a6d8dbe4b702")
+	)
+	(text "TODO:\nUPDATE 6N137 AND PC817 FOOTPRINTS FOR THE ONES IN DIGIKEY CART"
+		(exclude_from_sim no)
+		(at 127 152.908 0)
+		(effects
+			(font
+				(size 3.81 3.81)
+			)
+		)
+		(uuid "ce2f073c-0182-4b44-8e5e-c6e9d2f1c0a7")
+	)
 	(junction
 		(at 128.27 124.46)
 		(diameter 0)
