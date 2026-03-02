@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP 6N137
+D High Speed Optocouplers High Speed 10MBd LogicGate Output
+K
+F https://optoelectronics.liteon.com/upload/download/DS70-2008-0035/6N137-L%20series%20Oct%202017%20RevD.PDF
+$ENDCMP
+#
+#End Doc Library
