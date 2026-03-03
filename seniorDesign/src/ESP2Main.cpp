@@ -18,10 +18,11 @@
 // MOVE_COMMAND recieveMessageFromParent();
 
 // MotorGroup *turn_motors = nullptr;
+// HardwareSerial Mother(2);
 
 // void setup() {
 //     Serial.begin(115200);
-//     Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
+//     Mother.begin(115200, SERIAL_8N1, RXD2, TXD2);
 //     MotorGroup::engineStartup();
 //     pinMode(LED_BUILTIN, OUTPUT);
 //     initMotorGroup();
@@ -172,26 +173,27 @@
 //  *      None.
 //  * 
 //  ************************/
-// bool first = true;
 // void loop() {
-//     if (first) {
-//         delay(1000);
-//         first = false;
-//     }
 
-//     // turn_motors->moveForwards(1, false);
-//     // turn_motors->moveBackwards(1, false);    
-//     if (Serial2.available() > 0) {
-//         char incomingByte = Serial2.read();
-//         if (incomingByte == '1') {
-//             Serial2.write('A');
-//         } else if (incomingByte == '2') {
-//             turn_motors->moveForwards(1000000, false);
-//             Serial2.write('B');
-//         } else if (incomingByte =='3') {
-//             turn_motors->moveBackwards(1, false);
-//             Serial2.write('C');
+//     if (Mother.available() > 0) {
+//         MOTOR_COMMAND command = (MOTOR_COMMAND)Mother.read();
+//         switch(command) {
+//             case (INITIATE_TURN_MOTORS): turn_motors->moveForwards(); Mother.write(END_STAGE); break;
+//             case (RETURN_TURN_MOTORS): turn_motors->moveBackwards(); Mother.write(END_STAGE); break;
 //         }
 //     }
+    
+//     // if (Serial2.available() > 0) {
+//     //     char incomingByte = Serial2.read();
+//     //     if (incomingByte == '1') {
+//     //         Serial2.write('A');
+//     //     } else if (incomingByte == '2') {
+//     //         turn_motors->moveForwards(1000000, false);
+//     //         Serial2.write('B');
+//     //     } else if (incomingByte =='3') {
+//     //         turn_motors->moveBackwards(1, false);
+//     //         Serial2.write('C');
+//     //     }
+//     // }
 
 // }

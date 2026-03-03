@@ -7,15 +7,27 @@ class StateMachine {
 public:
 
     StateMachine();
-    STATE_TYPE parseCommands(MOVE_COMMAND command);
+    bool parseWebServerInput(MOVE_COMMAND command);
     STATE_TYPE getCurrState();
     MOVE_COMMAND getCurrCommand();
+    bool parseUARTInput(MOTOR_COMMAND command);
 
 private:
     STATE_TYPE curr_state;
-    MOVE_COMMAND command;
+    bool is_operating;
 
-    MOVE_COMMAND movement_memory[16][15];
+    void sendMessage();
+
+    static const MOTOR_COMMAND movement_memory[16][12];
+
+    /* IT INDEXES LIKE THIS: movement_memory[movement_commands][movement_index] 
+    SO, movement_index TELLS THE SYSTEM WHAT THE NEXT BOT MOVEMENT NEEDS TO BE,
+    AND movement_commands TELLS THE SYSTEM WHAT SERIES OF COMMANDS IS CURRENTLY
+    BEING EXECUTED. */
+    int movement_index;
+    int movement_commands;
+
+
 
 };
 

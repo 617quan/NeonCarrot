@@ -99,7 +99,6 @@ String WebPage::buildWebPage(STATE_TYPE curr_state) {
     case P2:      stateString = "Position2"; break;
     case P3:      stateString = "Position3"; break;
     case P4:      stateString = "Position4"; break;
-    case MOVING:  stateString = "Moving"; break;
     default:      stateString = "Unknown"; break;
 }
   String page = R"rawliteral(

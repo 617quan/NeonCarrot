@@ -9,35 +9,40 @@
 /* STATE MACHINE TYPES */
 
 typedef enum {
-    P1 = 0,
-    P2 = 1,
-    P3 = 2,
-    P4 = 3
+    P1,
+    P2,
+    P3,
+    P4
 } STATE_TYPE;
 
 typedef enum {
-    MOVE_TO_P1 = 63,    // ascii ?
-    MOVE_TO_P2 = 64,    // ascii A
-    MOVE_TO_P3 = 65,    // ascii B
-    MOVE_TO_P4 = 66,    // ascii C
-    IDLE = 67 // ascii D
+    MOVE_TO_P1,
+    MOVE_TO_P2,
+    MOVE_TO_P3,
+    MOVE_TO_P4,
+    IDLE
 } MOVE_COMMAND;
 
+/* DECLARED SO THAT ODD MESSAGES GO TO ESP1, AND EVEN MESSAGES GO TO ESP2 */
 typedef enum {
-    WHEELS_UP,
-    WHEELS_DOWN,
-    MOVE_FORWARDS_24_IN,
-    MOVE_BACKWARDS_24_IN,
-    INITIATE_TURN_MOTORS,
-    RETURN_TURN_MOTORS,
-    TURN_RIGHT_90_DEGREES,
-    TURN_LEFT_90_DEGREES,
-    TURN_RIGHT_135_DEGREES,
-    TURN_LEFT_135_DEGREES,
+    END_STAGE,
+    WHEELS_UP = 1,
+    WHEELS_DOWN = 3,
+    MOVE_FORWARDS_24_IN = 5,
+    MOVE_BACKWARDS_24_IN = 7,
+    INITIATE_TURN_MOTORS = 2,
+    RETURN_TURN_MOTORS = 4,
+    TURN_RIGHT_90_DEGREES = 9,
+    TURN_LEFT_90_DEGREES = 11,
+    TURN_RIGHT_45_DEGREES = 13,
+    TURN_LEFT_45_DEGREES = 15,
+    TURN_RIGHT_135_DEGREES = 17,
+    TURN_LEFT_135_DEGREES = 19,
     FINISH_MOVEMENT
 } MOTOR_COMMAND;
 
 /* ESP1 PINOUT */
+
 #define DRIVE_ENABLE 13
 
 #define FRONT_DRIVE_DIRECTION 12
@@ -46,29 +51,29 @@ typedef enum {
 #define BACK_DRIVE_DIRECTION 27
 #define BACK_DRIVE_PULSE 26
 
-#define LIFT_ENABLE 25
+#define LIFT_ENABLE 18 /* CHANGED */
 #define LIFT_DIRECTION 23
 
-#define LIFT1_PULSE 33
-#define LIFT2_PULSE 32
-#define LIFT3_PULSE 15
-#define LIFT4_PULSE 2
+#define LIFT1_PULSE 19 /* CHANGED */
+#define LIFT2_PULSE 21 /* CHANGED */
+#define LIFT3_PULSE 2 /* CHANGED */
+#define LIFT4_PULSE 15 /* CHANGED */
 
 /* ESP2 PINOUT */
 
 #define TURN_ENABLE 13
 
-#define TURN1_PULSE 12
-#define TURN1_DIRECTION 14
+#define TURN1_PULSE 14 /* CHANGED */
+#define TURN1_DIRECTION 12 /* CHANGED */
 
-#define TURN2_PULSE 27
-#define TURN2_DIRECTION 26
+#define TURN2_PULSE 33 /* CHANGED */
+#define TURN2_DIRECTION 25 /* CHANGED */
 
-#define TURN3_PULSE 25
+#define TURN3_PULSE 32 /* CHANGED */
 #define TURN3_DIRECTION 23
 
-#define TURN4_PULSE 33
-#define TURN4_DIRECTION 32
+#define TURN4_PULSE 26 /* CHANGED */
+#define TURN4_DIRECTION 27 /* CHANGED */
 
 /* SPI Pin Defines. Not used anymore */
 #define SPI_CLK 18

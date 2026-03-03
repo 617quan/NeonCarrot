@@ -10,28 +10,37 @@
 extern HardwareSerial ESP1;
 extern HardwareSerial ESP2;
 
+
+
+const MOTOR_COMMAND StateMachine::movement_memory[16][12] = {
+    /* P1 to P1 */ {FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
+    /* P1 to P2 */ {INITIATE_TURN_MOTORS, WHEELS_DOWN, TURN_LEFT_90_DEGREES, WHEELS_UP, RETURN_TURN_MOTORS, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
+    /* P1 to P3 */ {WHEELS_DOWN, MOVE_BACKWARDS_24_IN, WHEELS_UP, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
+    /* P1 to P4 */ {INITIATE_TURN_MOTORS, WHEELS_DOWN, TURN_RIGHT_45_DEGREES, WHEELS_UP, RETURN_TURN_MOTORS, WHEELS_DOWN, MOVE_FORWARDS_24_IN, WHEELS_UP, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
+    /* P2 to P1 */ {INITIATE_TURN_MOTORS, WHEELS_DOWN, TURN_RIGHT_90_DEGREES, WHEELS_UP, RETURN_TURN_MOTORS, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
+    /* P2 to P2 */ {FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
+    /* P2 to P3 */ {INITIATE_TURN_MOTORS, WHEELS_DOWN, TURN_RIGHT_90_DEGREES, WHEELS_UP, RETURN_TURN_MOTORS, WHEELS_DOWN, MOVE_BACKWARDS_24_IN, WHEELS_UP, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
+    /* P2 to P4 */ {INITIATE_TURN_MOTORS, WHEELS_DOWN, TURN_RIGHT_135_DEGREES, WHEELS_UP, RETURN_TURN_MOTORS, WHEELS_DOWN, MOVE_FORWARDS_24_IN, WHEELS_UP, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
+    /* P3 to P1 */ {WHEELS_DOWN, MOVE_FORWARDS_24_IN, WHEELS_UP, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
+    /* P3 to P2 */ {INITIATE_TURN_MOTORS, WHEELS_DOWN, TURN_LEFT_90_DEGREES, WHEELS_UP, RETURN_TURN_MOTORS, WHEELS_DOWN, MOVE_FORWARDS_24_IN, WHEELS_UP, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
+    /* P3 to P3 */ {FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
+    /* P3 to P4 */ {WHEELS_DOWN, MOVE_FORWARDS_24_IN, WHEELS_UP, INITIATE_TURN_MOTORS, WHEELS_DOWN, TURN_RIGHT_45_DEGREES, WHEELS_UP, RETURN_TURN_MOTORS, WHEELS_DOWN, MOVE_FORWARDS_24_IN, WHEELS_UP, FINISH_MOVEMENT},
+    /* P4 to P1 */ {WHEELS_DOWN, MOVE_BACKWARDS_24_IN, WHEELS_UP, INITIATE_TURN_MOTORS, WHEELS_DOWN, TURN_LEFT_45_DEGREES, WHEELS_UP, RETURN_TURN_MOTORS, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
+    /* P4 to P2 */ {WHEELS_DOWN, MOVE_BACKWARDS_24_IN, WHEELS_UP, INITIATE_TURN_MOTORS, WHEELS_DOWN, TURN_LEFT_135_DEGREES, WHEELS_UP, RETURN_TURN_MOTORS, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
+    /* P4 to P3 */ {WHEELS_DOWN, MOVE_BACKWARDS_24_IN, WHEELS_UP, INITIATE_TURN_MOTORS, WHEELS_DOWN, TURN_LEFT_45_DEGREES, WHEELS_UP, RETURN_TURN_MOTORS, WHEELS_DOWN, MOVE_BACKWARDS_24_IN, WHEELS_UP, FINISH_MOVEMENT},
+    /* P4 to P4 */ {FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT}
+};
+
 /********** StateMachine **********
  * 
  * Initializes the state machine to the stop state.
  * 
  ************************/
 StateMachine::StateMachine() {
-
-    movement_memory[16][15] = {
-    {FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
-    {INITIATE_TURN_MOTORS, WHEELS_DOWN, TURN_RIGHT_90_DEGREES, WHEELS_UP, RETURN_TURN_MOTORS, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
-    {INITIATE_TURN_MOTORS, WHEELS_DOWN, TURN_RIGHT_90_DEGREES, WHEELS_UP, RETURN_TURN_MOTORS, WHEELS_DOWN, MOVE_BACKWARDS_24_IN, WHEELS_UP, INITIATE_TURN_MOTORS, WHEELS_DOWN, TURN_LEFT_90_DEGREES, WHEELS_UP, RETURN_TURN_MOTORS, FINISH_MOVEMENT, FINISH_MOVEMENT},
-    {INITIATE_TURN_MOTORS, WHEELS_DOWN, TURN_RIGHT_135_DEGREES, WHEELS_UP, RETURN_TURN_MOTORS, WHEELS_DOWN, MOVE_FORWARDS_24_IN, WHEELS_UP, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
-    {INITIATE_TURN_MOTORS, WHEELS_DOWN, TURN_LEFT_90_DEGREES, WHEELS_UP, RETURN_TURN_MOTORS, WHEELS_DOWN, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
-    {FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
-    {WHEELS_DOWN, MOVE_BACKWARDS_24_IN, WHEELS_UP, INITIATE_TURN_MOTORS, WHEELS_DOWN, TURN_LEFT_90_DEGREES, WHEELS_UP, RETURN_TURN_MOTORS, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
-    /* THIS IS HELL */
-    };
-
-
-
+    movement_index = 0;
+    movement_commands = 0;
+    is_operating = false;
     curr_state = P1;
-    command = IDLE;
 }
 
 /********** parseCommands **********
@@ -57,71 +66,64 @@ StateMachine::StateMachine() {
  *   command can be issued
  * 
  ************************/
- STATE_TYPE StateMachine::parseCommands(MOVE_COMMAND command) {
+bool StateMachine::parseWebServerInput(MOVE_COMMAND command) {
 
-    return P1;
-    
-
-
-    switch (curr_state) {
-
-        case (P1): 
-            if (command == MOVE_TO_P1) {
-                return P1;
-            } else if (command == MOVE_TO_P2) {
-                ESP2.write(INITIATE_TURN_MOTORS);
-                ESP1.write(LIFT_FRAME);
-                ESP1.write(TURN_RIGHT_90_DEGREES);
-                ESP1.write(LOWER_FRAME);
-                ESP2.write(RETURN_TURN_MOTORS);
-                return P2;
-            } else if (command == MOVE_TO_P3) {
-                return P3;
-            } else if (command == MOVE_TO_P4) {
-                return P4;
+    if (!is_operating) {
+        movement_commands = (curr_state * 4) + command;
+        curr_state = (STATE_TYPE)command;
+        is_operating = true;
+        // if (command == MOVE_TO_P1 && curr_state == P1) {
+        //     ESP1.write(WHEELS_UP);
+        // } else if (command == MOVE_TO_P2 && curr_state == P1) {
+        //     ESP1.write(TURN_LEFT_90_DEGREES);
+        // } else if (command == MOVE_TO_P3 && curr_state == P1) {
+        //     ESP2.write(INITIATE_TURN_MOTORS);
+        // } else if (command == MOVE_TO_P4 && curr_state == P1) {
+        //     ESP2.write(RETURN_TURN_MOTORS);
+        // } 
+        if (movement_memory[movement_commands][movement_index] != FINISH_MOVEMENT) {
+            if (movement_memory[movement_commands][movement_index] % 2 == 1) {
+                ESP1.write(movement_memory[movement_commands][movement_index]);
+                movement_index++;
             } else {
+                ESP2.write(movement_memory[movement_commands][movement_index]);
+                movement_index++;
             }
-        break;
-        case (P2):
-            if (command == MOVE_TO_P1) {
-                return P1;
-            } else if (command == MOVE_TO_P2) {
-                return P2;
-            } else if (command == MOVE_TO_P3) {
-                return P3;
-            } else if (command == MOVE_TO_P4) {
-                return P4;
-            } else {
-            }
-        break;
-        case (P3):
-            if (command == MOVE_TO_P1) {
-                return P1;
-            } else if (command == MOVE_TO_P2) {
-                return P2;
-            } else if (command == MOVE_TO_P3) {
-                return P3;
-            } else if (command == MOVE_TO_P4) {
-                return P4;
-            } else {
-            }
-        break;
-        case (P4):
-            if (command == MOVE_TO_P1) {
-                return P1;
-            } else if (command == MOVE_TO_P2) {
-                return P2;
-            } else if (command == MOVE_TO_P3) {
-                return P3;
-            } else if (command == MOVE_TO_P4) {
-                return P4;
-            } else {
-            }
-        break;
+        } else {
+            is_operating = false;
+            movement_index = 0;
+            movement_commands = 0;
+        }
+    } else {
+        return false;
     }
-    return curr_state;
+    
+    return true;
 }
 
+bool StateMachine::parseUARTInput(MOTOR_COMMAND command) {
+
+    if (command == END_STAGE) {
+        if (movement_memory[movement_commands][movement_index] != FINISH_MOVEMENT) {
+            if (movement_memory[movement_commands][movement_index] % 2 == 1) {
+                ESP1.write(movement_memory[movement_commands][movement_index]);
+                movement_index++;
+            } else {
+                ESP2.write(movement_memory[movement_commands][movement_index]);
+                movement_index++;
+            }
+        } else {
+
+            is_operating = false;
+            movement_index = 0;
+            movement_commands = 0;
+        }
+    } else {
+        return false;
+    }
+
+    return true;
+}
 
 /********** getCurrState **********
  * 
@@ -134,17 +136,4 @@ StateMachine::StateMachine() {
  ************************/
 STATE_TYPE StateMachine::getCurrState() {
     return curr_state;
-}
-
-/********** getCurrCommand **********
- * 
- * Returns the current command in the state machine.
- * 
- * Inputs: None.
- * 
- * Returns: MOVE_COMMAND - the current command.
- * 
- ************************/
-MOVE_COMMAND StateMachine::getCurrCommand() {
-    return command;
 }
