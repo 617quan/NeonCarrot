@@ -11,10 +11,10 @@ public:
     STATE_TYPE getCurrState();
     MOVE_COMMAND getCurrCommand();
     bool parseUARTInput(MOTOR_COMMAND command);
+    bool isMoving();
 
 private:
     STATE_TYPE curr_state;
-    bool is_operating;
 
     void sendMessage();
 

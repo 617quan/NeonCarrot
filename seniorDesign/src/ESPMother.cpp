@@ -32,13 +32,18 @@ void setup() {
  *      None.
  * 
  ************************/
+unsigned long busyUntil = 0;
 void loop() {  
 
+    webServer.setBusyMessage(state_machine.isMoving());
+
     webServer.handleClient(state_machine.getCurrState());
+
     if (webServer.hasNewCommand()) {
         MOVE_COMMAND new_command = webServer.getCommand();
         state_machine.parseWebServerInput(new_command);
     }
+
     if (ESP1.available() > 0) {
         uint8_t incoming_byte = ESP1.read();
         state_machine.parseUARTInput((MOTOR_COMMAND)incoming_byte);

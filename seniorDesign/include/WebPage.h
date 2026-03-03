@@ -15,6 +15,7 @@ class WebPage {
 
     bool hasNewCommand();       // True if user issued new command
     MOVE_COMMAND getCommand();  // Returns command and clears flag
+    void setBusyMessage(bool busy);
 
   private:
     const char* _ssid;
@@ -26,6 +27,7 @@ class WebPage {
 
     String buildWebPage(STATE_TYPE curr_state);           // Generate HTML page
     void handleRequest(String request); // Parse GET requests
+    bool _showBusyMessage;
 };
 
 #endif

@@ -5,9 +5,14 @@ WebPage::WebPage(const char* ssid, const char* password)
     _password(password),
     _server(80),
     _command(IDLE),
-    _newCommand(false) {}
+    _newCommand(false),
+    _showBusyMessage(false) {}
 
 WebPage::~WebPage() {}
+
+void WebPage::setBusyMessage(bool busy) {
+  _showBusyMessage = busy;
+}
 
 void WebPage::begin() {
   Serial.println("Setting up Access Point...");
@@ -21,6 +26,7 @@ void WebPage::begin() {
 }
 
 void WebPage::handleClient(STATE_TYPE curr_state) {
+
   WiFiClient client = _server.available();
   if (!client) return;
 
@@ -28,13 +34,46 @@ void WebPage::handleClient(STATE_TYPE curr_state) {
   String currentLine = "";
 
   while (client.connected()) {
+
     if (client.available()) {
+
       char c = client.read();
       header += c;
 
       if (c == '\n') {
+
         if (currentLine.length() == 0) {
 
+          // ---- STATUS ENDPOINT ----
+          if (header.indexOf("GET /status") >= 0) {
+            // Build the same stateString used in buildWebPage
+            String stateString;
+            switch (curr_state) {
+                case P1:      stateString = "Position 1"; break;
+                case P2:      stateString = "Position 2"; break;
+                case P3:      stateString = "Position 3"; break;
+                case P4:      stateString = "Position 4"; break;
+                case MOVING:  stateString = "Moving";     break;
+                default:      stateString = "Unknown";    break;
+            }
+
+            String json = "{";
+            json += "\"position\": \"" + stateString + "\",";  // note the quotes — it's now a string
+            json += "\"moving\": ";
+            json += (_showBusyMessage ? "true" : "false");
+            json += "}";
+
+            client.println("HTTP/1.1 200 OK");
+            client.println("Content-Type: application/json");
+            client.println("Connection: close");
+            client.println();
+            client.println(json);
+            client.println();
+
+            break;  // IMPORTANT
+          }
+
+          // ---- NORMAL PAGE REQUEST ----
           handleRequest(header);
 
           client.println("HTTP/1.1 200 OK");
@@ -43,11 +82,13 @@ void WebPage::handleClient(STATE_TYPE curr_state) {
           client.println();
           client.println(buildWebPage(curr_state));
           client.println();
+
           break;
 
         } else {
           currentLine = "";
         }
+
       } else if (c != '\r') {
         currentLine += c;
       }
@@ -93,14 +134,17 @@ MOVE_COMMAND WebPage::getCommand() {
 }
 
 String WebPage::buildWebPage(STATE_TYPE curr_state) {
+
   String stateString;
   switch (curr_state) {
     case P1:      stateString = "Position1"; break;
     case P2:      stateString = "Position2"; break;
     case P3:      stateString = "Position3"; break;
     case P4:      stateString = "Position4"; break;
+    case MOVING:  stateString = "Moving"; break;
     default:      stateString = "Unknown"; break;
-}
+  }
+
   String page = R"rawliteral(
 <!DOCTYPE html>
 <html lang="en">
@@ -108,6 +152,7 @@ String WebPage::buildWebPage(STATE_TYPE curr_state) {
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>ESP32 Position Control</title>
+
 <style>
 body {
   font-family: 'Poppins', sans-serif;
@@ -118,13 +163,6 @@ body {
 h1 {
   font-size: 2.2em; color: #c58eff;
   text-shadow: 0 0 15px #a45bff; margin-bottom: 10px;
-}
-#state {
-  color: #fff; font-weight: 600; font-size: 1.2em;
-  background: rgba(255,255,255,0.05);
-  padding: 10px 20px; border-radius: 10px;
-  backdrop-filter: blur(10px); margin-bottom: 25px;
-  box-shadow: 0 0 10px rgba(165,69,255,0.25);
 }
 .room {
   position: relative; width: 300px; height: 300px;
@@ -156,19 +194,30 @@ h1 {
   background: transparent; padding: 14px 26px; border-radius: 12px;
   font-size: 1.05em; color: #fff; cursor: pointer;
   transition: all 0.25s ease-in-out; text-transform: uppercase; letter-spacing: 1px;
-  position: relative; box-shadow: 0 0 8px rgba(165,69,255,0.15);
 }
 .button:hover {
   box-shadow: 0 0 18px rgba(175,80,255,0.5); transform: translateY(-2px);
 }
-.button.active {
-  border-color: #c58eff; box-shadow: 0 0 20px rgba(197,142,255,0.8);
-}
 </style>
 </head>
+
 <body>
+
 <h1>ESP32 Position Control</h1>
-<p>Current State: <span id="state">)rawliteral" + stateString + R"rawliteral(</span></p>
+)rawliteral";
+
+  // ---- POSITION DISPLAY ----
+    page += "<p style=\"margin:10px 0;\">Position: <span id=\"position\">";
+    page += stateString;
+    page += "</span></p>";
+
+  // ---- BUSY MESSAGE ----
+  page += "<div id=\"busy\" style=\"display:none; color:#ff4d4d; "
+          "font-weight:600;\">";
+  page += "Bot currently moving. Please wait until movement is finished.";
+  page += "</div>";
+
+  page += R"rawliteral(
 
 <div class="room">
   <div class="corner pos1"></div>
@@ -188,10 +237,30 @@ h1 {
 </div>
 
 <script>
+
+function updateStatus() {
+  fetch('/status')
+    .then(response => response.json())
+    .then(data => {
+
+      document.getElementById("position").innerText = data.position;
+
+      const busyDiv = document.getElementById("busy");
+      if (data.moving) {
+        busyDiv.style.display = "block";
+      } else {
+        busyDiv.style.display = "none";
+      }
+    });
+}
+
+setInterval(updateStatus, 200);
+
+// ---- Existing Robot Logic ----
 const buttons=document.querySelectorAll('.button');
-const stateText=document.getElementById('state');
 const robot=document.getElementById('robot');
 let currentPos='Position1';
+
 function setRobotPosition(pos){
   const room=document.querySelector('.room');
   const roomSize=room.getBoundingClientRect();
@@ -200,29 +269,35 @@ function setRobotPosition(pos){
     case'Position1':x=10;y=roomSize.height-robotSize-10;break;
     case'Position2':x=10;y=10;break;
     case'Position3':x=roomSize.width-robotSize-10;y=10;break;
-    case'Position4':x=roomSize.width-robotSize-10;y=roomSize.height-robotSize-10;break;
+    case'Position4':x=roomSize.width-robotSize-10;
+                     y=roomSize.height-robotSize-10;break;
   }
-  robot.style.left=`${x}px`; robot.style.top=`${y}px`;
+  robot.style.left=`${x}px`;
+  robot.style.top=`${y}px`;
 }
-window.addEventListener('load',()=>setRobotPosition('Position1'));
+
+window.addEventListener('load',()=>{
+  setRobotPosition(')rawliteral";
+
+  page += stateString;
+
+  page += R"rawliteral(');
+});
+
 buttons.forEach(button=>{
   button.addEventListener('click',()=>{
-    buttons.forEach(btn=>btn.classList.remove('active'));
     let pos=button.id;
     if(pos==='Redo'){
-      stateText.textContent=currentPos+" (Redo)";
-      setRobotPosition(currentPos);
       fetch(`/Redo`);
       return;
     }
     if(pos==='Reset')pos='Position1';
     currentPos=pos;
-    button.classList.add('active');
-    stateText.textContent=pos;
     setRobotPosition(pos);
     fetch(`/${pos}`);
   });
 });
+
 </script>
 </body></html>
 )rawliteral";

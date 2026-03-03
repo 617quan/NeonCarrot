@@ -39,8 +39,11 @@ const MOTOR_COMMAND StateMachine::movement_memory[16][12] = {
 StateMachine::StateMachine() {
     movement_index = 0;
     movement_commands = 0;
-    is_operating = false;
     curr_state = P1;
+}
+
+bool StateMachine::isMoving() {
+    return curr_state == MOVING;
 }
 
 /********** parseCommands **********
@@ -68,19 +71,9 @@ StateMachine::StateMachine() {
  ************************/
 bool StateMachine::parseWebServerInput(MOVE_COMMAND command) {
 
-    if (!is_operating) {
+    if (curr_state != MOVING) {
         movement_commands = (curr_state * 4) + command;
-        curr_state = (STATE_TYPE)command;
-        is_operating = true;
-        // if (command == MOVE_TO_P1 && curr_state == P1) {
-        //     ESP1.write(WHEELS_UP);
-        // } else if (command == MOVE_TO_P2 && curr_state == P1) {
-        //     ESP1.write(TURN_LEFT_90_DEGREES);
-        // } else if (command == MOVE_TO_P3 && curr_state == P1) {
-        //     ESP2.write(INITIATE_TURN_MOTORS);
-        // } else if (command == MOVE_TO_P4 && curr_state == P1) {
-        //     ESP2.write(RETURN_TURN_MOTORS);
-        // } 
+        curr_state = MOVING;
         if (movement_memory[movement_commands][movement_index] != FINISH_MOVEMENT) {
             if (movement_memory[movement_commands][movement_index] % 2 == 1) {
                 ESP1.write(movement_memory[movement_commands][movement_index]);
@@ -90,15 +83,27 @@ bool StateMachine::parseWebServerInput(MOVE_COMMAND command) {
                 movement_index++;
             }
         } else {
-            is_operating = false;
+            curr_state = STATE_TYPE(movement_commands % 4);
             movement_index = 0;
             movement_commands = 0;
         }
-    } else {
+    } else { // The bot is currently moving. Cannot do anything new while moving
         return false;
     }
     
     return true;
+
+        /* CODE TO TEST SIMPLE MOVEMENT WITH WEB SERVER */
+
+        // if (command == MOVE_TO_P1 && curr_state == P1) {
+        //     ESP1.write(WHEELS_UP);
+        // } else if (command == MOVE_TO_P2 && curr_state == P1) {
+        //     ESP1.write(TURN_LEFT_90_DEGREES);
+        // } else if (command == MOVE_TO_P3 && curr_state == P1) {
+        //     ESP2.write(INITIATE_TURN_MOTORS);
+        // } else if (command == MOVE_TO_P4 && curr_state == P1) {
+        //     ESP2.write(RETURN_TURN_MOTORS);
+        // } 
 }
 
 bool StateMachine::parseUARTInput(MOTOR_COMMAND command) {
@@ -113,12 +118,13 @@ bool StateMachine::parseUARTInput(MOTOR_COMMAND command) {
                 movement_index++;
             }
         } else {
-
-            is_operating = false;
+            curr_state = STATE_TYPE(movement_commands % 4);
             movement_index = 0;
             movement_commands = 0;
         }
     } else {
+        /* The message sent to the mother wasn't END_STAGE, which shouldn't be
+        possible. Throw an error (return false) when this happens */
         return false;
     }
 
