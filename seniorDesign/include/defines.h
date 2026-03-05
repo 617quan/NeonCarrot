@@ -1,7 +1,18 @@
-/* defines.h
- * Purpose: Has all of the pin number assignments for the motors. Holds constants
- * for the frame class and spi class.
- */
+/********** defines.h **********
+ *
+ * Created by Team Neon Carrot. Contact Carrot Griffin Faecher for Info
+ * Provides all global constants, enumerations, and hardware configuration
+ * values used throughout the robot control software. This file centralizes
+ * definitions for system states, movement commands, motor control messages,
+ * pin assignments, and mechanical conversion constants.
+ *
+ * The header also contains parameters used to translate real world movement
+ * (inches or degrees) into stepper motor microsteps based on gearbox ratios,
+ * wheel geometry, and microstepping configuration. Motor speed and
+ * acceleration limits are also defined here so they can be tuned in a single
+ * location without modifying motor control code.
+ *
+ ****************************************/
 
 #ifndef _DEFINES
 #define _DEFINES
@@ -27,19 +38,24 @@ typedef enum {
 
 /* DECLARED SO THAT ODD MESSAGES GO TO ESP1, AND EVEN MESSAGES GO TO ESP2 */
 typedef enum {
-    END_STAGE,
-    WHEELS_UP = 1,
-    WHEELS_DOWN = 3,
-    MOVE_FORWARDS_24_IN = 5,
-    MOVE_BACKWARDS_24_IN = 7,
+    END_STAGE = 0,
+
+    /* ESP1 COMMANDS (odd) */
+    WHEELS_UP            = 1,
+    WHEELS_DOWN          = WHEELS_UP + 2,
+    MOVE_FORWARDS_24_IN  = WHEELS_DOWN + 2,
+    MOVE_BACKWARDS_24_IN = MOVE_FORWARDS_24_IN + 2,
+    TURN_RIGHT_90_DEGREES= MOVE_BACKWARDS_24_IN + 2,
+    TURN_LEFT_90_DEGREES = TURN_RIGHT_90_DEGREES + 2,
+    TURN_RIGHT_45_DEGREES= TURN_LEFT_90_DEGREES + 2,
+    TURN_LEFT_45_DEGREES = TURN_RIGHT_45_DEGREES + 2,
+    TURN_RIGHT_135_DEGREES= TURN_LEFT_45_DEGREES + 2,
+    TURN_LEFT_135_DEGREES = TURN_RIGHT_135_DEGREES + 2,
+
+    /* ESP2 COMMANDS (even) */
     INITIATE_TURN_MOTORS = 2,
-    RETURN_TURN_MOTORS = 4,
-    TURN_RIGHT_90_DEGREES = 9,
-    TURN_LEFT_90_DEGREES = 11,
-    TURN_RIGHT_45_DEGREES = 13,
-    TURN_LEFT_45_DEGREES = 15,
-    TURN_RIGHT_135_DEGREES = 17,
-    TURN_LEFT_135_DEGREES = 19,
+    RETURN_TURN_MOTORS   = INITIATE_TURN_MOTORS + 2,
+
     FINISH_MOVEMENT
 } MOTOR_COMMAND;
 
@@ -53,35 +69,29 @@ typedef enum {
 #define BACK_DRIVE_DIRECTION 27
 #define BACK_DRIVE_PULSE 26
 
-#define LIFT_ENABLE 18 /* CHANGED */
+#define LIFT_ENABLE 18 
 #define LIFT_DIRECTION 23
 
-#define LIFT1_PULSE 19 /* CHANGED */
-#define LIFT2_PULSE 21 /* CHANGED */
-#define LIFT3_PULSE 2 /* CHANGED */
-#define LIFT4_PULSE 15 /* CHANGED */
+#define LIFT1_PULSE 19 
+#define LIFT2_PULSE 21 
+#define LIFT3_PULSE 2 
+#define LIFT4_PULSE 15 
 
 /* ESP2 PINOUT */
 
 #define TURN_ENABLE 13
 
-#define TURN1_PULSE 14 /* CHANGED */
-#define TURN1_DIRECTION 12 /* CHANGED */
+#define TURN1_PULSE 14 
+#define TURN1_DIRECTION 12 
 
-#define TURN2_PULSE 33 /* CHANGED */
-#define TURN2_DIRECTION 25 /* CHANGED */
+#define TURN2_PULSE 33 
+#define TURN2_DIRECTION 25 
 
-#define TURN3_PULSE 32 /* CHANGED */
+#define TURN3_PULSE 32 
 #define TURN3_DIRECTION 23
 
-#define TURN4_PULSE 26 /* CHANGED */
-#define TURN4_DIRECTION 27 /* CHANGED */
-
-/* SPI Pin Defines. Not used anymore */
-#define SPI_CLK 18
-#define VSPI_CIPO 19 // controller in peripheral out
-#define VSPI_COPI 23 // controller out peripheral in
-#define VSPI_CS 5 
+#define TURN4_PULSE 26 
+#define TURN4_DIRECTION 27 
 
 /* UART Pin Defines. RXD2 and TXD2 are the specified pins on the board, while
 RXD1 and TXD1 are both remapped for UART channel 1 */

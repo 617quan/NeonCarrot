@@ -1,5 +1,32 @@
+/********** WebPage.cpp **********
+ * Created by Team Neon Carrot. Contact Carrot Griffin Faecher for Info
+ * Purpose: Implements the WebPage class which creates and serves a web UI
+ * for controlling robot movement and reporting system state over WiFi.
+ * Handles HTTP requests, parses commands, and builds the dynamic page.
+ ********************************/
+
 #include "WebPage.h"
 
+/********** WebPage **********
+ *
+ * Description:
+ *      Constructor for the WebPage class. Initializes WiFi credentials,
+ *      HTTP server instance, and internal command tracking variables.
+ *
+ * Parameters:
+ *      ssid     - Name of the access point created by the ESP32.
+ *      password - Password used to connect to the access point.
+ *
+ * Return:
+ *      None. Initializes the WebPage object.
+ *
+ * Expects:
+ *      Valid SSID and password strings provided by the caller.
+ *
+ * Notes:
+ *      Server is initialized on port 80 but does not start until begin().
+ *
+ ************************/
 WebPage::WebPage(const char* ssid, const char* password)
   : _ssid(ssid),
     _password(password),
@@ -8,23 +35,90 @@ WebPage::WebPage(const char* ssid, const char* password)
     _newCommand(false),
     _showBusyMessage(false) {}
 
+/********** ~WebPage **********
+ *
+ * Description:
+ *      Destructor for the WebPage class.
+ *
+ * Parameters:
+ *      None.
+ *
+ * Return:
+ *      Nothing.
+ *
+ * Expects:
+ *      Nothing.
+ *
+ * Notes:
+ *      Currently no dynamic memory is allocated so nothing is freed.
+ *
+ ************************/
 WebPage::~WebPage() {}
 
+/********** setBusyMessage **********
+ *
+ * Description:
+ *      Updates the busy status displayed on the web interface when the
+ *      robot is executing a movement command.
+ *
+ * Parameters:
+ *      busy - Boolean indicating whether the robot is currently moving.
+ *
+ * Return:
+ *      Nothing. Internal busy flag is updated.
+ *
+ * Expects:
+ *      Called by the state machine before serving clients.
+ *
+ * Notes:
+ *      Value is used when generating the status response.
+ *
+ ************************/
 void WebPage::setBusyMessage(bool busy) {
   _showBusyMessage = busy;
 }
 
+/********** begin **********
+ *
+ * Description:
+ *      Starts the WiFi access point and launches the HTTP server that
+ *      serves the robot control web interface.
+ *
+ * Parameters:
+ *      Nothing.
+ *
+ * Return:
+ *      Nothing. Access point and server are initialized.
+ *
+ * Expects:
+ *      Valid SSID and password were provided in the constructor.
+ *
+ * Notes:
+ *
+ ************************/
 void WebPage::begin() {
-  Serial.println("Setting up Access Point...");
   WiFi.softAP(_ssid, _password);
-
-  IPAddress IP = WiFi.softAPIP();
-  Serial.print("AP IP address: ");
-  Serial.println(IP);
-
   _server.begin();
 }
 
+/********** handleClient **********
+ *
+ * Description:
+ *      Handles incoming HTTP client connections. Parses requests,
+ *      serves the web page, and responds to the status endpoint.
+ *
+ * Parameters:
+ *      curr_state - Current position or movement state of the robot.
+ *
+ * Return:
+ *      Nothing. Sends HTTP responses directly to the client.
+ *
+ * Expects:
+ *      Called repeatedly in the main loop to service requests.
+ *
+ * Notes:
+ *
+ ************************/
 void WebPage::handleClient(STATE_TYPE curr_state) {
 
   WiFiClient client = _server.available();
@@ -44,9 +138,7 @@ void WebPage::handleClient(STATE_TYPE curr_state) {
 
         if (currentLine.length() == 0) {
 
-          // ---- STATUS ENDPOINT ----
           if (header.indexOf("GET /status") >= 0) {
-            // Build the same stateString used in buildWebPage
             String stateString;
             switch (curr_state) {
                 case P1:      stateString = "Position 1"; break;
@@ -56,9 +148,9 @@ void WebPage::handleClient(STATE_TYPE curr_state) {
                 case MOVING:  stateString = "Moving";     break;
                 default:      stateString = "Unknown";    break;
             }
-
+            /* Logic to print the correct state on web page */
             String json = "{";
-            json += "\"position\": \"" + stateString + "\",";  // note the quotes — it's now a string
+            json += "\"position\": \"" + stateString + "\",";
             json += "\"moving\": ";
             json += (_showBusyMessage ? "true" : "false");
             json += "}";
@@ -70,10 +162,10 @@ void WebPage::handleClient(STATE_TYPE curr_state) {
             client.println(json);
             client.println();
 
-            break;  // IMPORTANT
+            break;
           }
 
-          // ---- NORMAL PAGE REQUEST ----
+          /* Displays the web page to the client */
           handleRequest(header);
 
           client.println("HTTP/1.1 200 OK");
@@ -98,6 +190,25 @@ void WebPage::handleClient(STATE_TYPE curr_state) {
   client.stop();
 }
 
+/********** handleRequest **********
+ *
+ * Description:
+ *      Parses the HTTP request string to determine if a movement
+ *      command was issued from the web interface.
+ *
+ * Parameters:
+ *      request - Raw HTTP request header string.
+ *
+ * Return:
+ *      Nothing. Updates the stored command if a new one is detected.
+ *
+ * Expects:
+ *      Valid HTTP request string from handleClient().
+ *
+ * Notes:
+ *      Sets a flag so the main program knows a new command arrived.
+ *
+ ************************/
 void WebPage::handleRequest(String request) {
 
   MOVE_COMMAND newCommand = IDLE;
@@ -117,25 +228,79 @@ void WebPage::handleRequest(String request) {
   else if (request.indexOf("GET /Initialize") >= 0)
     newCommand = INITIALIZE;
 
-  // Only trigger if the command actually changed
+  /* Only trigger if the command actually changed */
   if (newCommand != _command) {
     _command = newCommand;
     _newCommand = true;
-
-    Serial.printf("New MOVE_COMMAND received: %u\n",
-                  (uint8_t)_command);
   }
 }
 
+/********** hasNewCommand **********
+ *
+ * Description:
+ *      Indicates whether a new movement command has been received
+ *      from the web interface.
+ *
+ * Parameters:
+ *      None.
+ *
+ * Return:
+ *      bool - True if a new command is waiting to be processed.
+ *
+ * Expects:
+ *      Called by the main control loop to poll for new commands.
+ *
+ * Notes:
+ *      Flag is cleared when getCommand() is called.
+ *
+ ************************/
 bool WebPage::hasNewCommand() {
   return _newCommand;
 }
 
+/********** getCommand **********
+ *
+ * Description:
+ *      Returns the most recently received movement command and
+ *      clears the new command flag.
+ *
+ * Parameters:
+ *      None.
+ *
+ * Return:
+ *      MOVE_COMMAND representing the requested movement action.
+ *
+ * Expects:
+ *      Called only when hasNewCommand() returns true.
+ *
+ * Notes:
+ *      Allows the state machine to process commands exactly once.
+ *
+ ************************/
 MOVE_COMMAND WebPage::getCommand() {
   _newCommand = false;
   return _command;
 }
 
+/********** buildWebPage **********
+ *
+ * Description:
+ *      Dynamically builds the HTML page served to the client which
+ *      displays the robot position, busy status, and control buttons.
+ *
+ * Parameters:
+ *      curr_state - Current position or movement state of the robot.
+ *
+ * Return:
+ *      String containing the full HTML page to send to the client.
+ *
+ * Expects:
+ *      Valid state value provided by the system state machine.
+ *
+ * Notes:
+ *      Includes JavaScript for polling status and animating the robot.
+ *
+ ************************/
 String WebPage::buildWebPage(STATE_TYPE curr_state) {
 
   String stateString;

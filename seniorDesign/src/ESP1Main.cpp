@@ -1,229 +1,175 @@
-// /* esp1_main.cpp
-//  * Lift Motor: 1 EN, 1 DIR, 4 PUL
-//  * Drive Motor: 1 EN, 2 DIR, 2 PUL
-//  * 4 Pins for Limit Switches
-// */
+/********** esp1_main.cpp **********
+ * Created by Team Neon Carrot. Contact Carrot Griffin Faecher for Info
+ * Purpose: Motor control for the ESP32 responsible for drive and lift motors. 
+ * Processes UART commands from the parent controller and executes movements 
+ * using MotorGroup objects. Uses FastAccelStepper Library:
+ * https://github.com/gin66/FastAccelStepper/tree/master
+ * Uses 1 Enable, 1 Direction, and 4 Pulse pins for the lift motors
+ * Uses 1 Enable, 2 Direction, and 2 Pulse pins for the drive motors
+ * Uses 4 pins for Limit Switches
+ **********************************/
+#include "MotorGroup.h"
+#include "defines.h"
 
-// #include "MotorGroup.h"
-// #include "StateMachine.h"
-// #include "defines.h"
-
-// #define SPI_CHILD_INITIALIZE spi_slave_initialize
-// #define SPI_CHILD_TRANSMIT spi_slave_transmit
-// typedef spi_slave_transaction_t spi_child_transaction_t;
-// typedef spi_slave_interface_config_t spi_child_interface_config_t;
-
-// void initMotorGroup();
-// void initSPI();
-// MOVE_COMMAND recieveMessageFromParent();
+void initMotorGroup();
     
-// MotorGroup *drive_motors = nullptr;
-// MotorGroup *lift_motors = nullptr;
+MotorGroup *drive_motors = nullptr;
+MotorGroup *lift_motors = nullptr;
 
-// HardwareSerial Mother(2);
+HardwareSerial Mother(2);
 
-// void setup() {
-//     Serial.begin(115200);
-//     Mother.begin(115200, SERIAL_8N1, RXD2, TXD2);
-//     // webServer.begin();
-//     // WebPage webServer("ESP32-Access-Point", "123456789");
-//     MotorGroup::engineStartup();
-//     pinMode(LED_BUILTIN, OUTPUT);
-//     initMotorGroup();
-//     // initSPI();    
-// }
+/********** setup **********
+ *
+ * Description:
+ *      Initializes the ESP communication with the parent controller. Starts the 
+ *      motor control engine and configures all pins required to drive the lift 
+ *      and drive motors.
+ *
+ * Parameters:
+ *      Nothing.
+ *
+ * Return:
+ *      Nothing. Hardware interfaces and motor engine are initialized.
+ *
+ * Expects:
+ *      Executed once during system boot before loop begins execution.
+ *
+ * Notes:
+ *      Calls initMotorGroup() to create and configure MotorGroup
+ *      instances used to control all stepper motors on this board.
+ *
+ ************************/
+void setup() {
+    Serial.begin(115200);
+    Mother.begin(115200, SERIAL_8N1, RXD2, TXD2);
+    MotorGroup::engineStartup();
+    initMotorGroup();
+    pinMode(LED_BUILTIN, OUTPUT);
+}
 
-// /********** initSPI **********
-//  * 
-//  * Initializes the board flashed with this main as a child. Initializes the size
-//  * of the queue holding spi messages.
-//  *
-//  * Parameters:
-//  *      Nothing
-//  * 
-//  * Return:
-//  *     Nothing. Initializes the board to allow communication through SPI, with
-//  *     this board being the child board
-//  *
-//  * Expects:
-//  *      This board is being defined as the child board. There are at least 4
-//  *      pins available for this protocol to work. There is an available DMA
-//  *      channel for this protocol.
-//  *   
-//  ************************/
-// void initSPI() {
+/********** initMotorGroup **********
+ *
+ * Description:
+ *      Configures all GPIO pins used by the drive and lift motors and
+ *      constructs MotorGroup objects using the required MotorSettings
+ *      structures. Each MotorGroup manages multiple stepper motors.
+ *
+ * Parameters:
+ *      Nothing.
+ *
+ * Return:
+ *      Nothing. Global MotorGroup pointers are initialized and ready
+ *      to issue motion commands.
+ *
+ * Expects:
+ *      MotorGroup::engineStartup() must be called before this function
+ *      so the underlying FastAccelStepper engine is available.
+ *
+ * Notes:
+ *      Two groups are created: one for the drive motors and one for the
+ *      lift motors controlling the wheel elevation mechanism.
+ *
+ ************************/
+void initMotorGroup() {
 
-//     /* SPI Child Init - SPI bus configuration */
-//     spi_bus_config_t buscfg = {
-//         .mosi_io_num = VSPI_COPI,
-//         .miso_io_num = VSPI_CIPO,
-//         .sclk_io_num = SPI_CLK,
-//         .quadwp_io_num = -1,
-//         .quadhd_io_num = -1
-//     };
+    pinMode(DRIVE_ENABLE, OUTPUT);
+    pinMode(FRONT_DRIVE_DIRECTION, OUTPUT);
+    pinMode(FRONT_DRIVE_PULSE, OUTPUT);
+    pinMode(BACK_DRIVE_DIRECTION, OUTPUT);
+    pinMode(BACK_DRIVE_PULSE, OUTPUT);
+    pinMode(LIFT_ENABLE, OUTPUT);
+    pinMode(LIFT_DIRECTION, OUTPUT);
+    pinMode(LIFT1_PULSE, OUTPUT);
+    pinMode(LIFT2_PULSE, OUTPUT);
+    pinMode(LIFT3_PULSE, OUTPUT);
+    pinMode(LIFT4_PULSE, OUTPUT);
 
-//     /* SPI child interface configuration */
-//     spi_child_interface_config_t chldcfg = {
-//         .spics_io_num = VSPI_CS,
-//         .flags = 0,
-//         .queue_size = 1, // Only one transaction queued at a time
-//         .mode = 0,       // SPI mode 0 (CPOL=0, CPHA=0)
-//     };
-//     pinMode(VSPI_COPI, INPUT_PULLUP);
-//     pinMode(SPI_CLK, INPUT_PULLUP);
-//     pinMode(VSPI_CS, INPUT_PULLUP);
-//     pinMode(VSPI_CIPO, OUTPUT);
+    MotorSettings_t front_drive_settings = {FRONT_DRIVE_PULSE, FRONT_DRIVE_DIRECTION, DRIVE_ENABLE, DRIVE_MAX_SPEED, DRIVE_ACCEL};
+    MotorSettings_t back_drive_settings = {BACK_DRIVE_PULSE, BACK_DRIVE_DIRECTION, DRIVE_ENABLE, DRIVE_MAX_SPEED, DRIVE_ACCEL};
+    MotorSettings_t lift1_settings = {LIFT1_PULSE, LIFT_DIRECTION, LIFT_ENABLE, LIFT_MAX_SPEED, LIFT_ACCEL};
+    MotorSettings_t lift2_settings = {LIFT2_PULSE, 0, LIFT_ENABLE, LIFT_MAX_SPEED, LIFT_ACCEL};
+    MotorSettings_t lift3_settings = {LIFT3_PULSE, 0, LIFT_ENABLE, LIFT_MAX_SPEED, LIFT_ACCEL};
+    MotorSettings_t lift4_settings = {LIFT4_PULSE, 0, LIFT_ENABLE, LIFT_MAX_SPEED, LIFT_ACCEL};
 
-//     esp_err_t ret = SPI_CHILD_INITIALIZE(VSPI_HOST, &buscfg, &chldcfg, SPI_DMA_CH_AUTO);
-//     if (ret != ESP_OK) {
-//         while(1) {
-//             Serial.printf("SPI child init failed: %d\n", ret);
-//         }
-//     }
-// }
+    MotorSettings_t drive_settings[4] = {front_drive_settings, 
+                                         back_drive_settings
+                                        };
 
-// /********** initMotorGroup **********
-//  * 
-//  * Initializes the lift and drive motors on ESP1. Called in the setup function.
-//  * 
-//  * Inputs/Returns: 
-//  *      None. Initializes the frame.
-//  * 
-//  ************************/
-// void initMotorGroup() {
+    MotorSettings_t lift_settings[4] = {lift1_settings, 
+                                        lift2_settings,
+                                        lift3_settings, 
+                                        lift4_settings
+                                        };
 
-//     pinMode(DRIVE_ENABLE, OUTPUT);
-//     pinMode(FRONT_DRIVE_DIRECTION, OUTPUT);
-//     pinMode(FRONT_DRIVE_PULSE, OUTPUT);
-//     pinMode(BACK_DRIVE_DIRECTION, OUTPUT);
-//     pinMode(BACK_DRIVE_PULSE, OUTPUT);
-//     pinMode(LIFT_ENABLE, OUTPUT);
-//     pinMode(LIFT_DIRECTION, OUTPUT);
-//     pinMode(LIFT1_PULSE, OUTPUT);
-//     pinMode(LIFT2_PULSE, OUTPUT);
-//     pinMode(LIFT3_PULSE, OUTPUT);
-//     pinMode(LIFT4_PULSE, OUTPUT);
-
-//     MotorSettings_t front_drive_settings = {FRONT_DRIVE_PULSE, FRONT_DRIVE_DIRECTION, DRIVE_ENABLE, DRIVE_MAX_SPEED, DRIVE_ACCEL};
-//     MotorSettings_t back_drive_settings = {BACK_DRIVE_PULSE, BACK_DRIVE_DIRECTION, DRIVE_ENABLE, DRIVE_MAX_SPEED, DRIVE_ACCEL};
-//     MotorSettings_t lift1_settings = {LIFT1_PULSE, LIFT_DIRECTION, LIFT_ENABLE, LIFT_MAX_SPEED, LIFT_ACCEL};
-//     MotorSettings_t lift2_settings = {LIFT2_PULSE, 0, LIFT_ENABLE, LIFT_MAX_SPEED, LIFT_ACCEL};
-//     MotorSettings_t lift3_settings = {LIFT3_PULSE, 0, LIFT_ENABLE, LIFT_MAX_SPEED, LIFT_ACCEL};
-//     MotorSettings_t lift4_settings = {LIFT4_PULSE, 0, LIFT_ENABLE, LIFT_MAX_SPEED, LIFT_ACCEL};
-
-//     MotorSettings_t drive_settings[4] = {front_drive_settings, 
-//                                          back_drive_settings
-//                                         };
-
-//     MotorSettings_t lift_settings[4] = {lift1_settings, 
-//                                         lift2_settings,
-//                                         lift3_settings, 
-//                                         lift4_settings
-//                                         };
-
-//     drive_motors = new MotorGroup(drive_settings, 'd');
-//     if (drive_motors == nullptr) {
-//         Serial.println("FATAL ERROR: drive motors initialized incorrectly");
-//     }
-//     lift_motors = new MotorGroup(lift_settings, 'l');
-//     if (lift_motors == nullptr) {
-//         Serial.println("FATAL ERROR: lift motors initialized incorrectly");
-//     }
+    drive_motors = new MotorGroup(drive_settings, 'd');
+    if (drive_motors == nullptr) {
+        Serial.println("FATAL ERROR: drive motors initialized incorrectly");
+    }
+    lift_motors = new MotorGroup(lift_settings, 'l');
+    if (lift_motors == nullptr) {
+        Serial.println("FATAL ERROR: lift motors initialized incorrectly");
+    }
     
-// }
+}
 
-// /********** recieveMessageFromParent **********
-//  * Description: 
-//  *     Recieves an uint8_t message from the parent ESP32.
-//  * 
-//  * Inputs: 
-//  *     None.
-//  * 
-//  * Returns:
-//  *     uint8_t - message from parent.
-//  * 
-//  * Notes:
-//  *     - Since there is no heap and we don't know how long of a message will
-//  *       come across we first send across size (in bytes) then make a buffer 
-//  *       to recieve the whole message
-//  *     - Use memset tp set everything in child struct to 0
-//  *     - Uses spi_child_transmit() blocking call to wait for parent to send
-//  * 
-//  ************************/
-// MOVE_COMMAND recieveMessageFromParent() {
-//     spi_child_transaction_t t;
-//     memset(&t, 0, sizeof(t));
-    
-//     /* Receive 1-byte uint8_t */
-//     uint8_t rec_buf[128] = {0}; // Must be 128
-//     t.length = 8; // 8 bits = 1 byte for uint8_t
-//     t.rx_buffer = rec_buf; 
-//     t.tx_buffer = nullptr;
+/********** loop **********
+ *
+ * Description:
+ *      Main execution loop which monitors the UART connection to the
+ *      parent controller for motor commands. Commands are translated
+ *      into motor actions and completion is reported when movement
+ *      finishes.
+ *
+ * Parameters:
+ *      Nothing.
+ *
+ * Return:
+ *      Nothing. Runs continuously after setup completes.
+ *
+ * Expects:
+ *      MotorGroup objects must already be initialized and the UART
+ *      connection to the parent controller must be active.
+ *
+ * Notes:
+ *
+ ************************/
+void loop() {
 
-//     esp_err_t t_status = SPI_CHILD_TRANSMIT(VSPI_HOST, &t, portMAX_DELAY);
-//     if (t_status == ESP_OK) {
-//         Serial.print("Nothing wong\n");
-//     } else if (t_status == ESP_ERR_TIMEOUT) {
-//         Serial.print("Took too wong\n");
-//     } else if (t_status == ESP_ERR_INVALID_STATE) {
-//         Serial.print("Invalid state\n");
-//     } else if (t_status == ESP_ERR_INVALID_ARG) {
-//         Serial.print("Invalid argument\n");
-//     } else {
-//         Serial.print("Transaction failed\n");
-//     }
+    static bool waitingForMoveComplete = false;
 
-//     MOVE_COMMAND command = (MOVE_COMMAND)rec_buf[0];
-//     Serial.printf("Receiving message from parent, command: %u\n", (uint8_t)command);
-    
-//     return command;
-// }
+    if (Mother.available() > 0) {
+        MOTOR_COMMAND command = (MOTOR_COMMAND)Mother.read();
 
-// /********** loop **********
-//  * Description: 
-//  *      Testing.
-//  *
-//  * Inputs/Returns: 
-//  *      None.
-//  * 
-//  ************************/
+        // TODO: check for emergency stop here before anything else
 
-// bool waitingForMoveComplete = false;
-// void loop() {
+        if (!waitingForMoveComplete) {
+            waitingForMoveComplete = true;
 
-//     if (Mother.available() > 0) {
-//         MOTOR_COMMAND command = (MOTOR_COMMAND)Mother.read();
+            switch (command) {
+                case WHEELS_UP:              lift_motors->moveForwards(.4);                                 break;
+                case WHEELS_DOWN:            lift_motors->moveBackwards(.4);                                break;
+                case MOVE_FORWARDS_24_IN:    drive_motors->moveForwards(24, false);                         break;
+                case MOVE_BACKWARDS_24_IN:   drive_motors->moveBackwards(24, false);                        break;
+                case TURN_RIGHT_90_DEGREES:  drive_motors->moveForwards(WHEEL_CIRCUMFERENCE, true);         break;
+                case TURN_LEFT_90_DEGREES:   drive_motors->moveBackwards(WHEEL_CIRCUMFERENCE, true);        break;
+                case TURN_RIGHT_45_DEGREES:  drive_motors->moveForwards(WHEEL_CIRCUMFERENCE / 2, true);     break;
+                case TURN_LEFT_45_DEGREES:   drive_motors->moveBackwards(WHEEL_CIRCUMFERENCE / 2, true);    break;
+                case TURN_RIGHT_135_DEGREES: drive_motors->moveForwards(WHEEL_CIRCUMFERENCE * 1.5f, true);  break;
+                case TURN_LEFT_135_DEGREES:  drive_motors->moveBackwards(WHEEL_CIRCUMFERENCE * 1.5f, true); break;
+                /* ESP2 handle the rest of the commands, so if this ESP somehow received these messages, just immediately return */
+                case INITIATE_TURN_MOTORS:
+                case RETURN_TURN_MOTORS:     Mother.write(END_STAGE); waitingForMoveComplete = false;       break;
+                default:                     waitingForMoveComplete = false;                                break;
+            }
+        }
+        // TODO: Add logic here for when board is requested to move when already moving
+    }
 
-//         // TODO: check for emergency stop here before anything else
-
-//         if (!waitingForMoveComplete) {
-//             waitingForMoveComplete = true;
-
-//             switch (command) {
-//                 case WHEELS_UP:              lift_motors->moveForwards(.4);                                 break;
-//                 case WHEELS_DOWN:            lift_motors->moveBackwards(.4);                                break;
-//                 case MOVE_FORWARDS_24_IN:    drive_motors->moveForwards(24, false);                         break;
-//                 case MOVE_BACKWARDS_24_IN:   drive_motors->moveBackwards(24, false);                        break;
-//                 case TURN_RIGHT_90_DEGREES:  drive_motors->moveForwards(WHEEL_CIRCUMFERENCE, true);         break;
-//                 case TURN_LEFT_90_DEGREES:   drive_motors->moveBackwards(WHEEL_CIRCUMFERENCE, true);        break;
-//                 case TURN_RIGHT_45_DEGREES:  drive_motors->moveForwards(WHEEL_CIRCUMFERENCE / 2, true);     break;
-//                 case TURN_LEFT_45_DEGREES:   drive_motors->moveBackwards(WHEEL_CIRCUMFERENCE / 2, true);    break;
-//                 case TURN_RIGHT_135_DEGREES: drive_motors->moveForwards(WHEEL_CIRCUMFERENCE * 1.5f, true);  break;
-//                 case TURN_LEFT_135_DEGREES:  drive_motors->moveBackwards(WHEEL_CIRCUMFERENCE * 1.5f, true); break;
-//                 /* ESP2 handle the rest of the commands, so if this ESP somehow received these messages, just immediately return */
-//                 case INITIATE_TURN_MOTORS:
-//                 case RETURN_TURN_MOTORS:     Mother.write(END_STAGE); waitingForMoveComplete = false;       break;
-//                 default:                     waitingForMoveComplete = false;                                break;
-//             }
-//         }
-//         // TODO: Add logic here for when board is requested to move when already moving
-//     }
-
-//     // Separately, check if the current move just finished
-//     if (waitingForMoveComplete) {
-//         if (lift_motors->isDoneMoving() && drive_motors->isDoneMoving()) {
-//             waitingForMoveComplete = false;
-//             Mother.write(END_STAGE);
-//         }
-//     }
-// }
+    // Separately, check if the current move just finished
+    if (waitingForMoveComplete) {
+        if (lift_motors->isDoneMoving() && drive_motors->isDoneMoving()) {
+            waitingForMoveComplete = false;
+            Mother.write(END_STAGE);
+        }
+    }
+}

@@ -1,3 +1,17 @@
+/********** WebPage.h **********
+ * 
+ * Created by Team Neon Carrot. Contact Carrot Griffin Faecher for Info
+ * Defines the WebPage class which hosts a simple HTTP interface on the ESP32
+ * using WiFi Access Point mode. Allows a user to connect to the ESP32 and send
+ * MOVE_COMMAND instructions through a browser.
+ *
+ * The class manages WiFi initialization, HTTP client handling, webpage
+ * generation, and parsing incoming GET requests to determine which command
+ * the user issued. Commands are stored internally until retrieved by the
+ * main program.
+ *
+ ****************************************/
+
 #ifndef WEBPAGE_H
 #define WEBPAGE_H
 

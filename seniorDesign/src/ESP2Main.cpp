@@ -1,202 +1,149 @@
-// /* esp1_main.cpp
-//  * Turn Motor: 1 EN, 4 DIR, 4 PUL
-//  * 4 Pins for Limit Switches
-// */
+/********** esp2_main.cpp **********
+ * Created by Team Neon Carrot. Contact Carrot Griffin Faecher for Info
+ * Purpose: Motor control firmware for the ESP2 controller responsible
+ * for the four turn motors. Receives commands from the parent board
+ * and executes rotation movements through a MotorGroup interface.
+ * Uses FastAccelStepper Library:
+ * https://github.com/gin66/FastAccelStepper/tree/master
+ * Uses 1 Enable, 4 Direction, and 4 Pulse pins for the turn motors
+ * Uses 4 pins for Limit Switches
+ **********************************/
+#include "MotorGroup.h"
+#include "defines.h"
 
-// #include "MotorGroup.h"
-// #include "StateMachine.h"
-// #include "WebPage.h"
-// #include "defines.h"
+void initMotorGroup();
 
-// #define SPI_CHILD_INITIALIZE spi_slave_initialize
-// #define SPI_CHILD_TRANSMIT spi_slave_transmit
-// typedef spi_slave_transaction_t spi_child_transaction_t;
-// typedef spi_slave_interface_config_t spi_child_interface_config_t;
+MotorGroup *turn_motors = nullptr;
 
-// void initMotorGroup();
-// void initSPI();
-// MOVE_COMMAND recieveMessageFromParent();
+HardwareSerial Mother(2);
 
-// MotorGroup *turn_motors = nullptr;
-// HardwareSerial Mother(2);
+/********** setup **********
+ *
+ * Description:
+ *      Initializes the serial communication with the parent controller, 
+ *      initializes the motor control engine, and configures all turn motors.
+ *
+ * Parameters:
+ *      Nothing.
+ *
+ * Return:
+ *      Nothing. UART and motor control system are initialized and ready to 
+ *      receive commands.
+ *
+ * Expects:
+ *      Executed once during system boot before loop begins running.
+ *
+ * Notes:
+ *      Calls initMotorGroup() to create the MotorGroup controlling
+ *      the four turn motors on this board.
+ *
+ ************************/
+void setup() {
+    Serial.begin(115200);
+    Mother.begin(115200, SERIAL_8N1, RXD2, TXD2);
+    MotorGroup::engineStartup();
+    initMotorGroup();
+    pinMode(LED_BUILTIN, OUTPUT); 
+}
 
-// void setup() {
-//     Serial.begin(115200);
-//     Mother.begin(115200, SERIAL_8N1, RXD2, TXD2);
-//     MotorGroup::engineStartup();
-//     pinMode(LED_BUILTIN, OUTPUT);
-//     initMotorGroup();
-//     // initSPI();    
-// }
+/********** initMotorGroup **********
+ *
+ * Description:
+ *      Initializes all GPIO pins associated with the four turn motors
+ *      and constructs a MotorGroup object to manage their operation.
+ *
+ * Parameters:
+ *      Nothing.
+ *
+ * Return:
+ *      Nothing. The global MotorGroup pointer is initialized and ready
+ *      to execute turn motor commands.
+ *
+ * Expects:
+ *      MotorGroup::engineStartup() must have already been called so
+ *      the FastAccelStepper engine is available for motor creation.
+ *
+ * Notes:
+ *      Each motor has its own pulse and direction pins but shares
+ *      a common enable line.
+ *
+ ************************/
+void initMotorGroup() {
 
-// /********** initSPI **********
-//  * 
-//  * Initializes the board flashed with this main as a child. Initializes the size
-//  * of the queue holding spi messages.
-//  *
-//  * Parameters:
-//  *      Nothing
-//  * 
-//  * Return:
-//  *     Nothing. Initializes the board to allow communication through SPI, with
-//  *     this board being the child board
-//  *
-//  * Expects:
-//  *      This board is being defined as the child board. There are at least 4
-//  *      pins available for this protocol to work. There is an available DMA
-//  *      channel for this protocol.
-//  *   
-//  ************************/
-// void initSPI() {
+    pinMode(TURN_ENABLE, OUTPUT);
 
-//     /* SPI Child Init - SPI bus configuration */
-//     spi_bus_config_t buscfg = {
-//         .mosi_io_num = VSPI_COPI,
-//         .miso_io_num = VSPI_CIPO,
-//         .sclk_io_num = SPI_CLK,
-//         .quadwp_io_num = -1,
-//         .quadhd_io_num = -1
-//     };
+    pinMode(TURN1_DIRECTION, OUTPUT);
+    pinMode(TURN1_PULSE, OUTPUT);
 
-//     /* SPI child interface configuration */
-//     spi_child_interface_config_t chldcfg = {
-//         .spics_io_num = VSPI_CS,
-//         .flags = 0,
-//         .queue_size = 1, // Only one transaction queued at a time
-//         .mode = 0,       // SPI mode 0 (CPOL=0, CPHA=0)
-//     };
-//     pinMode(VSPI_COPI, INPUT_PULLUP);
-//     pinMode(SPI_CLK, INPUT_PULLUP);
-//     pinMode(VSPI_CS, INPUT_PULLUP);
-//     pinMode(VSPI_CIPO, OUTPUT);
+    pinMode(TURN2_DIRECTION, OUTPUT);
+    pinMode(TURN2_PULSE, OUTPUT);
 
-//     esp_err_t ret = SPI_CHILD_INITIALIZE(VSPI_HOST, &buscfg, &chldcfg, SPI_DMA_CH_AUTO);
-//     if (ret != ESP_OK) {
-//         while(1) {
-//             Serial.printf("SPI child init failed: %d\n", ret);
-//         }
-//     }
-// }
+    pinMode(TURN3_DIRECTION, OUTPUT);
+    pinMode(TURN3_PULSE, OUTPUT);
 
-// /********** initMotorGroup **********
-//  * 
-//  * Initializes all of the motors on the frame. Call in the setup function.
-//  * 
-//  * Inputs/Returns: 
-//  *      None. Initializes the frame
-//  * 
-//  ************************/
-// void initMotorGroup() {
+    pinMode(TURN4_DIRECTION, OUTPUT);
+    pinMode(TURN4_PULSE, OUTPUT);
 
+    MotorSettings_t turn1_settings = {TURN1_PULSE, TURN1_DIRECTION, TURN_ENABLE, TURN_1_3_MAX_SPEED, TURN_1_3_ACCEL};
+    MotorSettings_t turn2_settings = {TURN2_PULSE, TURN2_DIRECTION, TURN_ENABLE, TURN_2_4_MAX_SPEED, TURN_2_4_ACCEL};
+    MotorSettings_t turn3_settings = {TURN3_PULSE, TURN3_DIRECTION, TURN_ENABLE, TURN_1_3_MAX_SPEED, TURN_1_3_ACCEL};
+    MotorSettings_t turn4_settings = {TURN4_PULSE, TURN4_DIRECTION, TURN_ENABLE, TURN_2_4_MAX_SPEED, TURN_2_4_ACCEL};
 
-//     pinMode(TURN_ENABLE, OUTPUT);
+    MotorSettings_t turn_settings[4] = {turn1_settings, turn2_settings, turn3_settings, turn4_settings};
 
-//     pinMode(TURN1_DIRECTION, OUTPUT);
-//     pinMode(TURN1_PULSE, OUTPUT);
+    turn_motors = new MotorGroup(turn_settings, 't');
 
-//     pinMode(TURN2_DIRECTION, OUTPUT);
-//     pinMode(TURN2_PULSE, OUTPUT);
+    if (turn_motors == nullptr) {
+        Serial.println("FATAL ERROR: turn motors initialized incorrectly");
+    }
 
-//     pinMode(TURN3_DIRECTION, OUTPUT);
-//     pinMode(TURN3_PULSE, OUTPUT);
+}
 
-//     pinMode(TURN4_DIRECTION, OUTPUT);
-//     pinMode(TURN4_PULSE, OUTPUT);
+/********** loop **********
+ *
+ * Description:
+ *      Continuously monitors the UART connection to the parent board
+ *      for motor commands. When a valid command is received the turn
+ *      motors execute the requested motion and report completion.
+ *
+ * Parameters:
+ *      Nothing.
+ *
+ * Return:
+ *      Nothing. Runs continuously after setup completes.
+ *
+ * Expects:
+ *      MotorGroup must already be initialized and the parent UART
+ *      connection must be active.
+ *
+ * Notes:
+ *
+ ************************/
+void loop() {
 
-//     MotorSettings_t turn1_settings = {TURN1_PULSE, TURN1_DIRECTION, TURN_ENABLE, TURN_1_3_MAX_SPEED, TURN_1_3_ACCEL};
-//     MotorSettings_t turn2_settings = {TURN2_PULSE, TURN2_DIRECTION, TURN_ENABLE, TURN_2_4_MAX_SPEED, TURN_2_4_ACCEL};
-//     MotorSettings_t turn3_settings = {TURN3_PULSE, TURN3_DIRECTION, TURN_ENABLE, TURN_1_3_MAX_SPEED, TURN_1_3_ACCEL};
-//     MotorSettings_t turn4_settings = {TURN4_PULSE, TURN4_DIRECTION, TURN_ENABLE, TURN_2_4_MAX_SPEED, TURN_2_4_ACCEL};
+    static bool waitingForMoveComplete = false;
 
-//     MotorSettings_t turn_settings[4] = {turn1_settings, turn2_settings, turn3_settings, turn4_settings};
+    if (Mother.available() > 0) {
+        MOTOR_COMMAND command = (MOTOR_COMMAND)Mother.read();
 
-//     turn_motors = new MotorGroup(turn_settings, 't');
+        // TODO: check for emergency stop here before anything else
 
-//     if (turn_motors == nullptr) {
-//         Serial.println("FATAL ERROR: turn motors initialized incorrectly");
-//     }
+        if (!waitingForMoveComplete) {
+            waitingForMoveComplete = true;
 
-// }
-
-// /********** recieveMessageFromParent **********
-//  * Description: 
-//  *     Recieves an uint8_t message from the parent ESP32.
-//  * 
-//  * Inputs: 
-//  *     None.
-//  * 
-//  * Returns:
-//  *     uint8_t - message from parent.
-//  * 
-//  * Notes:
-//  *     - Since there is no heap and we don't know how long of a message will
-//  *       come across we first send across size (in bytes) then make a buffer 
-//  *       to recieve the whole message
-//  *     - Use memset tp set everything in child struct to 0
-//  *     - Uses spi_child_transmit() blocking call to wait for parent to send
-//  * 
-//  ************************/
-// MOVE_COMMAND recieveMessageFromParent() {
-//     spi_child_transaction_t t;
-//     memset(&t, 0, sizeof(t));
-    
-//     /* Receive 1-byte uint8_t */
-//     uint8_t rec_buf[128] = {0}; // Must be 128
-//     t.length = 8; // 8 bits = 1 byte for uint8_t
-//     t.rx_buffer = rec_buf; 
-//     t.tx_buffer = nullptr;
-
-//     esp_err_t t_status = SPI_CHILD_TRANSMIT(VSPI_HOST, &t, portMAX_DELAY);
-//     if (t_status == ESP_OK) {
-//         Serial.print("Nothing wong\n");
-//     } else if (t_status == ESP_ERR_TIMEOUT) {
-//         Serial.print("Took too wong\n");
-//     } else if (t_status == ESP_ERR_INVALID_STATE) {
-//         Serial.print("Invalid state\n");
-//     } else if (t_status == ESP_ERR_INVALID_ARG) {
-//         Serial.print("Invalid argument\n");
-//     } else {
-//         Serial.print("Transaction failed\n");
-//     }
-
-//     MOVE_COMMAND command = (MOVE_COMMAND)rec_buf[0];
-//     Serial.printf("Receiving message from parent, command: %u\n", (uint8_t)command);
-    
-//     return command;
-// }
-
-// /********** loop **********
-//  * Description: 
-//  *      Testing.
-//  *
-//  * Inputs/Returns: 
-//  *      None.
-//  * 
-//  ************************/
-// bool waitingForMoveComplete = false;
-// void loop() {
-
-//     if (Mother.available() > 0) {
-//         MOTOR_COMMAND command = (MOTOR_COMMAND)Mother.read();
-
-//         // TODO: check for emergency stop here before anything else
-
-//         if (!waitingForMoveComplete) {
-//             waitingForMoveComplete = true;
-
-//             switch (command) {
-//                 case INITIATE_TURN_MOTORS: turn_motors->moveForwards();  break;
-//                 case RETURN_TURN_MOTORS:   turn_motors->moveBackwards(); break;
-//                 default:                   waitingForMoveComplete = false; break;
-//             }
-//         }
-//         // TODO: Add logic here for when board is requested to move when already moving
-//     }
-//     // Separately, check if the current move just finished
-//     if (waitingForMoveComplete) {
-//         if (turn_motors->isDoneMoving()) {
-//             waitingForMoveComplete = false;
-//             Mother.write(END_STAGE);
-//         }
-//     }
-// }
+            switch (command) {
+                case INITIATE_TURN_MOTORS: turn_motors->moveForwards();  break;
+                case RETURN_TURN_MOTORS:   turn_motors->moveBackwards(); break;
+                default:                   waitingForMoveComplete = false; break;
+            }
+        }
+        // TODO: Add logic here for when board is requested to move when already moving
+    }
+    // Separately, check if the current move just finished
+    if (waitingForMoveComplete) {
+        if (turn_motors->isDoneMoving()) {
+            waitingForMoveComplete = false;
+            Mother.write(END_STAGE);
+        }
+    }
+}

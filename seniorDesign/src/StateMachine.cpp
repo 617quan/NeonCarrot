@@ -1,16 +1,16 @@
 /********** state_machine.cpp **********
  * 
- * Program movement of the BEAST.
- * 
- */
+ * Created by Team Neon Carrot. Contact Carrot Griffin Faecher for Info.
+ * Implements the robot state machine controlling BEAST movement between
+ * positions and coordinating commands sent to the motor controller ESPs.
+ *
+ **************************************/
 
 #include "StateMachine.h"
 #include "Arduino.h"
 
 extern HardwareSerial ESP1;
 extern HardwareSerial ESP2;
-
-
 
 const MOTOR_COMMAND StateMachine::movement_memory[16][12] = {
     /* P1 to P1 */ {FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT, FINISH_MOVEMENT},
@@ -32,9 +32,23 @@ const MOTOR_COMMAND StateMachine::movement_memory[16][12] = {
 };
 
 /********** StateMachine **********
- * 
- * Initializes the state machine to the stop state.
- * 
+ *
+ * Description:
+ *      Constructor that initializes the state machine variables and
+ *      sets the starting robot position.
+ *
+ * Parameters:
+ *      None.
+ *
+ * Return:
+ *      None.
+ *
+ * Expects:
+ *      Called once during system initialization.
+ *
+ * Notes:
+ *      Robot begins in Position 1 with no pending movement commands.
+ *
  ************************/
 StateMachine::StateMachine() {
     movement_index = 0;
@@ -42,37 +56,52 @@ StateMachine::StateMachine() {
     curr_state = P1;
 }
 
+/********** isMoving **********
+ *
+ * Description:
+ *      Indicates whether the robot is currently executing a movement
+ *      sequence.
+ *
+ * Parameters:
+ *      None.
+ *
+ * Return:
+ *      bool - True if the robot is currently moving.
+ *
+ * Expects:
+ *      State machine has been initialized.
+ *
+ * Notes:
+ *
+ ************************/
 bool StateMachine::isMoving() {
     return curr_state == MOVING;
 }
 
-/********** parseCommands **********
- * 
- * Handles commands from parent and calls appropriate wheel functions. 
- * 
- * Inputs:
- *    MOVE_COMMAND command - command from parent
- * 
- * Returns:
- *    None.
- * 
+/********** parseWebServerInput **********
+ *
+ * Description:
+ *      Processes a movement command received from the web interface
+ *      and sends a message to the correct ESP to begin movement
+ *
+ * Parameters:
+ *      MOVE_COMMAND command - requested destination or action.
+ *
+ * Return:
+ *      bool - True if the command was accepted and executed.
+ *
  * Expects:
- *   - Commands apply to both wheel 3 and wheel 4
- * 
+ *      Robot must not currently be in the MOVING state.
+ *
  * Notes:
- *  - Commands defined in state_machine.h
- *  - If the emergency stop command is sent at any time then the emergencyStop() 
- *    function is called immediately
- * - While motors are moving, sMoving() returns true, so new commands aren't 
- *   issued
- * - When motors reach target position, isMoving() returns false, so the next 
- *   command can be issued
- * 
+ *      Uses the movement_memory lookup table to determine the sequence
+ *      of motor commands needed to reach the destination.
+ *
  ************************/
 bool StateMachine::parseWebServerInput(MOVE_COMMAND command) {
 
     if (curr_state != MOVING) {
-        movement_commands = (curr_state * 4) + command;
+        movement_commands = (curr_state * 4) + command; // Finds correct series of movements
         curr_state = MOVING;
         if (movement_memory[movement_commands][movement_index] != FINISH_MOVEMENT) {
             if (movement_memory[movement_commands][movement_index] % 2 == 1) {
@@ -92,20 +121,28 @@ bool StateMachine::parseWebServerInput(MOVE_COMMAND command) {
     }
     
     return true;
-
-        /* CODE TO TEST SIMPLE MOVEMENT WITH WEB SERVER */
-
-        // if (command == MOVE_TO_P1 && curr_state == P1) {
-        //     ESP1.write(WHEELS_UP);
-        // } else if (command == MOVE_TO_P2 && curr_state == P1) {
-        //     ESP1.write(TURN_LEFT_90_DEGREES);
-        // } else if (command == MOVE_TO_P3 && curr_state == P1) {
-        //     ESP2.write(INITIATE_TURN_MOTORS);
-        // } else if (command == MOVE_TO_P4 && curr_state == P1) {
-        //     ESP2.write(RETURN_TURN_MOTORS);
-        // } 
 }
 
+/********** parseUARTInput **********
+ *
+ * Description:
+ *      Handles messages received from motor controller ESP boards
+ *      indicating completion of a motion stage.
+ *
+ * Parameters:
+ *      MOTOR_COMMAND command - message sent from child ESP board.
+ *
+ * Return:
+ *      bool - True if the message was processed successfully.
+ *
+ * Expects:
+ *      Only END_STAGE messages should be received from children.
+ *
+ * Notes:
+ *      When a stage finishes, the next command in the movement sequence
+ *      is issued until FINISH_MOVEMENT is reached.
+ *
+ ************************/
 bool StateMachine::parseUARTInput(MOTOR_COMMAND command) {
 
     if (command == END_STAGE) {
@@ -127,18 +164,26 @@ bool StateMachine::parseUARTInput(MOTOR_COMMAND command) {
         possible. Throw an error (return false) when this happens */
         return false;
     }
-
     return true;
 }
 
 /********** getCurrState **********
- * 
- * 
- * 
- * Inputs: None.
- * 
- * Returns: None.
- * 
+ *
+ * Description:
+ *      Returns the robot's current position or movement state.
+ *
+ * Parameters:
+ *      None.
+ *
+ * Return:
+ *      STATE_TYPE representing the robot's current state.
+ *
+ * Expects:
+ *      State machine has been initialized.
+ *
+ * Notes:
+ *      Used by the web interface and control logic to display status.
+ *
  ************************/
 STATE_TYPE StateMachine::getCurrState() {
     return curr_state;
