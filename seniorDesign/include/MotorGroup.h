@@ -57,6 +57,8 @@ public:
     void stopMoving();
     bool isMoving();
 
+    bool isDoneMoving();
+
     void printPosition(int positionNum); //FUNCTION IS TEMPORARY, USED TO TEST INTERFACING WEBSERVER INTO MotorGroup CLASS - QUAN
 
 private:
@@ -87,6 +89,8 @@ private:
     char group_type; /* VERY IMPORTANT. 't' FOR TURN, 'd' FOR DRIVE, 'l' FOR LIFT */
 
     int position = 0; // used to track position based on webserver input
+
+    unsigned long _moveDeadlineMs = 0;
     
     /* Target positions for movement tracking */
     // int32_t drive_target_pos = 0;

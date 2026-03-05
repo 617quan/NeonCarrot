@@ -126,24 +126,35 @@ FastAccelStepper* MotorGroup::initMotor(MotorSettings_t motor_settings) {
     return motor;
 }
 
+bool MotorGroup::isDoneMoving() {
+    if (_moveDeadlineMs == 0) return true;
+    if (millis() >= _moveDeadlineMs) {
+        _moveDeadlineMs = 0;
+        return true;
+    }
+    return false;
+}
+
 void MotorGroup::moveForwards() {
     if (group_type == 't') {
+        uint32_t move_time = computeMoveTimeMs(TURN_1_3_NUM_STEPS, TURN_1_3_MAX_SPEED, TURN_1_3_ACCEL) + 100;
         wheel1_motor->move(-TURN_1_3_NUM_STEPS, false);
         wheel2_motor->move(-TURN_2_4_NUM_STEPS, false);
         wheel3_motor->move(-TURN_1_3_NUM_STEPS, false);
         wheel4_motor->move(-TURN_2_4_NUM_STEPS, false);
-        delay(computeMoveTimeMs(TURN_1_3_NUM_STEPS, TURN_1_3_MAX_SPEED, TURN_1_3_ACCEL) + 100);
+        _moveDeadlineMs = millis() + move_time;
     }
 }
 
 void MotorGroup::moveForwards(float distance) {
     if (group_type == 'l') {
         int32_t steps_needed = (int)(distance * 100) * STEPS_PER_LIFT_HUNDREDTH_INCH;
+        uint32_t move_time = computeMoveTimeMs(steps_needed, LIFT_MAX_SPEED, LIFT_ACCEL) + 100;
         wheel1_motor->move(-steps_needed, false);
         wheel2_motor->move(steps_needed, false);
         wheel3_motor->move(steps_needed, false);
         wheel4_motor->move(steps_needed, false);
-        delay(computeMoveTimeMs(steps_needed, LIFT_MAX_SPEED, LIFT_ACCEL) + 100);
+        _moveDeadlineMs = millis() + move_time;
     }
 }
 
@@ -167,36 +178,38 @@ void MotorGroup::moveForwards(float distance) {
 void MotorGroup::moveForwards(float distance, bool is_turning) {
     if (group_type == 'd') {
         int32_t steps_needed = convertInchesToSteps(distance);
+        uint32_t move_time = computeMoveTimeMs(steps_needed, DRIVE_MAX_SPEED, DRIVE_ACCEL) + 100;
         if (is_turning) {
             wheel1_motor->move(steps_needed, false);
             wheel2_motor->move(-steps_needed, false);
-            delay(computeMoveTimeMs(steps_needed, DRIVE_MAX_SPEED, DRIVE_ACCEL) + 100);
         } else {
             wheel1_motor->move(steps_needed, false);
             wheel2_motor->move(steps_needed, false); 
-            delay(computeMoveTimeMs(steps_needed, DRIVE_MAX_SPEED, DRIVE_ACCEL) + 100);
         }
+        _moveDeadlineMs = millis() + move_time;
     }
 }
 
 void MotorGroup::moveBackwards() {
     if (group_type == 't') {
+        uint32_t move_time = computeMoveTimeMs(TURN_1_3_NUM_STEPS, TURN_1_3_MAX_SPEED, TURN_1_3_ACCEL) + 100;
         wheel1_motor->move(TURN_1_3_NUM_STEPS, false);
         wheel2_motor->move(TURN_2_4_NUM_STEPS, false);
         wheel3_motor->move(TURN_1_3_NUM_STEPS, false);
         wheel4_motor->move(TURN_2_4_NUM_STEPS, false);
-        delay(computeMoveTimeMs(TURN_1_3_NUM_STEPS, TURN_1_3_MAX_SPEED, TURN_1_3_ACCEL) + 100);
+        _moveDeadlineMs = millis() + move_time;
     }
 }
 
 void MotorGroup::moveBackwards(float distance) {
     if (group_type == 'l') {
         int32_t steps_needed = (int)(distance * 100) * STEPS_PER_LIFT_HUNDREDTH_INCH;
+        uint32_t move_time = computeMoveTimeMs(steps_needed, LIFT_MAX_SPEED, LIFT_ACCEL) + 100;
         wheel1_motor->move(steps_needed, false);
         wheel2_motor->move(steps_needed, false);
         wheel3_motor->move(steps_needed, false);
         wheel4_motor->move(steps_needed, false);
-        delay(computeMoveTimeMs(steps_needed, LIFT_MAX_SPEED, LIFT_ACCEL) + 100);
+        _moveDeadlineMs = millis() + move_time;
     }
 }
 
@@ -224,15 +237,15 @@ void MotorGroup::moveBackwards(float distance) {
 void MotorGroup::moveBackwards(float distance, bool is_turning) {
     if (group_type == 'd') {
         int32_t steps_needed = convertInchesToSteps(distance);
+        uint32_t move_time = computeMoveTimeMs(steps_needed, LIFT_MAX_SPEED, LIFT_ACCEL) + 100;
         if (is_turning) {
             wheel1_motor->move(-steps_needed, false);
             wheel2_motor->move(steps_needed, false); 
-            delay(computeMoveTimeMs(steps_needed, DRIVE_MAX_SPEED, DRIVE_ACCEL) + 100);
         } else {
             wheel1_motor->move(-steps_needed, false);
             wheel2_motor->move(-steps_needed, false); 
-            delay(computeMoveTimeMs(steps_needed, DRIVE_MAX_SPEED, DRIVE_ACCEL) + 100);
         }
+        _moveDeadlineMs = millis() + move_time;
     }
 }
 

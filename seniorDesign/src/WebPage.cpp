@@ -113,6 +113,9 @@ void WebPage::handleRequest(String request) {
 
   else if (request.indexOf("GET /Position4") >= 0)
     newCommand = MOVE_TO_P4;
+  
+  else if (request.indexOf("GET /Initialize") >= 0)
+    newCommand = INITIALIZE;
 
   // Only trigger if the command actually changed
   if (newCommand != _command) {
@@ -232,8 +235,8 @@ h1 {
   <button class="button" id="Position2">Position 2</button>
   <button class="button" id="Position3">Position 3</button>
   <button class="button" id="Position4">Position 4</button>
-  <button class="button" id="Reset">Reset</button>
-  <button class="button" id="Redo">Redo</button>
+  <button class="button" id="Initialize">Initialize</button>
+  <button class="button" id="Future">Bomboclat</button>
 </div>
 
 <script>
@@ -287,14 +290,14 @@ window.addEventListener('load',()=>{
 buttons.forEach(button=>{
   button.addEventListener('click',()=>{
     let pos=button.id;
-    if(pos==='Redo'){
-      fetch(`/Redo`);
+    if(pos==='Bomboclat'){
+      // TODO: implement future button behavior
       return;
     }
-    if(pos==='Reset')pos='Position1';
-    currentPos=pos;
-    setRobotPosition(pos);
-    fetch(`/${pos}`);
+    if(pos==='Initialize'){
+      fetch(`/Initialize`);
+      return;
+    }
   });
 });
 

@@ -1,8 +1,9 @@
-/* esp1_main.cpp
- * Lift Motor: 1 EN, 1 DIR, 4 PUL
- * Drive Motor: 1 EN, 2 DIR, 2 PUL
- * 4 Pins for Limit Switches
-*/
+/********** esp1_main.cpp **********
+ * Purpose: Main control program for the ESP32 coordinating the system
+ * state machine, web interface, and UART communication with motor
+ * controllers. Created by Team Neon Carrot. Initializes serial links
+ * and services commands from the web server and connected ESP boards.
+ **********************************/
 
 #include "StateMachine.h"
 #include "WebPage.h"

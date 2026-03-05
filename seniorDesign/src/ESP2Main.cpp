@@ -173,27 +173,30 @@
 //  *      None.
 //  * 
 //  ************************/
+// bool waitingForMoveComplete = false;
 // void loop() {
 
 //     if (Mother.available() > 0) {
 //         MOTOR_COMMAND command = (MOTOR_COMMAND)Mother.read();
-//         switch(command) {
-//             case (INITIATE_TURN_MOTORS): turn_motors->moveForwards(); Mother.write(END_STAGE); break;
-//             case (RETURN_TURN_MOTORS): turn_motors->moveBackwards(); Mother.write(END_STAGE); break;
+
+//         // TODO: check for emergency stop here before anything else
+
+//         if (!waitingForMoveComplete) {
+//             waitingForMoveComplete = true;
+
+//             switch (command) {
+//                 case INITIATE_TURN_MOTORS: turn_motors->moveForwards();  break;
+//                 case RETURN_TURN_MOTORS:   turn_motors->moveBackwards(); break;
+//                 default:                   waitingForMoveComplete = false; break;
+//             }
+//         }
+//         // TODO: Add logic here for when board is requested to move when already moving
+//     }
+//     // Separately, check if the current move just finished
+//     if (waitingForMoveComplete) {
+//         if (turn_motors->isDoneMoving()) {
+//             waitingForMoveComplete = false;
+//             Mother.write(END_STAGE);
 //         }
 //     }
-    
-//     // if (Serial2.available() > 0) {
-//     //     char incomingByte = Serial2.read();
-//     //     if (incomingByte == '1') {
-//     //         Serial2.write('A');
-//     //     } else if (incomingByte == '2') {
-//     //         turn_motors->moveForwards(1000000, false);
-//     //         Serial2.write('B');
-//     //     } else if (incomingByte =='3') {
-//     //         turn_motors->moveBackwards(1, false);
-//     //         Serial2.write('C');
-//     //     }
-//     // }
-
 // }

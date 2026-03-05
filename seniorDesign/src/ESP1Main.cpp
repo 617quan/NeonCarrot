@@ -187,74 +187,43 @@
 //  *      None.
 //  * 
 //  ************************/
-// void loop() {  
 
-//     // lift_motors->moveBackwards(.5);
+// bool waitingForMoveComplete = false;
+// void loop() {
 
 //     if (Mother.available() > 0) {
 //         MOTOR_COMMAND command = (MOTOR_COMMAND)Mother.read();
-//         switch(command) {
-//             case (WHEELS_UP): lift_motors->moveForwards(.4); 
-//             Mother.write(END_STAGE); 
-//             break;
-//             case (WHEELS_DOWN): lift_motors->moveBackwards(.4); 
-//             Mother.write(END_STAGE); 
-//             break;
-//             case (MOVE_FORWARDS_24_IN): drive_motors->moveForwards(24, false); 
-//             Mother.write(END_STAGE); 
-//             break;
-//             case (MOVE_BACKWARDS_24_IN): drive_motors->moveBackwards(24, false); 
-//             Mother.write(END_STAGE); 
-//             break;
-//             case (TURN_RIGHT_90_DEGREES): drive_motors->moveForwards(WHEEL_CIRCUMFERENCE, true); 
-//             Mother.write(END_STAGE); 
-//             break;
-//             case (TURN_LEFT_90_DEGREES): drive_motors->moveBackwards(WHEEL_CIRCUMFERENCE, true); 
-//             Mother.write(END_STAGE); 
-//             break;
-//             case (TURN_RIGHT_45_DEGREES): drive_motors->moveForwards(WHEEL_CIRCUMFERENCE / 2, true); 
-//             Mother.write(END_STAGE); 
-//             break;
-//             case (TURN_LEFT_45_DEGREES): drive_motors->moveBackwards(WHEEL_CIRCUMFERENCE / 2, true); 
-//             Mother.write(END_STAGE); 
-//             break;
-//             case (TURN_RIGHT_135_DEGREES): drive_motors->moveForwards(float(WHEEL_CIRCUMFERENCE * 1.5), true); 
-//             Mother.write(END_STAGE); 
-//             break;
-//             case (TURN_LEFT_135_DEGREES): drive_motors->moveBackwards(float(WHEEL_CIRCUMFERENCE * 1.5), true); 
-//             Mother.write(END_STAGE); 
-//             break;
+
+//         // TODO: check for emergency stop here before anything else
+
+//         if (!waitingForMoveComplete) {
+//             waitingForMoveComplete = true;
+
+//             switch (command) {
+//                 case WHEELS_UP:              lift_motors->moveForwards(.4);                                 break;
+//                 case WHEELS_DOWN:            lift_motors->moveBackwards(.4);                                break;
+//                 case MOVE_FORWARDS_24_IN:    drive_motors->moveForwards(24, false);                         break;
+//                 case MOVE_BACKWARDS_24_IN:   drive_motors->moveBackwards(24, false);                        break;
+//                 case TURN_RIGHT_90_DEGREES:  drive_motors->moveForwards(WHEEL_CIRCUMFERENCE, true);         break;
+//                 case TURN_LEFT_90_DEGREES:   drive_motors->moveBackwards(WHEEL_CIRCUMFERENCE, true);        break;
+//                 case TURN_RIGHT_45_DEGREES:  drive_motors->moveForwards(WHEEL_CIRCUMFERENCE / 2, true);     break;
+//                 case TURN_LEFT_45_DEGREES:   drive_motors->moveBackwards(WHEEL_CIRCUMFERENCE / 2, true);    break;
+//                 case TURN_RIGHT_135_DEGREES: drive_motors->moveForwards(WHEEL_CIRCUMFERENCE * 1.5f, true);  break;
+//                 case TURN_LEFT_135_DEGREES:  drive_motors->moveBackwards(WHEEL_CIRCUMFERENCE * 1.5f, true); break;
+//                 /* ESP2 handle the rest of the commands, so if this ESP somehow received these messages, just immediately return */
+//                 case INITIATE_TURN_MOTORS:
+//                 case RETURN_TURN_MOTORS:     Mother.write(END_STAGE); waitingForMoveComplete = false;       break;
+//                 default:                     waitingForMoveComplete = false;                                break;
+//             }
+//         }
+//         // TODO: Add logic here for when board is requested to move when already moving
+//     }
+
+//     // Separately, check if the current move just finished
+//     if (waitingForMoveComplete) {
+//         if (lift_motors->isDoneMoving() && drive_motors->isDoneMoving()) {
+//             waitingForMoveComplete = false;
+//             Mother.write(END_STAGE);
 //         }
 //     }
-    
-
-//     // delay(60000);
-//     // lift_motors->moveBackwards(0.7, false);
-
-//     // if (Serial2.available() > 0) {
-//     //     char incomingByte = Serial2.read();
-//     //     if (incomingByte == 'A') {
-//     //         lift_motors->moveForwards(.4, false);
-//     //         Serial2.write('2');
-//     //     } else if (incomingByte == 'B') {
-//     //         lift_motors->moveBackwards(.4, false);
-//     //         drive_motors->moveForwards(WHEEL_CIRCUMFERENCE, true);
-//     //         drive_motors->moveBackwards(WHEEL_CIRCUMFERENCE, true);
-//     //         lift_motors->moveForwards(.4, false);
-//     //         Serial2.write('3');
-//     //     } else if (incomingByte == 'C') {
-//     //         lift_motors->moveBackwards(.4, false);
-//     //         Serial2.write('1');
-//     //     }
-//     // }
-
-
-// //     // drive_motors->moveForwards((float)WHEEL_CIRCUMFERENCE * 3, false);
-
-// //     // drive_motors->moveBackwards((float)WHEEL_CIRCUMFERENCE * 3, false);
-
-// //     // drive_motors->moveForwards((float)WHEEL_CIRCUMFERENCE, true);
-
-// //     // drive_motors->moveBackwards((float)WHEEL_CIRCUMFERENCE, true);
-
 // }
