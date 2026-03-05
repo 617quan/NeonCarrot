@@ -37,7 +37,7 @@ public:
 private:
     STATE_TYPE curr_state;
 
-    static const MOTOR_COMMAND movement_memory[16][12];
+    static const MOTOR_COMMAND movement_memory[16][17];
 
     /* IT INDEXES LIKE THIS: movement_memory[movement_commands][movement_index] 
     SO, movement_index TELLS THE SYSTEM WHAT ACTION IS CURRENTLY TAKING PLACE,
