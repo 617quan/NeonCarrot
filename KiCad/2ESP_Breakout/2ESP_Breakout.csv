@@ -1,0 +1,6 @@
+"Reference","Qty","Value","DNP","Exclude from BOM","Exclude from Board","Footprint","Datasheet"
+"Buck_Header1","1","Conn_01x04_Pin","","","","Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical","https://www.digikey.com/en/products/detail/w-rth-elektronik/61300411121/4846827?gclsrc=aw.ds&gad_source=1&gad_campaignid=20234014242&gbraid=0AAAAADrbLliwwozj6to0msoOs8vKZVvZi&gclid=EAIaIQobChMI8Z--yZqHkwMVHkxHAR1zvgIUEAQYASABEgKN4PD_BwE"
+"DRIVE1,DRIVE2,DRIVE3,DRIVE4,LIFT1,LIFT2,LIFT3,LIFT4,TURN1,TURN2,TURN3,TURN4","12","Conn_01x06_Socket","","","","Connector_JST:JST_PH_B6B-PH-K_1x06_P2.00mm_Vertical","https://www.digikey.com/en/products/detail/jst-sales-america-inc/B6B-PH-K-S/926615"
+"ESP1L_1,ESP1L_2,ESP1R_1,ESP1R_2,ESP2L_1,ESP2L_2,ESP2R_1,ESP2R_2,ESP3L_1,ESP3L_2,ESP3L_3,ESP3R_1","12","Conn_01x15_Socket","","","","Connector_PinSocket_2.54mm:PinSocket_1x15_P2.54mm_Vertical","https://www.digikey.com/en/products/detail/sullins-connector-solutions/PPTC151LFBN-RC/810153"
+"H1,H2,H3,H4","4","MountingHole","","Excluded from BOM","","MountingHole:MountingHole_3.2mm_M3","~"
+"J2,J3,J4,J5,J6,J7,J9,J10,J11,J12,J13,J14,J15,J16","14","Conn_01x02_Socket","","","","Connector_JST:JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical","https://www.digikey.com/en/products/detail/jst-sales-america-inc/B2B-PH-K-S/926611"
