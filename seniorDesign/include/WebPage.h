@@ -18,6 +18,7 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include "defines.h"
+#include "SPIFFS.h"
 
 class WebPage {
   public:

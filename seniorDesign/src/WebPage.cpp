@@ -97,6 +97,9 @@ void WebPage::setBusyMessage(bool busy) {
  *
  ************************/
 void WebPage::begin() {
+  if (!SPIFFS.begin(true)) {
+    Serial.println("SPIFFS mount failed");
+  }
   WiFi.softAP(_ssid, _password);
   _server.begin();
 }
@@ -137,7 +140,27 @@ void WebPage::handleClient(STATE_TYPE curr_state) {
       if (c == '\n') {
 
         if (currentLine.length() == 0) {
-
+          
+          if (header.indexOf("GET /bomboclat.mp3") >= 0) {
+            File file = SPIFFS.open("/bomboclat.mp3", "r");
+            if (!file) {
+              client.println("HTTP/1.1 404 Not Found");
+              client.println("Connection: close");
+              client.println();
+            } else {
+              client.println("HTTP/1.1 200 OK");
+              client.println("Content-Type: audio/mpeg");
+              client.println("Connection: close");
+              client.println();
+              uint8_t buf[512];
+              while (file.available()) {
+                int bytesRead = file.read(buf, sizeof(buf));
+                client.write(buf, bytesRead);
+              }
+              file.close();
+            }
+            break;
+          }
           if (header.indexOf("GET /status") >= 0) {
             String stateString;
             switch (curr_state) {
@@ -455,14 +478,18 @@ window.addEventListener('load',()=>{
 buttons.forEach(button=>{
   button.addEventListener('click',()=>{
     let pos=button.id;
-    if(pos==='Bomboclat'){
-      // TODO: implement future button behavior
+    if(pos==='Future'){
+      new Audio('/bomboclat.mp3').play();
       return;
     }
     if(pos==='Initialize'){
       fetch(`/Initialize`);
       return;
     }
+    // Position buttons
+    currentPos=pos;
+    setRobotPosition(pos);
+    fetch(`/${pos}`);
   });
 });
 

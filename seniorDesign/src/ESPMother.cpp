@@ -10,7 +10,7 @@
 #include "WebPage.h"
 #include "defines.h"
     
-WebPage webServer("ESP32-Access-Point", "123456789");
+WebPage webServer("Neon-Carrot_ESP32", "asdfghjkl;'");
 StateMachine state_machine;
 
 HardwareSerial ESP1(1);
@@ -19,7 +19,7 @@ HardwareSerial ESP2(2);
 /********** setup **********
  *
  * Description:
- *      Initializes the ESP32 UART connactions, and starts the web server used
+ *      Initializes the ESP32 UART connections, and starts the web server used
  *      for issuing system commands.
  *
  * Parameters:
@@ -71,7 +71,6 @@ void setup() {
 
 void loop() {  
 
-    static unsigned long busyUntil = 0;
     webServer.setBusyMessage(state_machine.isMoving());
 
     webServer.handleClient(state_machine.getCurrState());
@@ -82,10 +81,10 @@ void loop() {
     }
 
     if (ESP1.available() > 0) {
-        uint8_t incoming_byte = ESP1.read();
-        state_machine.parseUARTInput((MOTOR_COMMAND)incoming_byte);
+        MOTOR_COMMAND incoming_command = (MOTOR_COMMAND)ESP1.read();
+        state_machine.parseUARTInput(incoming_command);
     } else if (ESP2.available() > 0) {
-        uint8_t incoming_byte = ESP2.read();
-        state_machine.parseUARTInput((MOTOR_COMMAND)incoming_byte);
+        MOTOR_COMMAND incoming_command = (MOTOR_COMMAND)ESP2.read();
+        state_machine.parseUARTInput(incoming_command);
     }
 }
