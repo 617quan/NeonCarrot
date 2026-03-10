@@ -60,9 +60,6 @@ private:
     /* Call this in the constructor to initialize all motors to correct pins */
     FastAccelStepper* initMotor(MotorSettings_t lift_motor_settings);
 
-    /* Conversion Functions for accurate movement*/
-    int32_t convertInchesToSteps(float num_inches);
-
     /* Calculates how long it will take for a movement command to execute */
     uint32_t computeMoveTimeMs(int32_t steps, float max_speed, float accel);
     
