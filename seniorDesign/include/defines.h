@@ -77,6 +77,12 @@ typedef enum {
 #define LIFT3_PULSE 2 
 #define LIFT4_PULSE 15 
 
+// Limit Switches: GPIO 36, 39, 34, 35 are input only
+#define LIMIT1 36 
+#define LIMIT2 39 
+#define LIMIT3 34
+#define LIMIT4 35
+
 /* ESP2 PINOUT */
 
 #define TURN_ENABLE 13
