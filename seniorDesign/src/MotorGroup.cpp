@@ -398,7 +398,7 @@ void MotorGroup::moveBackwards(float distance) {
 void MotorGroup::moveBackwards(float distance, bool is_turning) {
     if (_group_type == 'd') {
         int32_t steps_needed = (int32_t)((distance / (float)WHEEL_CIRCUMFERENCE) * (float)FULL_DRIVE_ROTATION);
-        uint32_t move_time = computeMoveTimeMs(steps_needed, LIFT_MAX_SPEED, LIFT_ACCEL) + 100;
+        uint32_t move_time = computeMoveTimeMs(steps_needed, DRIVE_MAX_SPEED, DRIVE_ACCEL) + 100;
         if (is_turning) {
             wheel1_motor->move(-steps_needed, false);
             wheel2_motor->move(steps_needed, false); 

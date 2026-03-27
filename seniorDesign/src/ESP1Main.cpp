@@ -44,16 +44,15 @@ void setup() {
     Mother.begin(115200, SERIAL_8N1, RXD2, TXD2);
     MotorGroup::engineStartup();
     initMotorGroup();
-    pinMode(LED_BUILTIN, OUTPUT);
 
     // Limit Switch Pins
-    pinMode(LIMIT1, INPUT);
-    pinMode(LIMIT2, INPUT);
-    pinMode(LIMIT3, INPUT);
-    pinMode(LIMIT4, INPUT);
+    // pinMode(LIMIT1, INPUT);
+    // pinMode(LIMIT2, INPUT);
+    // pinMode(LIMIT3, INPUT);
+    // pinMode(LIMIT4, INPUT);
 
     // Initialize lift motors height
-    liftMotorInit();
+    // liftMotorInit();
 }
 
 /********** initMotorGroup **********
@@ -141,37 +140,37 @@ void initMotorGroup() {
  ************************/
 void liftMotorInit() {
     // lifts motors move upwards all together
-    lift_motors->moveForwards(8);
-    int count;
-    bool finished = false;
-    while(!finished) {
-        //checks each limit switch until all have been pressed
-        count = 0;
-        if (digitalRead(LIMIT1) == Low) {
-            count++;
-            //stop lift motor 1
+    // lift_motors->moveForwards(8);
+    // int count;
+    // bool finished = false;
+    // while(!finished) {
+    //     //checks each limit switch until all have been pressed
+    //     count = 0;
+    //     if (digitalRead(LIMIT1) == Low) {
+    //         count++;
+    //         //stop lift motor 1
             
-        }
-        if (digitalRead(LIMIT2) == Low) {
-            count++
-            //stop lift motor 2
-        }
-        if (digitalRead(LIMIT3) == Low) {
-            count++
-            //stop lift motor 3
-        }
-        if (digitalRead(LIMIT4) == Low) {
-            count++;
-            // stop lift motor 4
-        }
-        if (count == 4) {
-            finished = true;
-        }
-    }
+    //     }
+    //     if (digitalRead(LIMIT2) == Low) {
+    //         count++
+    //         //stop lift motor 2
+    //     }
+    //     if (digitalRead(LIMIT3) == Low) {
+    //         count++
+    //         //stop lift motor 3
+    //     }
+    //     if (digitalRead(LIMIT4) == Low) {
+    //         count++;
+    //         // stop lift motor 4
+    //     }
+    //     if (count == 4) {
+    //         finished = true;
+    //     }
+    // }
 
-    // TODO: Where do we want them to start at 
-    // I assume wheel down 
-    lift_motors->moveBackwards(0.4);
+    // // TODO: Where do we want them to start at 
+    // // I assume wheel down 
+    // lift_motors->moveBackwards(0.4);
 }
 
 /********** loop **********
@@ -210,17 +209,14 @@ void loop() {
             switch (command) {
                 case WHEELS_UP:              lift_motors->moveForwards(.4);                                break;
                 case WHEELS_DOWN:            lift_motors->moveBackwards(.4);                                break;
-                case MOVE_FORWARDS_24_IN:    drive_motors->moveForwards(24, false);                         break;
-                case MOVE_BACKWARDS_24_IN:   drive_motors->moveBackwards(24, false);                        break;
-                case TURN_RIGHT_90_DEGREES:  drive_motors->moveForwards(WHEEL_CIRCUMFERENCE, true);         break;
-                case TURN_LEFT_90_DEGREES:   drive_motors->moveBackwards(WHEEL_CIRCUMFERENCE, true);        break;
-                case TURN_RIGHT_45_DEGREES:  drive_motors->moveForwards(WHEEL_CIRCUMFERENCE / 2, true);     break;
-                case TURN_LEFT_45_DEGREES:   drive_motors->moveBackwards(WHEEL_CIRCUMFERENCE / 2, true);    break;
-                case TURN_RIGHT_135_DEGREES: drive_motors->moveForwards(WHEEL_CIRCUMFERENCE * 1.5f, true);  break;
-                case TURN_LEFT_135_DEGREES:  drive_motors->moveBackwards(WHEEL_CIRCUMFERENCE * 1.5f, true); break;
-                /* ESP2 handle the rest of the commands, so if this ESP somehow received these messages, just immediately return */
-                case INITIATE_TURN_MOTORS:
-                case RETURN_TURN_MOTORS:     Mother.write(END_STAGE); waitingForMoveComplete = false;       break;
+                case MOVE_FORWARDS_24_IN:    drive_motors->moveForwards(23.622, false);                         break;
+                case MOVE_BACKWARDS_24_IN:   drive_motors->moveBackwards(23.622, false);                        break;
+                case TURN_RIGHT_90_DEGREES:  drive_motors->moveForwards(IN_FOR_90_DEGREE_TURN, true);         break;
+                case TURN_LEFT_90_DEGREES:   drive_motors->moveBackwards(IN_FOR_90_DEGREE_TURN, true);        break;
+                case TURN_RIGHT_45_DEGREES:  drive_motors->moveForwards(IN_FOR_45_DEGREE_TURN, true);     break;
+                case TURN_LEFT_45_DEGREES:   drive_motors->moveBackwards(IN_FOR_45_DEGREE_TURN, true);    break;
+                case TURN_RIGHT_135_DEGREES: drive_motors->moveForwards(IN_FOR_135_DEGREE_TURN, true);  break;
+                case TURN_LEFT_135_DEGREES:  drive_motors->moveBackwards(IN_FOR_135_DEGREE_TURN, true); break;
                 default:                     waitingForMoveComplete = false;                                break;
             }
         }
