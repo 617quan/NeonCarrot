@@ -163,6 +163,60 @@ FastAccelStepper* MotorGroup::initMotor(MotorSettings_t motor_settings) {
     return motor;
 }
 
+void MotorGroup::initMotorPositions() {
+
+    init_active = true;
+    wheel1_init = false, wheel2_init = false, wheel3_init = false, wheel4_init = false;
+
+    if (_group_type == 'l') {
+        wheel1_motor->runBackward();
+        wheel2_motor->runForward();
+        wheel3_motor->runForward();
+        wheel4_motor->runForward();
+    } else if (_group_type == 't') {
+        wheel1_motor->runBackward();
+        wheel2_motor->runBackward();
+        wheel3_motor->runBackward();
+        wheel4_motor->runBackward();
+    }
+
+}
+
+void MotorGroup::updateInit() {
+    if (!init_active)
+        return;
+
+    if (!wheel1_init && !digitalRead(BOARD1_LIMIT1)) {
+        wheel1_init = true;
+        wheel1_motor->forceStop();
+    }
+
+    if (!wheel2_init && !digitalRead(BOARD1_LIMIT2)) {
+        wheel2_init = true;
+        wheel2_motor->forceStop();
+    }
+
+    if (!wheel3_init && !digitalRead(BOARD1_LIMIT3)) {
+        wheel3_init = true;
+        wheel3_motor->forceStop();
+    }
+
+    if (!wheel4_init && !digitalRead(BOARD1_LIMIT4)) {
+        wheel4_init = true;
+        wheel4_motor->forceStop();
+    }
+
+    if (wheel1_init && wheel2_init &&
+        wheel3_init && wheel4_init) {
+        
+        delay(20);
+        
+        moveBackwards(0.05);
+
+        init_active = false;
+    }
+}
+
 /********** isDoneMoving **********
  *
  * Purpose:
@@ -185,6 +239,9 @@ FastAccelStepper* MotorGroup::initMotor(MotorSettings_t motor_settings) {
  *
  ****************************************/
 bool MotorGroup::isDoneMoving() {
+
+    if (init_active) return false;
+
     if (_moveDeadlineMs == 0) return true;
     if (millis() >= _moveDeadlineMs) {
         _moveDeadlineMs = 0;
@@ -482,10 +539,10 @@ void MotorGroup::manualDisable() {
  *
  ****************************************/
 void MotorGroup::stopMoving() {
-    wheel1_motor->stopMove();
-    wheel2_motor->stopMove();
-    wheel3_motor->stopMove();
-    wheel4_motor->stopMove();
+    wheel1_motor->forceStop();
+    wheel2_motor->forceStop();
+    wheel3_motor->forceStop();
+    wheel4_motor->forceStop();
 }
 
 /********** computeMoveTimeMs **********

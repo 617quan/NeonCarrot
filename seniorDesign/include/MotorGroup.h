@@ -55,6 +55,10 @@ public:
 
     bool isDoneMoving();
 
+    void initMotorPositions();
+
+    void updateInit();
+
 private:
 
     /* Call this in the constructor to initialize all motors to correct pins */
@@ -79,6 +83,13 @@ private:
 
     /* Timer to keep track of time left in a movement */
     unsigned long _moveDeadlineMs = 0;
+
+    bool init_active = false;
+
+    bool wheel1_init = false;
+    bool wheel2_init = false;
+    bool wheel3_init = false;
+    bool wheel4_init = false;
 
 };
 

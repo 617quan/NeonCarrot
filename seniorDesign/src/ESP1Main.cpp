@@ -92,6 +92,11 @@ void initMotorGroup() {
     pinMode(LIFT3_PULSE, OUTPUT);
     pinMode(LIFT4_PULSE, OUTPUT);
 
+    pinMode(BOARD1_LIMIT1, INPUT_PULLUP);
+    pinMode(BOARD1_LIMIT2, INPUT_PULLUP);
+    pinMode(BOARD1_LIMIT3, INPUT_PULLUP);
+    pinMode(BOARD1_LIMIT4, INPUT_PULLUP);
+
     MotorSettings_t front_drive_settings = {FRONT_DRIVE_PULSE, FRONT_DRIVE_DIRECTION, DRIVE_ENABLE, DRIVE_MAX_SPEED, DRIVE_ACCEL};
     MotorSettings_t back_drive_settings = {BACK_DRIVE_PULSE, BACK_DRIVE_DIRECTION, DRIVE_ENABLE, DRIVE_MAX_SPEED, DRIVE_ACCEL};
     MotorSettings_t lift1_settings = {LIFT1_PULSE, LIFT_DIRECTION, LIFT_ENABLE, LIFT_MAX_SPEED, LIFT_ACCEL};
@@ -207,21 +212,24 @@ void loop() {
             waitingForMoveComplete = true;
 
             switch (command) {
-                case WHEELS_UP:              lift_motors->moveForwards(.4);                                break;
-                case WHEELS_DOWN:            lift_motors->moveBackwards(.4);                                break;
-                case MOVE_FORWARDS_24_IN:    drive_motors->moveForwards(23.622, false);                         break;
-                case MOVE_BACKWARDS_24_IN:   drive_motors->moveBackwards(23.622, false);                        break;
-                case TURN_RIGHT_90_DEGREES:  drive_motors->moveForwards(IN_FOR_90_DEGREE_TURN, true);         break;
-                case TURN_LEFT_90_DEGREES:   drive_motors->moveBackwards(IN_FOR_90_DEGREE_TURN, true);        break;
-                case TURN_RIGHT_45_DEGREES:  drive_motors->moveForwards(IN_FOR_45_DEGREE_TURN, true);     break;
-                case TURN_LEFT_45_DEGREES:   drive_motors->moveBackwards(IN_FOR_45_DEGREE_TURN, true);    break;
+                case WHEELS_UP:              lift_motors->moveForwards(.4);                             break;
+                case WHEELS_DOWN:            lift_motors->moveBackwards(.4);                            break;
+                case MOVE_FORWARDS_24_IN:    drive_motors->moveForwards(23.622, false);                 break;
+                case MOVE_BACKWARDS_24_IN:   drive_motors->moveBackwards(23.622, false);                break;
+                case TURN_RIGHT_90_DEGREES:  drive_motors->moveForwards(IN_FOR_90_DEGREE_TURN, true);   break;
+                case TURN_LEFT_90_DEGREES:   drive_motors->moveBackwards(IN_FOR_90_DEGREE_TURN, true);  break;
+                case TURN_RIGHT_45_DEGREES:  drive_motors->moveForwards(IN_FOR_45_DEGREE_TURN, true);   break;
+                case TURN_LEFT_45_DEGREES:   drive_motors->moveBackwards(IN_FOR_45_DEGREE_TURN, true);  break;
                 case TURN_RIGHT_135_DEGREES: drive_motors->moveForwards(IN_FOR_135_DEGREE_TURN, true);  break;
                 case TURN_LEFT_135_DEGREES:  drive_motors->moveBackwards(IN_FOR_135_DEGREE_TURN, true); break;
-                default:                     waitingForMoveComplete = false;                                break;
+                case INIT_LIFT:              lift_motors->initMotorPositions();                         break;
+                default:                     waitingForMoveComplete = false;                            break;
             }
         }
         // TODO: Add logic here for when board is requested to move when already moving
     }
+
+    lift_motors->updateInit();
 
     // Separately, check if the current move just finished
     if (waitingForMoveComplete) {

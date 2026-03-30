@@ -252,7 +252,7 @@ void WebPage::handleRequest(String request) {
     newCommand = INITIALIZE;
 
   /* Only trigger if the command actually changed */
-  if (newCommand != _command) {
+  if (newCommand != IDLE) {
     _command = newCommand;
     _newCommand = true;
   }

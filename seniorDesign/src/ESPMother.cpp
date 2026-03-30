@@ -1,4 +1,4 @@
-// /********** esp1_main.cpp **********
+// /********** espMother.cpp **********
 //  * Created by Team Neon Carrot. Contact Carrot Griffin Faecher for Info
 //  * Purpose: Main control program for the ESP32 coordinating the system
 //  * state machine, web interface, and UART communication with motor
@@ -10,7 +10,7 @@
 // #include "WebPage.h"
 // #include "defines.h"
     
-// WebPage webServer("Neon-Carrot_ESP32", "asdfghjkl;'");
+// WebPage webServer("Neon-Carrot-ESP32", "asdfghjkl;'");
 // StateMachine state_machine;
 
 // HardwareSerial ESP1(1);
