@@ -80,17 +80,17 @@ typedef enum {
 #define LIFT3_PULSE 2 
 #define LIFT4_PULSE 15 
 
-// Limit Switches: GPIO 36, 39, 34, 35 are input only
-
-#define BOARD2_LIMIT1 22
-#define BOARD2_LIMIT2 21
-#define BOARD2_LIMIT3 19
-#define BOARD2_LIMIT4 18
+/* LIMIT SWITCHES */
 
 #define BOARD1_LIMIT1 22
 #define BOARD1_LIMIT2 25
 #define BOARD1_LIMIT3 32
 #define BOARD1_LIMIT4 33
+
+#define BOARD2_LIMIT1 19
+#define BOARD2_LIMIT2 22
+#define BOARD2_LIMIT3 15
+#define BOARD2_LIMIT4 21
 
 /* ESP2 PINOUT */
 
@@ -142,6 +142,8 @@ VALUES MAY CAUSE MOTORS TO STALL */
 
 #define TURN_2_4_ACCEL 22500
 #define TURN_1_3_ACCEL (TURN_2_4_ACCEL / 3)
+
+#define TURN_INIT_SPEED (TURN_1_3_MAX_SPEED / 4)
 
 #define DRIVE_MAX_SPEED 15000
 #define DRIVE_ACCEL 10000

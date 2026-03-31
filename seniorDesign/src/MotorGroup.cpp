@@ -165,55 +165,103 @@ FastAccelStepper* MotorGroup::initMotor(MotorSettings_t motor_settings) {
 
 void MotorGroup::initMotorPositions() {
 
-    init_active = true;
-    wheel1_init = false, wheel2_init = false, wheel3_init = false, wheel4_init = false;
-
     if (_group_type == 'l') {
+
+        init_active = true;
+        wheel1_init = false, wheel2_init = false, wheel3_init = false, wheel4_init = false;
+
         wheel1_motor->runBackward();
         wheel2_motor->runForward();
         wheel3_motor->runForward();
         wheel4_motor->runForward();
-    } else if (_group_type == 't') {
-        wheel1_motor->runBackward();
-        wheel2_motor->runBackward();
-        wheel3_motor->runBackward();
-        wheel4_motor->runBackward();
-    }
 
+    } else if (_group_type == 't') {
+
+        init_active = true;
+        wheel1_init = false, wheel2_init = false, wheel3_init = false, wheel4_init = false;
+
+        wheel1_motor->setSpeedInHz(TURN_INIT_SPEED);
+        wheel2_motor->setSpeedInHz(TURN_INIT_SPEED);
+        wheel3_motor->setSpeedInHz(TURN_INIT_SPEED);
+        wheel4_motor->setSpeedInHz(TURN_INIT_SPEED);
+
+        wheel1_motor->runForward();
+        wheel2_motor->runForward();
+        wheel3_motor->runForward();
+        wheel4_motor->runForward();
+    }
 }
 
 void MotorGroup::updateInit() {
     if (!init_active)
         return;
 
-    if (!wheel1_init && !digitalRead(BOARD1_LIMIT1)) {
-        wheel1_init = true;
-        wheel1_motor->forceStop();
-    }
+    if (_group_type == 'l') {
 
-    if (!wheel2_init && !digitalRead(BOARD1_LIMIT2)) {
-        wheel2_init = true;
-        wheel2_motor->forceStop();
-    }
+        if (!wheel1_init && !digitalRead(BOARD1_LIMIT1)) {
+            wheel1_init = true;
+            wheel1_motor->forceStop();
+        }
+        if (!wheel2_init && !digitalRead(BOARD1_LIMIT2)) {
+            wheel2_init = true;
+            wheel2_motor->forceStop();
+        }
+        if (!wheel3_init && !digitalRead(BOARD1_LIMIT3)) {
+            wheel3_init = true;
+            wheel3_motor->forceStop();
+        }
+        if (!wheel4_init && !digitalRead(BOARD1_LIMIT4)) {
+            wheel4_init = true;
+            wheel4_motor->forceStop();
+        }
 
-    if (!wheel3_init && !digitalRead(BOARD1_LIMIT3)) {
-        wheel3_init = true;
-        wheel3_motor->forceStop();
-    }
+        if (wheel1_init && wheel2_init && wheel3_init && wheel4_init) {
+            delay(20);
+            moveBackwards(0.05);
+            init_active = false;
+        }
 
-    if (!wheel4_init && !digitalRead(BOARD1_LIMIT4)) {
-        wheel4_init = true;
-        wheel4_motor->forceStop();
-    }
+    } else if (_group_type == 't') {
 
-    if (wheel1_init && wheel2_init &&
-        wheel3_init && wheel4_init) {
-        
-        delay(20);
-        
-        moveBackwards(0.05);
+        if (!wheel1_init && !digitalRead(BOARD2_LIMIT1)) {
+            wheel1_init = true;
+            wheel1_motor->forceStop();
+        }
+        if (!wheel2_init && !digitalRead(BOARD2_LIMIT2)) {
+            wheel2_init = true;
+            wheel2_motor->forceStop();
+        }
+        if (!wheel3_init && !digitalRead(BOARD2_LIMIT3)) {
+            wheel3_init = true;
+            wheel3_motor->forceStop();
+        }
+        if (!wheel4_init && !digitalRead(BOARD2_LIMIT4)) {
+            wheel4_init = true;
+            wheel4_motor->forceStop();
+        }
 
-        init_active = false;
+        if (wheel1_init && wheel2_init && wheel3_init && wheel4_init) {
+            delay(20);
+
+            wheel1_motor->setSpeedInHz(TURN_1_3_MAX_SPEED);
+            wheel2_motor->setSpeedInHz(TURN_2_4_MAX_SPEED);
+            wheel3_motor->setSpeedInHz(TURN_1_3_MAX_SPEED);
+            wheel4_motor->setSpeedInHz(TURN_2_4_MAX_SPEED);
+
+            wheel1_motor->move(-int32_t((18.0f / 360.0f) * (float)FULL_TURN_ROTATION));
+            wheel2_motor->move(-int32_t((7.0f / 360.0f)  * (float)FULL_TURN_ROTATION));
+            wheel3_motor->move(-int32_t((47.0f / 360.0f) * (float)FULL_TURN_ROTATION));
+            wheel4_motor->move(-int32_t((13.0f / 360.0f)  * (float)FULL_TURN_ROTATION));
+
+            uint32_t move_time = computeMoveTimeMs(
+                int32_t((45.0f / 360.0f) * (float)FULL_TURN_ROTATION),
+                TURN_1_3_MAX_SPEED,
+                TURN_1_3_ACCEL
+            ) + 100;
+            _moveDeadlineMs = millis() + move_time;
+
+            init_active = false;
+        }
     }
 }
 

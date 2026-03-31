@@ -140,27 +140,6 @@ void WebPage::handleClient(STATE_TYPE curr_state) {
       if (c == '\n') {
 
         if (currentLine.length() == 0) {
-          
-          if (header.indexOf("GET /bomboclat.mp3") >= 0) {
-            File file = SPIFFS.open("/bomboclat.mp3", "r");
-            if (!file) {
-              client.println("HTTP/1.1 404 Not Found");
-              client.println("Connection: close");
-              client.println();
-            } else {
-              client.println("HTTP/1.1 200 OK");
-              client.println("Content-Type: audio/mpeg");
-              client.println("Connection: close");
-              client.println();
-              uint8_t buf[512];
-              while (file.available()) {
-                int bytesRead = file.read(buf, sizeof(buf));
-                client.write(buf, bytesRead);
-              }
-              file.close();
-            }
-            break;
-          }
           if (header.indexOf("GET /status") >= 0) {
             String stateString;
             switch (curr_state) {
@@ -389,6 +368,12 @@ h1 {
 .button:hover {
   box-shadow: 0 0 18px rgba(175,80,255,0.5); transform: translateY(-2px);
 }
+.button:disabled {
+  opacity: 0.5; cursor: not-allowed; box-shadow: none;
+}
+.button:disabled:hover {
+  box-shadow: none; transform: none;
+}
 </style>
 </head>
 
@@ -424,7 +409,6 @@ h1 {
   <button class="button" id="Position3">Position 3</button>
   <button class="button" id="Position4">Position 4</button>
   <button class="button" id="Initialize">Initialize</button>
-  <button class="button" id="Future">Bomboclat</button>
 </div>
 
 <script>
@@ -437,10 +421,14 @@ function updateStatus() {
       document.getElementById("position").innerText = data.position;
 
       const busyDiv = document.getElementById("busy");
+      const buttons = document.querySelectorAll('.button');
+      
       if (data.moving) {
         busyDiv.style.display = "block";
+        buttons.forEach(button => button.disabled = true);
       } else {
         busyDiv.style.display = "none";
+        buttons.forEach(button => button.disabled = false);
       }
     });
 }
@@ -478,10 +466,6 @@ window.addEventListener('load',()=>{
 buttons.forEach(button=>{
   button.addEventListener('click',()=>{
     let pos=button.id;
-    if(pos==='Future'){
-      new Audio('/bomboclat.mp3').play();
-      return;
-    }
     if(pos==='Initialize'){
       fetch(`/Initialize`);
       return;
