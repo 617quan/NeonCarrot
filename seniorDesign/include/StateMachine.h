@@ -36,6 +36,7 @@ public:
 
 private:
     STATE_TYPE curr_state;
+    STATE_TYPE previous_state;
 
     static const MOTOR_COMMAND movement_memory[17][17];
 
@@ -45,6 +46,7 @@ private:
     BEING EXECUTED. */
     int movement_index;
     int movement_commands;
+
 };
 
 #endif

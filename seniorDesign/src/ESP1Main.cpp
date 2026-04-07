@@ -125,59 +125,6 @@
     
 // }
 
-// /********** liftMotorInit **********
-//  *
-//  * Description:
-//  *      Configures all lift motors to starting position
-//  *
-//  * Parameters:
-//  *      Nothing.
-//  *
-//  * Return:
-//  *      Nothing. 
-//  *
-//  * Expects:
-//  *      initMotorGroup() should be called before thise and it should only run
-//  *      once during void setup.
-//  * 
-//  * Notes:
-//  *
-//  ************************/
-// void liftMotorInit() {
-//     // lifts motors move upwards all together
-//     // lift_motors->moveForwards(8);
-//     // int count;
-//     // bool finished = false;
-//     // while(!finished) {
-//     //     //checks each limit switch until all have been pressed
-//     //     count = 0;
-//     //     if (digitalRead(LIMIT1) == Low) {
-//     //         count++;
-//     //         //stop lift motor 1
-            
-//     //     }
-//     //     if (digitalRead(LIMIT2) == Low) {
-//     //         count++
-//     //         //stop lift motor 2
-//     //     }
-//     //     if (digitalRead(LIMIT3) == Low) {
-//     //         count++
-//     //         //stop lift motor 3
-//     //     }
-//     //     if (digitalRead(LIMIT4) == Low) {
-//     //         count++;
-//     //         // stop lift motor 4
-//     //     }
-//     //     if (count == 4) {
-//     //         finished = true;
-//     //     }
-//     // }
-
-//     // // TODO: Where do we want them to start at 
-//     // // I assume wheel down 
-//     // lift_motors->moveBackwards(0.4);
-// }
-
 // /********** loop **********
 //  *
 //  * Description:

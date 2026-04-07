@@ -103,6 +103,7 @@ bool StateMachine::parseWebServerInput(MOVE_COMMAND command) {
 
     if (curr_state != MOVING) {
         movement_commands = (command == INITIALIZE) ? 16 : (curr_state * 4) + command; // Finds correct series of movements
+        previous_state = curr_state;
         curr_state = MOVING;
         if (movement_memory[movement_commands][movement_index] != FINISH_MOVEMENT) {
             if (movement_memory[movement_commands][movement_index] % 2 == 1) {
@@ -156,7 +157,7 @@ bool StateMachine::parseUARTInput(MOTOR_COMMAND command) {
                 movement_index++;
             }
         } else {
-            curr_state = STATE_TYPE(movement_commands % 4);
+            curr_state = (movement_commands == 16) ? previous_state : (STATE_TYPE)(movement_commands % 4);
             movement_index = 0;
             movement_commands = 0;
         }

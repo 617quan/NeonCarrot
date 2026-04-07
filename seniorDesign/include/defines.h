@@ -89,7 +89,7 @@ typedef enum {
 
 #define BOARD2_LIMIT1 19
 #define BOARD2_LIMIT2 22
-#define BOARD2_LIMIT3 15
+#define BOARD2_LIMIT3 18
 #define BOARD2_LIMIT4 21
 
 /* ESP2 PINOUT */

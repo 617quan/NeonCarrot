@@ -248,13 +248,13 @@ void MotorGroup::updateInit() {
             wheel3_motor->setSpeedInHz(TURN_1_3_MAX_SPEED);
             wheel4_motor->setSpeedInHz(TURN_2_4_MAX_SPEED);
 
-            wheel1_motor->move(-int32_t((18.0f / 360.0f) * (float)FULL_TURN_ROTATION));
-            wheel2_motor->move(-int32_t((7.0f / 360.0f)  * (float)FULL_TURN_ROTATION));
-            wheel3_motor->move(-int32_t((47.0f / 360.0f) * (float)FULL_TURN_ROTATION));
+            wheel1_motor->move(-int32_t((57.0f / 360.0f) * (float)FULL_TURN_ROTATION));
+            wheel2_motor->move(-int32_t((15.0f / 360.0f)  * (float)FULL_TURN_ROTATION));
+            wheel3_motor->move(-int32_t((60.0f / 360.0f) * (float)FULL_TURN_ROTATION));
             wheel4_motor->move(-int32_t((13.0f / 360.0f)  * (float)FULL_TURN_ROTATION));
 
             uint32_t move_time = computeMoveTimeMs(
-                int32_t((45.0f / 360.0f) * (float)FULL_TURN_ROTATION),
+                int32_t((57.0f / 360.0f) * (float)FULL_TURN_ROTATION),
                 TURN_1_3_MAX_SPEED,
                 TURN_1_3_ACCEL
             ) + 100;
