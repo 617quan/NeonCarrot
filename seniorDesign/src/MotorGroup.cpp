@@ -217,7 +217,7 @@ void MotorGroup::updateInit() {
 
         if (wheel1_init && wheel2_init && wheel3_init && wheel4_init) {
             delay(20);
-            moveBackwards(0.05);
+            moveBackwards(0.03);
             init_active = false;
         }
 

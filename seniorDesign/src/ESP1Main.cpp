@@ -159,8 +159,8 @@
 //             waitingForMoveComplete = true;
 
 //             switch (command) {
-//                 case WHEELS_UP:              lift_motors->moveForwards(.4);                             break;
-//                 case WHEELS_DOWN:            lift_motors->moveBackwards(.4);                            break;
+//                 case WHEELS_UP:              lift_motors->moveForwards(.55);                             break;
+//                 case WHEELS_DOWN:            lift_motors->moveBackwards(.55);                            break;
 //                 case MOVE_FORWARDS_24_IN:    drive_motors->moveForwards(23.622, false);                 break;
 //                 case MOVE_BACKWARDS_24_IN:   drive_motors->moveBackwards(23.622, false);                break;
 //                 case TURN_RIGHT_90_DEGREES:  drive_motors->moveForwards(IN_FOR_90_DEGREE_TURN, true);   break;
