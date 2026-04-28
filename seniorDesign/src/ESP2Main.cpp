@@ -99,7 +99,7 @@ void initMotorGroup() {
     turn_motors = new MotorGroup(turn_settings, 't');
 
     if (turn_motors == nullptr) {
-        Serial.println("FATAL ERROR: turn motors initialized incorrectly");
+        Serial.println("FATAL ERROR: turn motors not initialized");
     }
 
 }

@@ -248,13 +248,13 @@ void MotorGroup::updateInit() {
             wheel3_motor->setSpeedInHz(TURN_1_3_MAX_SPEED);
             wheel4_motor->setSpeedInHz(TURN_2_4_MAX_SPEED);
 
-            wheel1_motor->move(-int32_t((57.0f / 360.0f) * (float)FULL_TURN_ROTATION));
+            wheel1_motor->move(-int32_t((60.0f / 360.0f) * (float)FULL_TURN_ROTATION));
             wheel2_motor->move(-int32_t((15.0f / 360.0f)  * (float)FULL_TURN_ROTATION));
             wheel3_motor->move(-int32_t((60.0f / 360.0f) * (float)FULL_TURN_ROTATION));
             wheel4_motor->move(-int32_t((13.0f / 360.0f)  * (float)FULL_TURN_ROTATION));
 
             uint32_t move_time = computeMoveTimeMs(
-                int32_t((57.0f / 360.0f) * (float)FULL_TURN_ROTATION),
+                int32_t((70.0f / 360.0f) * (float)FULL_TURN_ROTATION),
                 TURN_1_3_MAX_SPEED,
                 TURN_1_3_ACCEL
             ) + 100;
@@ -331,7 +331,7 @@ void MotorGroup::moveForwards() {
         wheel1_motor->move(-TURN_1_3_NUM_STEPS, false);
         wheel2_motor->move(-TURN_2_4_NUM_STEPS, false);
         wheel3_motor->move(-TURN_1_3_NUM_STEPS, false);
-        wheel4_motor->move(-TURN_2_4_NUM_STEPS, false);
+        wheel4_motor->move(-TURN_2_4_NUM_STEPS + 2000, false);
         _moveDeadlineMs = millis() + move_time;
     }
 }
