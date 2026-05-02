@@ -165,24 +165,6 @@
 					)
 				)
 			)
-			(pin power_out line
-				(at 0 -5.08 0)
-				(length 7.62)
-				(name "PGND"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "3"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
 			(pin output line
 				(at 0 -7.62 0)
 				(length 7.62)
@@ -545,6 +527,24 @@
 			)
 		)
 		(symbol "DRV8434PWPR_1_1"
+			(pin power_in line
+				(at 0 -5.08 0)
+				(length 7.62)
+				(name "PGND"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "3"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
 			(pin passive line
 				(at 0 -10.16 0)
 				(length 7.62)
@@ -617,7 +617,7 @@
 					)
 				)
 			)
-			(pin passive line
+			(pin power_in line
 				(at 0 -27.94 0)
 				(length 7.62)
 				(name "PGND"
@@ -635,7 +635,7 @@
 					)
 				)
 			)
-			(pin passive line
+			(pin power_in line
 				(at 0 -33.02 0)
 				(length 7.62)
 				(name "GND"

@@ -509,17 +509,24 @@
         "wire_width": 6
       },
       {
-        "name": "+5V",
-        "pcb_color": "rgb(255, 153, 0)",
-        "priority": 0,
-        "schematic_color": "rgba(0, 0, 0, 0.000)"
+        "line_style": 0,
+        "name": "+BATT",
+        "pcb_color": "rgb(255, 0, 72)",
+        "priority": 8,
+        "schematic_color": "rgb(255, 0, 72)"
       },
       {
         "line_style": 0,
-        "name": "+BATT",
-        "pcb_color": "rgb(255, 0, 0)",
-        "priority": 2,
-        "schematic_color": "rgba(0, 0, 0, 0.000)"
+        "name": "+DVDD",
+        "pcb_color": "rgb(255, 148, 0)",
+        "priority": 6,
+        "schematic_color": "rgb(255, 148, 0)"
+      },
+      {
+        "name": "DRIVE",
+        "pcb_color": "rgb(140, 222, 224)",
+        "priority": 3,
+        "schematic_color": "rgb(140, 222, 224)"
       },
       {
         "bus_width": 12,
@@ -530,20 +537,50 @@
         "microvia_diameter": 0.3,
         "microvia_drill": 0.1,
         "name": "GND",
-        "pcb_color": "rgb(132, 132, 132)",
-        "priority": 3,
-        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "pcb_color": "rgb(131, 131, 131)",
+        "priority": 9,
+        "schematic_color": "rgb(131, 131, 131)",
         "track_width": 0.2,
         "via_diameter": 0.6,
         "via_drill": 0.3,
         "wire_width": 6
       },
       {
+        "name": "GNDD",
+        "pcb_color": "rgb(72, 72, 72)",
+        "priority": 0,
+        "schematic_color": "rgb(87, 87, 87)"
+      },
+      {
+        "name": "LIFT",
+        "pcb_color": "rgb(255, 167, 222)",
+        "priority": 2,
+        "schematic_color": "rgb(255, 167, 222)"
+      },
+      {
         "line_style": 0,
         "name": "MOTOR",
-        "pcb_color": "rgb(0, 0, 255)",
+        "pcb_color": "rgb(0, 5, 255)",
+        "priority": 7,
+        "schematic_color": "rgb(0, 5, 255)"
+      },
+      {
+        "name": "PUL",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
         "priority": 1,
         "schematic_color": "rgba(0, 0, 0, 0.000)"
+      },
+      {
+        "name": "SWITCH",
+        "pcb_color": "rgb(223, 200, 66)",
+        "priority": 5,
+        "schematic_color": "rgb(223, 200, 66)"
+      },
+      {
+        "name": "TURN",
+        "pcb_color": "rgb(180, 172, 255)",
+        "priority": 4,
+        "schematic_color": "rgb(180, 172, 255)"
       }
     ],
     "meta": {
@@ -564,20 +601,44 @@
         "pattern": "/AOUT*"
       },
       {
+        "netclass": "SWITCH",
+        "pattern": "/M*"
+      },
+      {
         "netclass": "MOTOR",
         "pattern": "/BOUT*"
       },
       {
-        "netclass": "GND",
-        "pattern": "GND"
+        "netclass": "LIFT",
+        "pattern": "/LIFT*"
       },
       {
-        "netclass": "+BATT",
-        "pattern": "+BATT"
+        "netclass": "TURN",
+        "pattern": "/TURN*"
       },
       {
-        "netclass": "+5V",
-        "pattern": "+5V"
+        "netclass": "DRIVE",
+        "pattern": "/DRIVE*"
+      },
+      {
+        "netclass": "DRIVE",
+        "pattern": "/FRONT*"
+      },
+      {
+        "netclass": "DRIVE",
+        "pattern": "/BACK*"
+      },
+      {
+        "netclass": "PUL",
+        "pattern": "/*PUL"
+      },
+      {
+        "netclass": "+DVDD",
+        "pattern": "+DVDD*"
+      },
+      {
+        "netclass": "GNDD",
+        "pattern": "GNDD"
       }
     ]
   },
